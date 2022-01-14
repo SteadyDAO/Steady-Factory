@@ -38,7 +38,7 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     //   version: "0.5.16",
     // },
     {
-      version: "0.8.0",
+      version: "0.8.3",
       settings: {},
     },
   ]},
@@ -102,7 +102,7 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
       gasPrice: 1000000000,
-      accounts: [`${process.env.MUMBAI_PRIVATE_KEY}`],
+      accounts,
     },
   },
   preprocess: {

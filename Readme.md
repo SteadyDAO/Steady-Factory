@@ -9,9 +9,13 @@
 </p>
 
 
-At the base a contract that splits a token based on the latest chainlink price into 2 tokens, one token will be the same as the original token and will hold all of its properties.
+At the base a contract that splits a token based on the latest chainlink price into 2 preset erc20 tokens.
 
-Another is based on the current USD value of that token.
+The original alloy token - Chyme - The DAO has to approve and add a fee basis for different tokens.
+Steady - A stable token that is common to the entire system and represents $1 at the time of split.
+Elixir - This is an NFT token that represents all the original properties of the token as attributes. 
+
+A minimum of $10000 is required to create a new chyme split.
 
 The equation that we use is 
 if K denotes the original token amount, 
@@ -20,17 +24,20 @@ Y the Unsteady token and if the ratio of M:N = 1:2 then
 Z denote the price at contract creation time = max(1, priceFromOracle());
 
 As a user for this pool - Token X Price - (Z)       
- X = K * .75 * uint(Z)
- Y = K * 1 [Thus this token holds the remaining value logically]
-
-Anyone is free to create their base metals from their own CHYME (ALLOY). Upon splitting we intend to give the users Steady DAO and UFO tokens from the treasury.
+ X = K * .75 * uint(Z) Fungible ERC20
+ Y = K * 1 NFT
 
 ## Tokenomics
 
-1. Money Out - We give 10 Steady DAO token on splitting and 100 Steady DAO tokens for creating a new pool, We give 1 Steady DAO token for merging. 
-1. All these guages related to STEADY DAO token rewards can be modified by the DAO.
-1. Money In - We charge 200 basis points or 2% on merge in the underlying, and 10 basis points on SPLIT from the underlying
-1. BuyBack - 1% of the fees from the underlying across alll projects will be used to buyback Steady DAO tokens every X blocks
+1. Money Out - reward is the amount of Steady DAO tokens that are given out upon creation of a new pool
+1. All these gauges related to STEADY DAO token rewards can be modified by the DAO
+1. Money In - We charge 40 basis points or 0.4% on merge in the underlying
+1. BuyBack - 50% of the fees from the underlying across all projects will be used to buyback Steady DAO tokens every X blocks
+
+Inital Minting - 
+Yield Farms - 
+Total Supply - 
+
 
 ## IMPORTANT SAFETY NOTICE 
 Tokens in each pool can only be split for a period of three months. After a period of three weeks from the launch of the pool. No more tokens can be SPLIT at that price.
@@ -40,13 +47,11 @@ This incentivices Elixir token holders to not HODL for more than 3 years and imp
 
 ## How we used moralis
 
-We managed to integrate moralis into gamemaker studio 2 which we think is a huge boon to the indie dev community. We use moralis to create a database for contract events and to trigger in game actions based on this.
+We integrate moralis into gamemaker studio 2 which we think is a huge boon to the indie dev community. We use moralis to create a database for contract events and to trigger in game actions based on this.
 
-## How we used UFO tokens
-Our two way token linked with UFO - 
-https://mumbai.polygonscan.com/address/0x738C763dC38751Fc870a1B24ab23a7A36591005C
-
-Everytime someone splits a CHYME, a small amount of UFO is given to the splitter. The platform then collects fees on Merge (TODO: collect fees), which is then utilized to buy more UFO/SteadyDAO tokens.
+## How we used Steady DAO Dynasty tokens
+Our two way token linked with Steady DAO Dynasty - 
+Everytime someone splits a CHYME, a small amount of Steady DAO Dynasty is given to the splitter.
 
 ## How we used chainlink keepers
 
