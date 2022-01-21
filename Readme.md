@@ -87,7 +87,10 @@ The underlying chyme is send to each party in the respective amounts.
 Till the maturity period however only the token owner can close it.
 
 ## How we used Steady DAO Dynasty tokens
-Our two way token linked with Steady DAO Dynasty - 
+Our two way token linked with Steady DAO Dynasty - As part of the bigger project, we have a two token ecosystem wherein Steady DAO tokens can be exchanged for Steady DAO Dynasty "Play to earn tokens" and vice versa. 
+
+This allows us to integrate existing and future DeFi applications into our ecosystem in a meaningful way and pave way for building "Our Souq", wherein DeFi merchants can sell their wares in our ecosystem with a simple wrapped token concept.
+
 
 ## Steps 
 ### STEP 1 - CREATE CHYME	CreatNewChyme
