@@ -3,15 +3,13 @@
 pragma solidity ^0.8.3;
 
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol";
+
 
 import "./interfaces/IChyme.sol";
 import "./Alchemist.sol";
-import "./SteadyDaoToken.sol";
-import "./ElixirNFT.sol";
-// import "./interfaces/IERC20Burnable.sol";
 
 import "hardhat/console.sol";
 
@@ -35,18 +33,15 @@ contract AlchemistAcademy is Initializable {
     function initialize
     (
         address _steadyDAOToken,
-        string memory uri, 
-        string memory name, 
-        string memory symbol,
+        address _steadyImpl, 
+        address _elixirImpl,
         address payable _DAOAddress
     ) 
         public 
         initializer 
     {
-        steadyImpl = address(new ERC20PresetMinterPauserUpgradeable());
-        ERC20PresetMinterPauserUpgradeable(steadyImpl).initialize(name, symbol);
-        
-        elixirImpl = address(new Elixir("Elixir", "ELX"));
+        steadyImpl = _steadyImpl;
+        elixirImpl = _elixirImpl;
         
         alchemistImpl = address(new Alchemist());
         steadyDAOToken = _steadyDAOToken;
@@ -75,10 +70,8 @@ contract AlchemistAcademy is Initializable {
             _chyme, 
             steadyImpl,
             elixirImpl,
-            forgePrice, 
+            uint256(forgePrice), 
             alchemistCounter++);
-        
-        //so we will still have a single 
         
         IAccessControlEnumerableUpgradeable(steadyImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(MINTER_ROLE, alchemistDeployed);
@@ -118,15 +111,13 @@ contract AlchemistAcademy is Initializable {
 
     /// @dev Oracle price for Chyme utilizing chainlink
     function priceFromOracle(address _priceOracle) public view returns (int256 price) {
-        // bytes memory payload = abi.encodeWithSignature("getLatestPrice()");
         bytes memory payload = abi.encodeWithSignature("latestAnswer()");
         (, bytes memory returnData) = address(_priceOracle).staticcall(payload);
         (price) = abi.decode(returnData, (int256));
-        //minimumn price of 0.00000001 and max price of 1 Trillion
         require(price >= 1 && price <= 1000000000000000000000000000000, "Oracle price is out of range");
     }
 
-    function _onlyDAO() private {
+    function _onlyDAO() internal view {
         require(msg.sender == DAOAddress, "Requires Governance!");
     }
 }

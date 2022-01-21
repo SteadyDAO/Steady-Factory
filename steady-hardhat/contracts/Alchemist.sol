@@ -4,7 +4,7 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./interfaces/IERC20Burnable.sol";
-import "./interfaces/IERC721Burnable.sol";
+import "./interfaces/IElixir.sol";
 
 import "./interfaces/IChyme.sol";
 import "./interfaces/IAcademy.sol";
@@ -18,11 +18,11 @@ contract Alchemist is ReentrancyGuard, Initializable {
     address public academy;
     address public steadyImpl;
     address public elixirImpl;
-    int256 forgePrice;
+    uint256 forgePrice;
     uint256 alchemistId;
 
     event Split(address indexed source, uint256 splitAmount, uint256 poolId);
-    event Merge(address indexed source, uint256 mergedAmount, int256 price);
+    event Merge(address indexed source, uint256 mergedAmount, uint256 price);
 
     struct TokenInfo {
         uint256 balance;
@@ -34,7 +34,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         address _chyme,
         address _steadyImpl,
         address _elixirImpl,
-        int256 _forgePrice,
+        uint256 _forgePrice,
         uint256 _alchemistId
     ) 
         public 
@@ -47,7 +47,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         address _chyme,
         address _steadyImpl,
         address _elixirImpl,
-        int256 _forgePrice,
+        uint256 _forgePrice,
         uint256 _alchemistId
     )  internal initializer {
         chyme = _chyme;
@@ -77,7 +77,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         //transfer the Chyme tokens to the splitter contract
         IERC20Burnable(chyme).transferFrom(msg.sender, address(this), amount);
         steady.mint(msg.sender, sChymeAmt);
-        elixir.safeMint(msg.sender, 1);
+        elixir.safeMint(msg.sender, forgePrice, myChyme.oracleAddress, myChyme.fees, amount);
 
         // reward splitter with SDT
         // IERC20Burnable(sdtAddress).approve(msg.sender, 10);

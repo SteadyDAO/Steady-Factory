@@ -18,12 +18,12 @@ contract SteadyDaoToken is ERC20, Ownable {
         return 12;
     }
 
-    function swapUFOForSDT(uint256 amount) public {
+    function swapSDCForSDT(uint256 amount) public {
         s_ufoToken.transferFrom(msg.sender, address(this), amount);
         _mint(msg.sender, amount);
     }
 
-    function swapSDTForUFO(uint256 amount) public {
+    function swapSDTForSDC(uint256 amount) public {
         _burn(msg.sender, amount);
         s_ufoToken.transfer(msg.sender, amount);
     }

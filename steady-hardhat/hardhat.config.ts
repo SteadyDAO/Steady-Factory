@@ -38,7 +38,7 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     //   version: "0.5.16",
     // },
     {
-      version: "0.8.3",
+      version: "0.8.11",
       settings: {},
     },
   ]},
@@ -47,30 +47,19 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
   },
   networks: {
     localhost: {
-      url: "http://localhost:8545",
-      /*
-        notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
-        (you can put in a mnemonic here to set the deployer locally)
-      */
-        forking: {
-          enabled: true,
-          url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-          blockNumber: 13670552,
-        },
-        accounts
+      url: "http://127.0.0.1:8545",
+      // accounts,
+      blockGasLimit: 30000000
     },
     hardhat: {
-      // Seems to be a bug with this, even when false it complains about being unauthenticated.
-      // Reported to HardHat team and fix is incoming
       forking: {
         enabled: true,
-        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-        blockNumber: 13670552,
+        url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+        blockNumber: 22897375
       },
-      accounts
     },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`, 
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`, 
       accounts,
     },
     kovan: {
