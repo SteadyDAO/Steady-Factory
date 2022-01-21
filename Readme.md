@@ -6,6 +6,7 @@
   - [Roadmap](#roadmap)
   - [Steady DAO Mint Economic Model](#steady-dao-mint-economic-model)
     - [Scenario](#scenario)
+  - [Benefits to the Steady DAO holder](#benefits-to-the-steady-dao-holder)
   - [Dynamic Fees](#dynamic-fees)
     - [Simulations](#simulations)
   - [How to list your chyme](#how-to-list-your-chyme)
@@ -13,23 +14,22 @@
   - [How we used Steady DAO Dynasty tokens](#how-we-used-steady-dao-dynasty-tokens)
   - [Steps](#steps)
     - [STEP 1 - CREATE CHYME	CreatNewChyme](#step-1---create-chymecreatnewchyme)
+
   
 ## Introduction
 The inspiration for Steady DAO is from the fact that in today's crypto landscape there are multiple
 stable coin implementations that are not backed by real physical assets. This lends to increased risk, for eg
 see USDT and USDC both started out as redeemable and backed assets over time this has changed. 
 
-We at Steady DAO want to create Steady assets that are backed by real physical assets with great transparency. 
+Steady DAO creates Steady assets that are backed by real physical assets with great transparency. 
 The model gives you the user an opportunity to split your tokens into the current USD value and another NFT, which
 represents the volatility of the underlying collateral. We believe that decentralization requires a strong foundation.
 
 ## Roadmap
 
-|   	|   	|   	|   	|   	|   	|   	|   	|
-|---	|---	|---	|---	|---	|---	|---	|---	|
-|   	|   	|   	|   	|   	|   	|   	|   	|
-|   	|   	|   	|   	|   	|   	|   	|   	|
-|22-Q1	| Steady DAO Alchemist | The Alchemist allows the Steady DAO to create a foundational value with an underlying redeemable asset backed token. |1. Basic Animation 1. Gamification of closing mature options and earning rewards. 2. Possible use case to make fees lower based on correct timing.|The Mint
+| Quarter  	|  Event 	| Goals  	| Gamefication  	|  Land Used 	|  
+|---	|---	|---	|---	|---	|
+|22-Q1	| Steady DAO Alchemist | The Alchemist allows the Steady DAO to create a foundational value with an underlying redeemable asset backed token. |1. Basic Animation 1. Gamification of closing mature options and earning rewards. 2. Make fees lower based on correct timing.|The Mint
 |22-Q2|Steady DAO Stabilizer|This allows the economy to maintain a stable value for the steady token. A model similar to the maker dao model of auctioning collaterals that the treasury buys based on thresholds is created|1. Spotter - A spotter is someone who sirens that there is a deviation from price 1. First Responders - Responders who decide immediate action. Both spotters and Responders for actions(game elements) leading to stability earn rewards|The Reserve
 |22-Q3|Steady DAO Land Sales and Adventurers|Proximity based land allocation giving rewards to different areas based on growth. Adventurers who can be upgraded over time with PvP battles and equipments. Adventurers earn higher rewards for staking throughout the lands, based on their reputation|1. Land System 2. PvP and Player shops|Stage 1 - Lands
 |22-Q4|Steady DAO Dynasty Bank |The banking system within the DAO where yields are generated from bonds and also with merger of other dApp's  and protocols|1. Basic Animation 2. Become the Governor competitions|The Central 
@@ -60,6 +60,9 @@ the total volume of steady minted might still be backed.
 
 The DAO periodically invests and buys into the treasury the approved chymes/commodity assets. 
 
+## Benefits to the Steady DAO holder
+Steady DAO Tokens are the limited supply governance tokens for the Steady DAO ecosystem. Steady Token Minting and stabilization of the Steady DAO, depends on the governance decisions taken via staking Steady DAO tokens. Protocol fees are accumulated into the Steady DAO token as well via various mechanisms.
+
 ## Dynamic Fees
 1. Fee basis points are decided based on the risk of the chyme itself and transparency in the underlying 
 That is if the underlying is less transparent about its backing the chyme will be initiated with a higher fee
@@ -68,7 +71,7 @@ That is if the underlying is less transparent about its backing the chyme will b
 4. Rewards are only issued for closing mature chymes
 
 ### Simulations
-Todo
+TODO
 
 ## How to list your chyme
 In order to list your chyme, please create a pull request with ChymeList.json and mention the details required.
