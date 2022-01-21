@@ -2,24 +2,27 @@
 ![Steady](https://media.giphy.com/media/fyLKPt5fFoChh6u4uw/giphy.gif)
 
 - [Steady DAO](#steady-dao)
-  - [Introduction](#introduction)
-  - [Roadmap](#roadmap)
-  - [Steady DAO Mint Economic Model](#steady-dao-mint-economic-model)
-    - [Scenario](#scenario)
-  - [Benefits to the Steady DAO holder](#benefits-to-the-steady-dao-holder)
-  - [Dynamic Fees](#dynamic-fees)
-    - [Simulations](#simulations)
-  - [How to list your chyme](#how-to-list-your-chyme)
-  - [Alchemist Rules](#alchemist-rules)
-  - [How we used Steady DAO Dynasty tokens](#how-we-used-steady-dao-dynasty-tokens)
-  - [Steps](#steps)
-    - [STEP 1 - CREATE CHYME	CreatNewChyme](#step-1---create-chymecreatnewchyme)
+	- [Introduction](#introduction)
+	- [Roadmap](#roadmap)
+	- [Steady DAO Mint Economic Model](#steady-dao-mint-economic-model)
+		- [Scenario](#scenario)
+	- [Benefits to the Steady DAO holder](#benefits-to-the-steady-dao-holder)
+	- [Dynamic Fees](#dynamic-fees)
+		- [Simulations](#simulations)
+	- [How to list your chyme](#how-to-list-your-chyme)
+	- [Alchemist Rules](#alchemist-rules)
+	- [How we used Steady DAO Dynasty tokens](#how-we-used-steady-dao-dynasty-tokens)
+	- [Architecture](#architecture)
+	- [Steps](#steps)
+		- [STEP 1 - CREATE CHYME	CreatNewChyme](#step-1---create-chymecreatnewchyme)
 
   
 ## Introduction
 The inspiration for Steady DAO is from the fact that in today's crypto landscape there are multiple
 stable coin implementations that are not backed by real physical assets. This lends to increased risk, for eg
 see USDT and USDC both started out as redeemable and backed assets over time this has changed. 
+
+See [DAI collateral types](https://daistats.com/#/) . DAI added USDC in March 2020, when ETH prices dropped 30%. Now USDC takes more than 27% of the pie. What happens when USDC crashes ?
 
 Steady DAO creates Steady assets that are backed by real physical assets with great transparency. 
 The model gives you the user an opportunity to split your tokens into the current USD value and another NFT, which
@@ -91,6 +94,8 @@ Our two way token linked with Steady DAO Dynasty - As part of the bigger project
 
 This allows us to integrate existing and future DeFi applications into our ecosystem in a meaningful way and pave way for building "Our Souq", wherein DeFi merchants can sell their wares in our ecosystem with a simple wrapped token concept.
 
+## Architecture
+<img src="./chyme.png">
 
 ## Steps 
 ### STEP 1 - CREATE CHYME	CreatNewChyme
@@ -144,7 +149,7 @@ Amount to merger (1 Chyme) 	Input
 
 ### NFT Attributes
 
-
+Prior to settlement - 
 <img src="./elixir.svg">
 
 ```
