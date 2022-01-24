@@ -3,7 +3,8 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
-interface IERC721Burnable is IERC721Upgradeable {
+interface IElixir is IERC721Upgradeable {
     function burnFrom(address account, uint256 amount) external;
-     function safeMint(address to, uint256 forgePrice, address oracle, uint fees, uint amount) external;
+    function getSteadyRequired(uint256 tokenId) external view returns(uint256, uint256); 
+    function safeMint(address to, uint256 forgePrice, uint256 ratioOfSteady, address oracle, uint fees, uint amount) external;
 }

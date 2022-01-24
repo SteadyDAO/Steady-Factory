@@ -21,13 +21,14 @@ contract AlchemistAcademy is Initializable {
     address public steadyImpl;
     address public alchemistImpl;
     address public steadyDAOToken;
+    address public treasury;
     address payable public DAOAddress;
 
     uint256 public alchemistCounter;
-
+    uint256 public constant CREATION_FEE = 100 ether;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    event Chymed(address chyme, uint256 fees, bool approvalStatus);
+    event Chymed(address chyme, uint256 fees, uint256 approvalStatus);
     event AlchemistForged(address alchemist, address priceOracle, int256 forgePrice);
 
     function initialize
@@ -35,6 +36,7 @@ contract AlchemistAcademy is Initializable {
         address _steadyDAOToken,
         address _steadyImpl, 
         address _elixirImpl,
+        address _treasury,
         address payable _DAOAddress
     ) 
         public 
@@ -42,7 +44,7 @@ contract AlchemistAcademy is Initializable {
     {
         steadyImpl = _steadyImpl;
         elixirImpl = _elixirImpl;
-        
+        treasury = _treasury;
         alchemistImpl = address(new Alchemist());
         steadyDAOToken = _steadyDAOToken;
         DAOAddress = _DAOAddress;
@@ -59,17 +61,19 @@ contract AlchemistAcademy is Initializable {
         (address) 
     {
         IChyme.Chyme memory chyme = chymeList[_chyme];
-        require(chyme.DAOApproved == true, "Ye Chyme is Impure!");
-        require(msg.value >= 100);
+        require(chyme.DAOApproved == 1, "Ye Chyme is Impure!");
+        require(msg.value >= CREATION_FEE);//Chyme creation fee
 
         int256 forgePrice = priceFromOracle(chyme.oracleAddress);
 
         address alchemistDeployed = ClonesUpgradeable.clone(alchemistImpl);
         Alchemist(alchemistDeployed)
         .initialize(
-            _chyme, 
+            _chyme,
+            steadyDAOToken,
             steadyImpl,
             elixirImpl,
+            treasury,
             uint256(forgePrice), 
             alchemistCounter++);
         
@@ -77,7 +81,8 @@ contract AlchemistAcademy is Initializable {
         IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(MINTER_ROLE, alchemistDeployed);
 
         emit AlchemistForged(alchemistDeployed, chyme.oracleAddress, forgePrice);
-        DAOAddress.transfer(msg.value); //transfer the creation fee to the treasury
+        DAOAddress.transfer(CREATION_FEE); //transfer the creation fee to the treasury
+        //transfer a reward in steady DAO tokens to the creator for this alchemist creation
         if(chyme.reward > 0){
             IERC20Upgradeable(steadyDAOToken).transfer(msg.sender, chyme.reward);
         }
@@ -91,7 +96,8 @@ contract AlchemistAcademy is Initializable {
         uint256 _fees,
         uint256 _rewardAmount,
         uint256 _timeToMaturity,
-        bool _approvalStatus
+        uint256 _approvalStatus,
+        uint256 _ratioOfSteady
     ) 
         external 
     {
@@ -103,7 +109,8 @@ contract AlchemistAcademy is Initializable {
             _fees,
             _rewardAmount,
             _timeToMaturity,
-            _approvalStatus
+            _approvalStatus,
+            _ratioOfSteady
         );
         chymeList[_chyme] = chyme;
         emit Chymed(_chyme, _fees, _approvalStatus);

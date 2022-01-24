@@ -15,9 +15,11 @@ import "hardhat/console.sol";
 contract Alchemist is ReentrancyGuard, Initializable {
 
     address public chyme;
+    address public steadyDAOToken;
     address public academy;
     address public steadyImpl;
     address public elixirImpl;
+    address public treasury;
     uint256 forgePrice;
     uint256 alchemistId;
 
@@ -32,34 +34,49 @@ contract Alchemist is ReentrancyGuard, Initializable {
     function initialize
     (
         address _chyme,
+        address _steadyDAOToken,
         address _steadyImpl,
         address _elixirImpl,
+        address _treasury,
         uint256 _forgePrice,
         uint256 _alchemistId
     ) 
         public 
         initializer 
     {
-        __Alchemist_init(_chyme, _steadyImpl, _elixirImpl, _forgePrice, _alchemistId);
+        __Alchemist_init
+            (
+                _chyme, 
+                _steadyDAOToken, 
+                _steadyImpl, 
+                _elixirImpl, 
+                _treasury, 
+                _forgePrice, 
+                _alchemistId
+            );
     }
 
     function __Alchemist_init(
         address _chyme,
+        address _steadyDAOToken,
         address _steadyImpl,
         address _elixirImpl,
+        address _treasury,
         uint256 _forgePrice,
         uint256 _alchemistId
     )  internal initializer {
         chyme = _chyme;
+        steadyDAOToken = _steadyDAOToken;
         forgePrice = _forgePrice;
         alchemistId = _alchemistId;
         academy = msg.sender;
         steadyImpl = _steadyImpl;
         elixirImpl = _elixirImpl;
+        treasury = _treasury;
     }
 
-    /// @dev This splits an amount of Chyme into two parts one is Steady tokens which is the 3/4 the token in dollar value
-    /// @dev The rest is in Elixir tokens which is 1/4th of the token in original form
+    /// @dev This splits an amount of Chyme into two parts one is Steady tokens which takes the ratio of $ value
+    /// @dev The rest is in Elixir NFT's which takes all the volatility of the commodity
     function split(uint256 amount) 
         external 
         nonReentrant() 
@@ -67,58 +84,50 @@ contract Alchemist is ReentrancyGuard, Initializable {
     {
         require(amount >= 10); //minimum amount that can be split is 10 units or 0.0000001 Grams
         uint256 balanceOfSender = IERC20Burnable(chyme).balanceOf(msg.sender);
-        require(amount <= balanceOfSender, "You do not have enough Chyme");
+        require(amount <= balanceOfSender, "Ye do not have enough Chyme!");
 
         IERC20Burnable steady = IERC20Burnable(address(steadyImpl));
-        IERC721Burnable elixir = IERC721Burnable(address(elixirImpl));
+        IElixir elixir = IElixir(address(elixirImpl));
         IChyme.Chyme memory myChyme = IAcademy(address(academy)).chymeList(chyme);
 
-        uint256 sChymeAmt = (amount * 75 * uint256(forgePrice)) / 10000000000; // should have twice the amount of Steady.
+        uint256 sChymeAmt = (amount * myChyme.ratioOfSteady * uint256(forgePrice)) / 10000000000;
         //transfer the Chyme tokens to the splitter contract
         IERC20Burnable(chyme).transferFrom(msg.sender, address(this), amount);
         steady.mint(msg.sender, sChymeAmt);
-        elixir.safeMint(msg.sender, forgePrice, myChyme.oracleAddress, myChyme.fees, amount);
-
-        // reward splitter with SDT
-        // IERC20Burnable(sdtAddress).approve(msg.sender, 10);
+        elixir.safeMint(msg.sender, forgePrice, myChyme.ratioOfSteady, myChyme.oracleAddress, myChyme.fees, amount);
 
         emit Split(msg.sender, amount, alchemistId);
         return true;
     }
 
-    /// @notice This merges an amount of Chyme from two parts one part Steady tokens and another Elixir tokens
-    /// @dev Pass in the total amount of Chyme that you expect, it will increase the allowance accordingly
-    function merge(uint256 ChymeAmountToMerge) 
+    /// @notice This merges an amount of Chyme from an Elixir NFT
+    function merge(uint256 tokenId) 
         external 
         nonReentrant() 
         returns (bool) 
     {
-        require(ChymeAmountToMerge >= 10); //minimum amount that can be merged is 10 units or 0.0000001 Grams
 
         TokenInfo memory __elixir;
         TokenInfo memory __steady;
         
         IERC20Burnable steady = IERC20Burnable(address(steadyImpl));
-        IERC721Burnable elixir = IERC721Burnable(address(elixirImpl));
+        IElixir elixir = IElixir(address(elixirImpl));
         IChyme.Chyme memory myChyme = IAcademy(address(academy)).chymeList(chyme);
-
-
-        __steady.amount = (ChymeAmountToMerge * 75 * uint256(forgePrice)) / 10000000000;
-        __elixir.amount = (ChymeAmountToMerge * 25) / 100;
+        
+        require(elixir.ownerOf(tokenId) == msg.sender, "Ye do not have elixir!");
+        uint chymeAmountToMerge;
+        (__steady.amount, chymeAmountToMerge) = elixir.getSteadyRequired(tokenId);
         __steady.balance = steady.balanceOf(msg.sender);
-        __elixir.balance = elixir.balanceOf(msg.sender);
 
-        require(__elixir.amount <= __elixir.balance, "Need more Elixir");
         require(__steady.amount <= __steady.balance, "Need more Steady");
         //approve Chyme from this address to the msg.sender
-        IERC20Burnable(chyme).approve(msg.sender, ChymeAmountToMerge - myChyme.fees);
-        // console.log("Burn Elixir: %s\nBurn Steady: %s", __elixir.amount, __steady.amount);
-        console.log("alchI addr: %s", address(this));
-        console.log("Tring to merge Steady: %s, ||  Elixir: %s", __steady.amount, __elixir.amount);
+        IERC20Burnable(chyme).approve(msg.sender, chymeAmountToMerge);
+        IERC20Burnable(steadyDAOToken).transferFrom(msg.sender, address(treasury), chymeAmountToMerge * myChyme.fees);
+        
         elixir.burnFrom(msg.sender, __elixir.amount);
         steady.burnFrom(msg.sender, __steady.amount);
 
-        emit Merge(msg.sender, ChymeAmountToMerge, forgePrice);
+        emit Merge(msg.sender, chymeAmountToMerge, forgePrice);
         return true;
     }
 }

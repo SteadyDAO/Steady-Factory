@@ -8,6 +8,7 @@ interface IChyme{
         uint256 fees;
         uint256 reward;
         uint256 timeToMaturity;
-        bool DAOApproved;
+        uint256 DAOApproved;
+        uint256 ratioOfSteady;
     }
 }

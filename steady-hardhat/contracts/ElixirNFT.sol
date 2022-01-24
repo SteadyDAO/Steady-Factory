@@ -47,7 +47,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
     struct Spagyria {
         uint256 fees;
         uint256 amount;
-        uint256 ratio;
+        uint256 ratioOfSteady;
         uint256 forgePrice;
         address oracle;
         address alchemistId;
@@ -68,12 +68,28 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         return super.supportsInterface(interfaceId);
     }
 
-    function safeMint(address to,  uint256 forgePrice, uint256 ratio , address oracle, uint fees, uint amount) public onlyRole(MINTER_ROLE) {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-        elements[tokenId] = Spagyria(fees, amount, ratio, forgePrice, oracle, msg.sender);
+    function getSteadyRequired(uint256 tokenId) public view returns(uint256 steadyRequired, uint256 chymeAmount) {
+        Spagyria memory myElixir = elements[tokenId];
+        return ((myElixir.forgePrice * (1-myElixir.ratioOfSteady) * myElixir.amount) / 100, myElixir.amount);
     }
+
+    function safeMint
+        (
+        address to, 
+        uint256 forgePrice, 
+        uint256 ratio,
+        address oracle,
+        uint fees,
+        uint amount
+        ) 
+        public 
+        onlyRole(MINTER_ROLE) 
+        {
+            uint256 tokenId = _tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _safeMint(to, tokenId);
+            elements[tokenId] = Spagyria(fees, amount, ratio, forgePrice, oracle, msg.sender);
+        }
 
     function priceFromOracle(address _priceOracle) public view returns (int256 price) {
         // bytes memory payload = abi.encodeWithSignature("getLatestPrice()");
@@ -87,44 +103,49 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    function tokenURI(uint256 tokenId) 
+        public 
+        view 
+        virtual 
+        override 
+        returns (string memory) 
+        {
+            require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-        string memory name = string(abi.encodePacked(' Elxir Spagyria #', toString(tokenId)));
-        string memory description = "Elixir NFT Spagyria";
+            string memory name = string(abi.encodePacked(' Elxir Spagyria #', toString(tokenId)));
+            string memory description = "Elixir NFT Spagyria";
 
-        string memory image = generateBase64Image(tokenId);
+            string memory image = generateBase64Image(tokenId);
 
 
-        return string(
-            abi.encodePacked(
-                'data:application/json;base64,',
-                Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{"name":"', 
-                            name,
-                            '", "description":"', 
-                            description,
-                            '", "image": "', 
-                            'data:image/svg+xml;base64,', 
-                            image,
-                            '"}'
+            return string(
+                abi.encodePacked(
+                    'data:application/json;base64,',
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"', 
+                                name,
+                                '", "description":"', 
+                                description,
+                                '", "image": "', 
+                                'data:image/svg+xml;base64,', 
+                                image,
+                                '"}'
+                            )
                         )
                     )
                 )
-            )
-        );
-    }
+            );
+        }
 
     function generateBase64Image(uint256 tokenId) public view returns (string memory) {
         return Base64.encode(bytes(generateImage(tokenId)));
     }
 
     function generateImage(uint256 tokenId) public view returns (string memory) {
-       
         string memory treasureChest = Treasure.generateTreasureChest();
-        uint256 ForgeConstant = elements[tokenId].forgePrice * elements[tokenId].ratio / 100;
+        uint256 ForgeConstant = elements[tokenId].forgePrice * elements[tokenId].ratioOfSteady / 100;
         string memory elixirCurrentSteadyValue = toString((uint256(priceFromOracle(elements[tokenId].oracle)) 
                                                                     - ForgeConstant) 
                                                                     * elements[tokenId].amount / 1000000);
