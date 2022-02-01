@@ -7,25 +7,12 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SteadyDaoToken is ERC20, Ownable {
-    IERC20 public immutable s_ufoToken;
-
-    constructor(address ufoTokenAddress) ERC20("SteadyDaoToken", "SDT") {
-        s_ufoToken = IERC20(ufoTokenAddress);
+contract SimpleToken is ERC20, Ownable {
+    constructor() ERC20("SimpleToken", "STT") {
     }
 
     function decimals() public view virtual override returns (uint8) {
         return 18;
-    }
-
-    function swapSDCForSDT(uint256 amount) public {
-        s_ufoToken.transferFrom(msg.sender, address(this), amount);
-        _mint(msg.sender, amount);
-    }
-
-    function swapSDTForSDC(uint256 amount) public {
-        _burn(msg.sender, amount);
-        s_ufoToken.transfer(msg.sender, amount);
     }
 //TODO:Access control
     function mint(address account, uint256 amount) external {
