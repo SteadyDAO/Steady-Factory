@@ -70,7 +70,8 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
 
     function getSteadyRequired(uint256 tokenId) public view returns(uint256 steadyRequired, uint256 chymeAmount) {
         Spagyria memory myElixir = elements[tokenId];
-        return ((myElixir.forgePrice * (1-myElixir.ratioOfSteady) * myElixir.amount) / 100, myElixir.amount);
+        //(amount * ratioOfSteady * uint256(forgePrice)) / 10000000000;
+        return ((myElixir.forgePrice *  myElixir.ratioOfSteady * myElixir.amount) / 10000000000, myElixir.amount);
     }
 
     function safeMint
@@ -230,6 +231,10 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         }
         require(value == 0, "HEX_L");
         return string(buffer);
+    }
+
+    function burn(uint256 tokenId) public override(ERC721Burnable) {
+        super.burn(tokenId);
     }
 
 }

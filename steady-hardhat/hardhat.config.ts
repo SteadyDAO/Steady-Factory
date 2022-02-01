@@ -85,12 +85,12 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     },
     matic: {
       url: 'https://rpc-mainnet.maticvigil.com/',
-      gasPrice: 1000000000,
+      gasPrice: 30000000000,
       accounts,
     },
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-      gasPrice: 1000000000,
+      gasPrice: 31000000000,
       accounts,
     },
   },
@@ -116,6 +116,9 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     clear: false,
     flat: true,
     spacing: 2
+  },
+  mocha: {
+    timeout: 40000
   }
 };
 

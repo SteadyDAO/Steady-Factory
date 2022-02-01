@@ -27,8 +27,8 @@ contract SteadyDaoToken is ERC20, Ownable {
         _burn(msg.sender, amount);
         s_ufoToken.transfer(msg.sender, amount);
     }
-
-    function mint(address account, uint256 amount) external onlyOwner {
+//TODO:Access control
+    function mint(address account, uint256 amount) external {
         _mint(account, amount);
     }
 }

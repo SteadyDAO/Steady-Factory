@@ -1,365 +1,216 @@
-// import { Wallet } from 'ethers'
-// import { Contract } from "@ethersproject/contracts";
-// import { ethers, waffle, network } from "hardhat";
-// // import { Signer } from "ethers";
-// import { expect } from "chai";
-// import { describe } from "mocha";
-// import { RootAlchemist, Steady, Unsteady, CacheGold, DummyPriceOracleForTesting } from '../src/types';
+import { Wallet } from 'ethers'
+import { Contract } from "@ethersproject/contracts";
+import { ethers, waffle, network } from "hardhat";
+// import { Signer } from "ethers";
+import { BigNumber } from '@ethersproject/bignumber';
+import { expect } from "chai";
+import { describe } from "mocha";
+import {  
+  AlchemistAcademy,
+  Alchemist,
+  DummyPriceOracleForTesting, 
+  SteadyDaoToken,
+  Steady,
+  Elixir, 
+  ERC20} from '../src/types/index';
+import * as hre from "hardhat";
+let mrAlchemist:Alchemist;
+let alchemistAcademy: AlchemistAcademy;
+let sdt: SteadyDaoToken;
+let steadyImpl: Contract;
+let elixirImpl: Contract;
+let alchI: Contract;
+let alchemistImpl: Alchemist;
+let chyme:ERC20;
 
-// let mrAlchemist:RootAlchemist;
+const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
+// SAND token
+// Tests are based on Block: 13670552
+const chymeAddress = '0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683';
+// const chymeNotApprovedAddress = '0xaBEA9132b05A70803a4E85094fD0e1800777fBEF';
+const oracleAddress = '0x0C466540B2ee1a31b441671eac0ca886e051E410';// we use SAND token but we use Gold oracle
+const chymeImpersonate = "0x545967B6Ef1efe2B57AaA6353F0593f215fA66b8";
 
-// const testAddresses = [ '0xb4E459c2d7C9C4A13C4870ED35653d71536F5a4B', '0xE61A17362BEcE0764C641cd449B4c56150c99c80'];
-// const feeAddress = '0x3E924146306957bD453502e33B9a7B6AbA6e4D3a';
-// const DAY = 86400;
+// Start test block
+describe('Check the Alchemy', () => {
+  let wallet: Wallet, Wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 
-// // Start test block
-// describe('Check the Alchemy', () => {
-//   let wallet: Wallet, backedTreasury: Wallet, cgtHolder: Wallet;
-//   let factory:RootAlchemist;
-//   let scgt:Steady;
-//   let unsteady:Unsteady;
-//   let cgt:CacheGold;
-//   let dummyPriceOracleForTesting:DummyPriceOracleForTesting;
-//   let loadFixture: ReturnType<typeof createFixtureLoader>;
+  let dummyPriceOracleForTesting:DummyPriceOracleForTesting;
+  let loadFixture: ReturnType<typeof createFixtureLoader>;
+  const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
 
-//   const createFixtureLoader = waffle.createFixtureLoader;
-//   const advanceTimeAndBlock = async(_days:number) => {
-//     await network.provider.send("evm_increaseTime", [_days]);
-//     await network.provider.send("evm_mine");
-//    }
-//   const fixture = async () => {
-//   const priceOracle = "0x34BCe86EEf8516282FEE6B5FD19824163C2B5914";
-//   const lockedGoldOracle = await ethers.getContractFactory("LockedGoldOracle");
-//   const _lockedGoldOracle = await lockedGoldOracle.deploy();
+  const createFixtureLoader = waffle.createFixtureLoader;
+  const advanceTimeAndBlock = async(_days:number) => {
+    await network.provider.send("evm_increaseTime", [_days]);
+    await network.provider.send("evm_mine");
+   }
 
+  before('create fixture loader', async () => {
+    [wallet, DAOAddress, treasury] = await (ethers as any).getSigners()
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [chymeImpersonate],
+    });
+    await network.provider.send("hardhat_setBalance", [
+        chymeImpersonate,
+        "0xA688906BD8B00000",
+    ]);
 
-//   const cacheGold = await ethers.getContractFactory("CacheGold");
-//   cgt = await cacheGold.deploy( 
-//     "0xBc92dcCe42e3bE7a636b80a28f19f63FF1a91088",
-//     backedTreasury.address,
-//     "0x84ba6405774911D566584c3F348326B43A2f6f7C", 
-//     "0x55073c1E0e75cFbfb49eb7178113645FBC80D2D1",
-//      _lockedGoldOracle.address) as CacheGold;
+    chymeHolder = await (ethers as any).getSigner(chymeImpersonate);
 
-//      //set some gold in locked gold oracle
-//      //mint new tokens into backed treasury
-//      await _lockedGoldOracle.lockAmount(ethers.utils.parseUnits("1000000000000", 8));
-//      await cgt.addBackedTokens(ethers.utils.parseUnits("100", 8));
-//      await cgt.connect(backedTreasury).transfer(cgtHolder.address, ethers.utils.parseUnits("100", 8));
+    const SteadyDaoToken = await ethers.getContractFactory("SteadyDaoToken");
+    sdt = await SteadyDaoToken.deploy(ufoTokenAddr) as SteadyDaoToken;
 
-//     console.log("Deploying cacheGold...", cgt.address);
+    const Steady = await ethers.getContractFactory("Steady");
+    steadyImpl = await Steady.deploy() as Steady;
 
+    const ElixirFactory = await ethers.getContractFactory("Elixir");
+    elixirImpl = await ElixirFactory.deploy("NFT","Elixir") as Elixir;
 
-//     /* Then deploy the wrapped/stable CGT */
-//     const _wrappedCGT = await ethers.getContractFactory("Steady");
-//     scgt = await _wrappedCGT.deploy() as Steady;
-//     console.log("Deploying steady...", scgt.address);
+    const AlchemistAcademy = await ethers.getContractFactory("AlchemistAcademy");
+    alchemistAcademy = await AlchemistAcademy.deploy() as AlchemistAcademy;
 
-//     /* Then deploy the leveraged CGT */
-//     const _unsteadyCGT = await ethers.getContractFactory("Unsteady");
-//     unsteady = await _unsteadyCGT.deploy(feeAddress) as Unsteady;
-//     console.log("Deploying unsteady...", unsteady.address);
+    elixirImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+    steadyImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
 
-//     /* For testing we use a dummy price oracle */
-//     const _dummyPriceOracleForTesting = await ethers.getContractFactory("DummyPriceOracleForTesting");
-//     dummyPriceOracleForTesting = await _dummyPriceOracleForTesting.deploy() as DummyPriceOracleForTesting;
-//     console.log("Deploying dummyPriceOracleForTesting...", dummyPriceOracleForTesting.address);
-//     /* Then deploy the RootAlchemist CGT */
-//     const _mrAlchemist = await ethers.getContractFactory("RootAlchemist");
-//     mrAlchemist = await _mrAlchemist.deploy(cgt.address, scgt.address, unsteady.address, dummyPriceOracleForTesting.address) as RootAlchemist;
-//     console.log("Deploying mrAlchemist...", mrAlchemist.address);
+    const Alchemist = await ethers.getContractFactory("Alchemist");
+    alchemistImpl = await Alchemist.deploy() as Alchemist;
 
-//     return mrAlchemist;
-//   }
+    const _dummyPriceOracleForTesting = await ethers.getContractFactory("DummyPriceOracleForTesting");
+    dummyPriceOracleForTesting = await _dummyPriceOracleForTesting.deploy() as DummyPriceOracleForTesting;
 
-//   before('create fixture loader', async () => {
-//     [wallet, backedTreasury, cgtHolder] = await (ethers as any).getSigners()
-//     console.log("Wallet addresses - ", wallet.address, backedTreasury.address)
+    await dummyPriceOracleForTesting.setLatestAnswer(5778003570);
+    console.log("starting Academy Creation");
+    await alchemistAcademy.initialize(
+      sdt.address,
+      steadyImpl.address, 
+      elixirImpl.address,
+      treasury.address,
+      alchemistImpl.address,
+      DAOAddress.address
+    );
 
-//     loadFixture = createFixtureLoader([wallet, backedTreasury])
-//   })
+    await alchemistAcademy.connect(DAOAddress).createNewChyme( 
+      chymeAddress,           
+      dummyPriceOracleForTesting.address,
+      100,
+      0,
+      3600000,
+      1,
+      75
+      );
 
-//   beforeEach('deploy factory', async () => {
-//     mrAlchemist = await loadFixture(fixture);
-//     await scgt.setAlchemist(mrAlchemist.address);
-//     await unsteady.setAlchemist(mrAlchemist.address);
-//     await unsteady.setFeeExempt(mrAlchemist.address);
-//     await dummyPriceOracleForTesting.setLatestPrice(5778003570);
-//     // await cgt.setFeeExempt(mrAlchemist.address);
-//     // Assume that the CGT succeeds in feeExempting alchemist
-//   })
+    let tx = await alchemistAcademy.alchemist(chymeAddress,
+      {value: ethers.utils.parseEther("0.0001")});   
+    const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+    const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist, address priceOracle, int256 forgePrice)"]);
+    const data = receipt.logs[2].data;
+    const topics = receipt.logs[2].topics;
+    const event = interfaceAlch.decodeEventLog("AlchemistForged", data, topics);
+      
+    console.log(event, event.alchemist);
+    const Chyme = await ethers.getContractFactory("ERC20");
+    chyme = await Chyme.attach(chymeAddress) as ERC20;
 
-//   describe('Ideal alchemy cases for Alchemist', () => {
+    mrAlchemist = await Alchemist.attach(event.alchemist) as Alchemist;
+    
+    // let chymeAddressContract = await mrAlchemist.getChyme();
+    loadFixture = createFixtureLoader([wallet, DAOAddress, treasury])
+  })
+
+  describe('Ideal alchemy cases for Alchemist', () => {
   
-//     it('can split CGT belonging to it', async () => {
-//       let cgtToSplit =  await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    it('can split Chyme belonging to it', async () => {
+      await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseEther("100") )
+      let balanceBefore = await chyme.balanceOf(wallet.address);
+      console.log("Balance Of Chyme Held --",  balanceBefore);
+      expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
+      // let chymeAddressContract = await mrAlchemist.getChyme();
+      // console.log("chyme Of chymeAddressContract --",  chymeAddressContract);
+    
+      //split the token
+    await chyme.approve(mrAlchemist.address,ethers.utils.parseEther("10"));
+   
+    let tx = await mrAlchemist.split(ethers.utils.parseEther("10"));
 
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtToSplit);
-//       let alchemist = await scgt.getAlchemist();
+    let balanceAfter = await chyme.balanceOf(wallet.address);
+    console.log("Balance Of Chyme After --",  balanceAfter);
+     let balSteady = await steadyImpl.balanceOf(wallet.address);
+    console.log("Balance Of balSteady --",  balSteady);
 
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtToSplit);
+    let balElixir = await elixirImpl.balanceOf(wallet.address);
+    console.log("Balance Of balElixir --",  balElixir);
+      expect(balElixir).to.equal(ethers.BigNumber.from("1"))
 
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(432917350442);
-//       let balanceOfNoFeesCGTHolder = await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address);
-//       let calcBalance = (cgtToSplit.toNumber()  * (1/4))
-//       .toString().slice(0, -4).padEnd(10, '0');
-//       expect(balanceOfNoFeesCGTHolder.toNumber().toString()).equals(calcBalance);
-//     });
-
-
-//     it('can split and merge CGT belonging to it', async () => {
-
-//       let cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    });
 
 
-//       let alchemist = await scgt.getAlchemist();
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtAmountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    it('can split and merge Chyme belonging to it', async () => {
 
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(432917350442);
+      await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseEther("100") )
+      let balanceBefore = await chyme.balanceOf(wallet.address);
 
-//       let balanceOfNoFeesCGTHolder = await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address);
-//       let calcBalance = (cgtAmountToMerge.toNumber()  * (1/4))
-//       .toString().slice(0, -4).padEnd(10, '0');//set the last digit to 0
-//       expect(balanceOfNoFeesCGTHolder.toNumber().toString()).equals(calcBalance);
+      expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
 
-//       await unsteady.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let currentPrice = await mrAlchemist.priceFromOracle();
-//       let scgtAmount =  (cgtAmountToMerge.mul(75).mul(currentPrice)).div(10000000000);
-//       await scgt.connect(cgtHolder).approve(mrAlchemist.address, scgtAmount);
+      await chyme.approve(mrAlchemist.address,ethers.utils.parseEther("10"));     
+      let tx = await mrAlchemist.split(ethers.utils.parseEther("10"));
+
+      let balanceAfter = await chyme.balanceOf(wallet.address);
+      console.log("balanceAfter Split Chyme --",  balanceAfter);
+
+      expect(balanceBefore.sub(balanceAfter)).to.equal(ethers.utils.parseEther("10"));
+      let balSteady = await steadyImpl.balanceOf(wallet.address);
+      let balElixir = await elixirImpl.balanceOf(wallet.address);
+      expect(balElixir).to.equal(ethers.BigNumber.from("2"));
+      //time to merge the first elixir
+      //approve tokens
+      await sdt.mint(wallet.address, ethers.utils.parseEther("10000"));
+      await sdt.approve(mrAlchemist.address, ethers.utils.parseEther("10000"));
+      await steadyImpl.approve(mrAlchemist.address, ethers.utils.parseEther("10000"));
+      await elixirImpl.approve(mrAlchemist.address, 0);
+      await mrAlchemist.merge(0);
       
-//       let balOfLCGTWithFees = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
+      await chyme.transferFrom(mrAlchemist.address,wallet.address,ethers.utils.parseEther("10"));
 
-//       let amountToMerge = ethers.BigNumber.from(balOfLCGTWithFees).mul(4);
-
-//       await mrAlchemist.connect(cgtHolder).mergeCGT(amountToMerge);
-//       let alchemistBalNF = await cgt.balanceOfNoFees(mrAlchemist.address);
-//       let alchemistBal = await cgt.balanceOf(mrAlchemist.address);
-
-
-//       //Later calculate fees here by calling relevant functions and subtract instead of hardcoding
-//       await cgt.connect(cgtHolder).transferFrom(mrAlchemist.address, cgtHolder.address, amountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       expect(await cgt.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(amountToMerge);
-//     });
-//   });
-
-//   describe('Time based alchemy cases for Alchemist with constant price', () => {
+      let balanceAfterMerge = await chyme.balanceOf(wallet.address);
+      console.log("balanceAfterMerge Of Chyme --",  balanceAfterMerge);
   
-//    it('can split CGT belonging to it that accrues storage fees for a year', async () => {
-//       let cgtToSplit =  await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-      
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtToSplit);
-//       let alchemist = await scgt.getAlchemist();
-//       await advanceTimeAndBlock(365 * DAY);
+    });
 
-//       cgtToSplit = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtToSplit);
+  });
 
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(431835057065);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(
-//         Math.floor(
-//           Number((cgtToSplit.toNumber()  * (1/4)).toPrecision(9))));
-//     });
-
-//     it('cannot split CGT belonging to it that accrues too much storage fees for a year', async () => {
-//       let cgtToSplit =  await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       // console.log("Before: ", cgtToSplit.toNumber())
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtToSplit);
-//       let alchemist = await scgt.getAlchemist();
-//       await advanceTimeAndBlock(365 * DAY);
-
-//       await expect(mrAlchemist.connect(cgtHolder).splitCGT(cgtToSplit)).to.be.revertedWith("You do not have enough CGT");
-//     });
-
-
-//     it('can split CGT belonging to it that accrues storage fees for ten years', async () => {
-//       let cgtToSplit =  await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtToSplit);
-//       let alchemist = await scgt.getAlchemist();
-
-//       await advanceTimeAndBlock(3650 * DAY);
-
-//       cgtToSplit = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtToSplit);
-
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(399366255752);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(
-//         Math.floor(
-//           Number((cgtToSplit.toNumber()  * (1/4)).toPrecision(9))));
-//     });
-
-//     it('cannot split CGT belonging to it that accrues too much storage fees for ten years', async () => {
-//       let cgtToSplit =  await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtToSplit);
-//       let alchemist = await scgt.getAlchemist();
-
-//       await advanceTimeAndBlock(3650 * DAY);
-
-//       cgtToSplit = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       expect (mrAlchemist.connect(cgtHolder).splitCGT(cgtToSplit)).to.be.reverted;
-//     });
-
-
-//     it('can split and merge CGT belonging to it that accrues storage fees for a year', async () => {
-
-//       let cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       await advanceTimeAndBlock(365 * DAY);
-//       cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtAmountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       let alchBal = await cgt.balanceOf(mrAlchemist.address);
-//       console.log("Alchemist Bal Aft Split: %s || cgtAmt: %s", alchBal, cgtAmountToMerge);
-
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(431835057065);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(
-//         Math.floor(
-//         Number(
-//           (cgtAmountToMerge.toNumber()  * (1/4)).toPrecision(9))));
-
-//       await unsteady.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let currentPrice = await mrAlchemist.priceFromOracle();
-//       let scgtAmount =  (cgtAmountToMerge.mul(75).mul(currentPrice)).div(10000000000);
-//       await scgt.connect(cgtHolder).approve(mrAlchemist.address, scgtAmount);
-      
-//       let balOfLCGTWithFees = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       let amountToMerge = ethers.BigNumber.from(balOfLCGTWithFees).mul(4);
-
-//       await mrAlchemist.connect(cgtHolder).mergeCGT(amountToMerge);
-//       let alchemistBalNF = await cgt.balanceOfNoFees(mrAlchemist.address);
-//       let alchemistBal = await cgt.balanceOf(mrAlchemist.address);
-
-
-//       //Later calculate fees here by calling relevant functions and subtract instead of hardcoding
-//       console.log("amountToMerge: %s, mrAlch Bal: %s, balLCGTFees: %s", amountToMerge, alchemistBal, balOfLCGTWithFees);
-//       await cgt.connect(cgtHolder).transferFrom(mrAlchemist.address, cgtHolder.address, amountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       expect(await cgt.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(amountToMerge);
-//     });
-
-//     xit('can split and merge CGT belonging to it that accrues storage fees for a year and then kept in unsteady for a year', async () => {
-//       let cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       await advanceTimeAndBlock(365);
-
-//       let alchemist = await scgt.getAlchemist();
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtAmountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(432917350442);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(Math.floor(cgtAmountToMerge.toNumber()  * (1/4)));
-
-//       await unsteady.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       await scgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       await advanceTimeAndBlock(365);
-      
-//       let balOfLCGTWithFees = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       let amountToMerge = ethers.BigNumber.from(balOfLCGTWithFees).mul(4);
-      
-//       await mrAlchemist.connect(cgtHolder).mergeCGT(amountToMerge);
-//       //Later calculate fees here by calling relevant functions and subtract instead of hardcoding
-//       await cgt.connect(cgtHolder).transferFrom(mrAlchemist.address, cgtHolder.address, 9990009888);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-
-//       expect(await cgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(9990009888);
-//     });
-//   });
-
-//   describe.skip('Alchemy cases for Alchemist with fluctuating price', () => {
+  describe.skip('Time based alchemy cases for Alchemist with constant price', () => {
   
-//     it('should not be able to split at a lower price and merge CGT belonging to it at a higher price', async () => {
-//       //split at $50
-//       await dummyPriceOracleForTesting.setLatestPrice(5778003570);
-      
-      
-//       let cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+   it('can split CGT belonging to it that accrues storage fees for a year', async () => {
+
+    });
+
+    it('cannot split CGT belonging to it that accrues too much storage fees for a year', async () => {
+    });
 
 
-//       let alchemist = await scgt.getAlchemist();
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtAmountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    it('can split CGT belonging to it that accrues storage fees for ten years', async () => {
+    });
 
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(432917350442);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(Math.floor(cgtAmountToMerge.toNumber()  * (1/4)));
-
-//       await unsteady.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let currentPrice = await mrAlchemist.priceFromOracle();
-//       let scgtAmount =  (cgtAmountToMerge.mul(75).mul(currentPrice)).div(10000000000);
-//       await scgt.connect(cgtHolder).approve(mrAlchemist.address, scgtAmount);
-      
-//       let balOfLCGTWithFees = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let amountToMerge = ethers.BigNumber.from(balOfLCGTWithFees).mul(4);
-
-//       //Merge at $60
-//       await dummyPriceOracleForTesting.setLatestPrice(6778003570);
-      
-//       await expect(mrAlchemist.connect(cgtHolder).mergeCGT(amountToMerge)).to.be.revertedWith("Need more Steady");
-//     });
-
-//     it('can split at a higher price and merge CGT belonging to it at a lower price', async () => {
-      
-//       let cgtAmountToMerge = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       await cgt.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       let cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    it('cannot split CGT belonging to it that accrues too much storage fees for ten years', async () => {
+    });
 
 
-//       let alchemist = await scgt.getAlchemist();
-//       await mrAlchemist.connect(cgtHolder).splitCGT(cgtAmountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
+    it('can split and merge CGT belonging to it that accrues storage fees for a year', async () => {
+    });
 
-//       expect(await scgt.connect(cgtHolder).balanceOf(cgtHolder.address)).equals(432917350442);
-//       expect(await unsteady.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(Math.floor(cgtAmountToMerge.toNumber()  * (1/4)));
+    xit('can split and merge CGT belonging to it that accrues storage fees for a year and then kept in unsteady for a year', async () => {
+    });
+  });
 
-//       await unsteady.connect(cgtHolder).approve(mrAlchemist.address, cgtAmountToMerge);
-//       let currentPrice = await mrAlchemist.priceFromOracle();
-//       let scgtAmount =  (cgtAmountToMerge.mul(75).mul(currentPrice)).div(10000000000);
-//       await scgt.connect(cgtHolder).approve(mrAlchemist.address, scgtAmount);
-      
-//       let balOfLCGTWithFees = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
+  describe.skip('Alchemy cases for Alchemist with fluctuating price', () => {
+  
+    it('should not be able to split at a lower price and merge CGT belonging to it at a higher price', async () => {
+    });
 
-//       let amountToMerge = ethers.BigNumber.from(balOfLCGTWithFees).mul(4);
-//       //Merge at $40
-//       await dummyPriceOracleForTesting.setLatestPrice(4778003570);
+    it('can split at a higher price and merge CGT belonging to it at a lower price', async () => {
+    });
+  });
 
-//       await mrAlchemist.connect(cgtHolder).mergeCGT(amountToMerge);
-//       let alchemistBalNF = await cgt.balanceOfNoFees(mrAlchemist.address);
-//       let alchemistBal = await cgt.balanceOf(mrAlchemist.address);
+})
 
-
-//       //Later calculate fees here by calling relevant functions and subtract instead of hardcoding
-//       await cgt.connect(cgtHolder).transferFrom(mrAlchemist.address, cgtHolder.address, amountToMerge);
-//       unsteadyTokenBal = await unsteady.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       cgtBal = await cgt.connect(cgtHolder).balanceOf(cgtHolder.address);
-//       expect(await cgt.connect(cgtHolder).balanceOfNoFees(cgtHolder.address)).equals(amountToMerge);
-//     });
-//   });
-
-// })
