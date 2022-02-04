@@ -16,15 +16,14 @@ library Treasure {
         return string(abi.encodePacked(
                         '<g id="Treasure_Chest_Closed">',
                             '<g>',
-                                '<rect x="197.3" y="117.1" class="st20" width="3.8" height="3.8"/>',
-                                '<rect x="197.3" y="113.3" class="st21" width="3.8" height="3.8"/>',
-                                '<rect x="197.3" y="109.5" class="st20" width="3.8" height="3.8"/>',
-                                '<rect x="197.3" y="105.7" class="st21" width="3.8" height="3.8"/>',
-                                '<rect x="98.9" y="105.7" class="st33" width="3.8" height="3.8"/>',
-                                '<rect x="98.9" y="101.9" class="st20" width="3.8" height="3.8"/>',
-                                '<rect x="98.9" y="98.1" class="st21" width="3.8" height="3.8"/>',
-                                '<rect x="98.9" y="94.3" class="st33" width="3.8" height="3.8"/>',
-                                '<rect x="98.9" y="90.5" class="st20" width="3.8" height="3.8"/>',
+                                '<rect x="102.9" y="66.5" class="st20" width="72" height="50.8"/>',                                
+                                '<path fill="brown" stroke="gold" d="M97 97 102 97C104 92 108 85 121 91 127 92 134 73 152 92 162 92 169 82 174 97L179 74C180 70 179 67 174 66L102 66C97 66 96 70 97 74L126 74 126 70 149 70 149 74 179 74 149 74 149 78 140 78 140 80 135 80 135 78 126 78 126 74 149 74 126 74 97 74 102 97H135L135 103 140 103 140 97 135 97 179 97V124L97 124Z"/>',
+                                '<rect x="179.9" y="83.5" width="3.8" height="3.8">',
+                                '<animate attributeType="XML" attributeName="class" from="st21" to="st33" dur="3s" repeatCount="indefinite"/></rect>',
+                                '<rect x="184.9" y="83.5" width="3.8" height="3.8">',
+                                '<animate attributeType="XML" attributeName="class" from="st21" to="st33" dur="3s" repeatCount="indefinite"/></rect>',
+                                '<rect x="182.9" y="87.5" width="3.8" height="3.8">',
+                                '<animate attributeType="XML" attributeName="class" from="st21" to="st33" dur="3s" repeatCount="indefinite"/></rect>',
                             '</g>',
                         '</g>'
         )
@@ -113,8 +112,9 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         {
             require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-            string memory name = string(abi.encodePacked(' Elxir Spagyria #', toString(tokenId)));
+            string memory name = string(abi.encodePacked('Elxir Spagyria #', toString(tokenId)));
             string memory description = "Elixir NFT Spagyria";
+            string memory attributes = generateAttributes(tokenId);
 
             string memory image = generateBase64Image(tokenId);
 
@@ -129,7 +129,9 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                                 name,
                                 '", "description":"', 
                                 description,
-                                '", "image": "', 
+                                '", "attributes":[', 
+                                attributes,
+                                '], "image": "', 
                                 'data:image/svg+xml;base64,', 
                                 image,
                                 '"}'
@@ -139,6 +141,15 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                 )
             );
         }
+    
+    function generateAttributes(uint256 tokenId) public view returns (string memory) {
+        uint256 ForgeConstant = elements[tokenId].forgePrice * elements[tokenId].ratioOfSteady / 100;
+        string memory elixirCurrentSteadyValue = toString((uint256(priceFromOracle(elements[tokenId].oracle))  
+                                                                    - ForgeConstant) 
+                                                                    * elements[tokenId].amount / 1000000);
+        return string(abi.encodePacked('{"display_type": "date", "trait_type": "maturity", "value":1706845156',
+                                        '},{"display_type": "number", "trait_type": "price", "value":', elixirCurrentSteadyValue,'}'));
+    }
 
     function generateBase64Image(uint256 tokenId) public view returns (string memory) {
         return Base64.encode(bytes(generateImage(tokenId)));
@@ -147,7 +158,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
     function generateImage(uint256 tokenId) public view returns (string memory) {
         string memory treasureChest = Treasure.generateTreasureChest();
         uint256 ForgeConstant = elements[tokenId].forgePrice * elements[tokenId].ratioOfSteady / 100;
-        string memory elixirCurrentSteadyValue = toString((uint256(priceFromOracle(elements[tokenId].oracle)) 
+        string memory elixirCurrentSteadyValue = toString((uint256(priceFromOracle(elements[tokenId].oracle))  
                                                                     - ForgeConstant) 
                                                                     * elements[tokenId].amount / 1000000);
         

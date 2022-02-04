@@ -13,14 +13,14 @@ import * as hre from "hardhat";
 let  wallet: Wallet, testAddress : Wallet;
 
 async function main() {
-  let [wallet, testAddress] = await ethers.getSigners();
-  console.log(wallet.address);
+  let [wallet, wallet2] = await ethers.getSigners();
+  console.log(wallet2.address);
   const Elixir = await ethers.getContractFactory("Elixir");
-  const elixir = await Elixir.deploy("Ples","PLE");
+  const elixir = await Elixir.connect(wallet2).deploy("Ples","PLE");
   await elixir.deployed();
 
   
-  await elixir.safeMint("0xc1c5da1673935527d4EFE1714Ef8dcbee12a9380",50, "0x81570059A0cb83888f1459Ec66Aad1Ac16730243", 1,100);
+  await elixir.connect(wallet2).safeMint(wallet2.address,50,75, "0x9dd18534b8f456557d11B9DDB14dA89b2e52e308", 1,100);
   console.log("Elixir deployed to:", elixir.address);
   console.log("Now verifying...");
   return elixir.address;

@@ -74,7 +74,7 @@ contract AlchemistAcademy is Initializable {
             elixirImpl,
             treasury,
             uint256(forgePrice), 
-            alchemistCounter++);
+            alchemistCounter++); //TODO :Check on counter security
         IAccessControlEnumerableUpgradeable(steadyImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         emit AlchemistForged(alchemistDeployed, chyme.oracleAddress, forgePrice);

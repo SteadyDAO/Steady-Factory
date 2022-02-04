@@ -33,7 +33,7 @@ describe('Elixir NFT works as expected', async () => {
     it('can fetch a token URI string', async () => {
         await elixir.safeMint(Wallet2.address,50,75, "0x0C466540B2ee1a31b441671eac0ca886e051E410", 1,100);
         
-        const generateBase64Image = await elixir.generateBase64Image(0);
-        console.log("generateBase64Image  - ",generateBase64Image);       
+        const tokenURI = await elixir.tokenURI(0);
+        console.log("generateBase64Image  - ",tokenURI);       
     });
 });

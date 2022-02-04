@@ -81,13 +81,13 @@ contract Alchemist is ReentrancyGuard, Initializable {
         nonReentrant() 
         returns (bool) 
     {
-        require(amount >= 10); //minimum amount that can be split is 10 units or 0.0000001 Grams
+        require(amount >= 10); //minimum amount that can be split is 10 units
         uint256 balanceOfSender = IERC20Burnable(chyme).balanceOf(msg.sender);
         require(amount <= balanceOfSender, "Ye do not have enough Chyme!");
         IERC20Burnable steady = IERC20Burnable(address(steadyImpl));
         IElixir elixir = IElixir(address(elixirImpl));
         (address oracleAddress, uint fees, uint ratioOfSteady) = IAcademy(address(academy)).getChymeInfo(chyme);
-        uint256 sChymeAmt = (amount * ratioOfSteady * uint256(forgePrice)) / 10000000000;
+        uint256 sChymeAmt = (amount * ratioOfSteady * uint256(forgePrice)) / 10000000000; //TODO: get the decimals 8 for 18
         //transfer the Chyme tokens to the splitter contract
         IERC20Burnable(chyme).transferFrom(msg.sender, address(this), amount);
         steady.mint(msg.sender, sChymeAmt);
@@ -96,7 +96,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         return true;
     }
 
-    /// @notice This merges an amount of Chyme from an Elixir NFT
+    /// @notice Close an Elixir
     function merge(uint256 tokenId) 
         external 
         nonReentrant() 
@@ -112,6 +112,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         __steady.balance = steady.balanceOf(msg.sender);
         require(__steady.amount <= __steady.balance, "Need more Steady");
         //approve Chyme from this address to the msg.sender
+        //TODO: check maturity and split tokens accordingly
         IERC20Burnable(chyme).approve(msg.sender, chymeAmountToMerge);
         IERC20Burnable(steadyDAOToken).transferFrom(msg.sender, address(treasury), chymeAmountToMerge * fees);
         elixir.burn(tokenId);

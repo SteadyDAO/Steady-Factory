@@ -12,7 +12,7 @@ contract SimpleToken is ERC20, Ownable {
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 18;
+        return 8;
     }
 //TODO:Access control
     function mint(address account, uint256 amount) external {
