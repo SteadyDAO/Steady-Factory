@@ -26,10 +26,12 @@ let chyme:ERC20;
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
 // SAND token
 // Tests are based on Block: 13670552
-const chymeAddress = '0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683';
-// const chymeNotApprovedAddress = '0xaBEA9132b05A70803a4E85094fD0e1800777fBEF';
-const oracleAddress = '0x0C466540B2ee1a31b441671eac0ca886e051E410';// we use SAND token but we use Gold oracle
-const chymeImpersonate = "0x545967B6Ef1efe2B57AaA6353F0593f215fA66b8";
+const chymeAddress = "0xC79bE05675830c8C56A228B914C1a094296c37E4";
+// const chymeNotApprovedAddress = "0xaBEA9132b05A70803a4E85094fD0e1800777fBEF";
+const oracleAddress = "0x9dd18534b8f456557d11B9DDB14dA89b2e52e308";// we use SAND token but we use Gold oracle
+const chymeImpersonate = "0xCd746dbAec699A3E0B42e411909e67Ad8BbCC315";
+const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
+
 
 // Start test block
 describe('Check the Alchemy', () => {
@@ -37,7 +39,6 @@ describe('Check the Alchemy', () => {
 
   let dummyPriceOracleForTesting:DummyPriceOracleForTesting;
   let loadFixture: ReturnType<typeof createFixtureLoader>;
-  const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
 
   const createFixtureLoader = waffle.createFixtureLoader;
   const advanceTimeAndBlock = async(_days:number) => {
@@ -47,6 +48,7 @@ describe('Check the Alchemy', () => {
 
   before('create fixture loader', async () => {
     [wallet, DAOAddress, treasury] = await (ethers as any).getSigners()
+    console.log(wallet.address)
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [chymeImpersonate],
@@ -63,9 +65,11 @@ describe('Check the Alchemy', () => {
 
     const Steady = await ethers.getContractFactory("Steady");
     steadyImpl = await Steady.deploy() as Steady;
+    const TreasureChest = await ethers.getContractFactory("Treasure");
+    const treasureChest = await TreasureChest.deploy();
 
-    const ElixirFactory = await ethers.getContractFactory("Elixir");
-    elixirImpl = await ElixirFactory.deploy("NFT","Elixir") as Elixir;
+    const factoryProxy = await ethers.getContractFactory("Elixir");
+    elixirImpl = await factoryProxy.deploy("NFT","Elixir", treasureChest.address) as Elixir;
 
     const AlchemistAcademy = await ethers.getContractFactory("AlchemistAcademy");
     alchemistAcademy = await AlchemistAcademy.deploy() as AlchemistAcademy;
@@ -91,17 +95,20 @@ describe('Check the Alchemy', () => {
     );
 
     await alchemistAcademy.connect(DAOAddress).createNewChyme( 
-      chymeAddress,           
-      dummyPriceOracleForTesting.address,
+      8,
+      75,
       100,
-      0,
-      3600000,
       1,
-      75
+      chymeAddress,           
+      oracleAddress,
+      157680000,
+      10
       );
+    
+    elixirImpl.setAcademy(alchemistAcademy.address);
 
     let tx = await alchemistAcademy.alchemist(chymeAddress,
-      {value: ethers.utils.parseEther("0.0001")});   
+      {value: ethers.utils.parseEther("0.00001")});   
     const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
     const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist, address priceOracle, int256 forgePrice)"]);
     const data = receipt.logs[2].data;
@@ -121,22 +128,28 @@ describe('Check the Alchemy', () => {
   describe('Ideal alchemy cases for Alchemist', () => {
   
     it('can split Chyme belonging to it', async () => {
-      await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseEther("100") )
-      let balanceBefore = await chyme.balanceOf(wallet.address);
-      console.log("Balance Of Chyme Held --",  balanceBefore);
+      // let balanceBefore = await chyme.balanceOf(wallet.address);
+      console.log("Balance Of Chyme Held --",  wallet.address);
+
+      await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseUnits("100", 8) )
+
       expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
-      // let chymeAddressContract = await mrAlchemist.getChyme();
-      // console.log("chyme Of chymeAddressContract --",  chymeAddressContract);
+      let chymeAddressContract = await mrAlchemist.chyme();
+      console.log("chyme Of chymeAddressContract --",  chymeAddressContract);
+      console.log("chyme Of chymeAddressContract --",  mrAlchemist.address);
+      let balanceBefore = await chyme.balanceOf(wallet.address);
+      // console.log("Balance Of Chyme Held --",  balanceInitial);
     
       //split the token
-    await chyme.approve(mrAlchemist.address,ethers.utils.parseEther("10"));
+    await chyme.approve(mrAlchemist.address,ethers.utils.parseUnits("10", 8));
    
-    let tx = await mrAlchemist.split(ethers.utils.parseEther("10"));
+    let tx = await mrAlchemist.split(ethers.utils.parseUnits("10", 8));
 
     let balanceAfter = await chyme.balanceOf(wallet.address);
     console.log("Balance Of Chyme After --",  balanceAfter);
      let balSteady = await steadyImpl.balanceOf(wallet.address);
     console.log("Balance Of balSteady --",  balSteady);
+    expect(balanceBefore.sub(balanceAfter)).to.equal(ethers.utils.parseUnits("10", 8));
 
     let balElixir = await elixirImpl.balanceOf(wallet.address);
     console.log("Balance Of balElixir --",  balElixir);
@@ -145,36 +158,40 @@ describe('Check the Alchemy', () => {
     });
 
 
-    it('can split and merge Chyme belonging to it', async () => {
+    it('can merge Chyme belonging to it', async () => {
 
-      await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseEther("100") )
-      let balanceBefore = await chyme.balanceOf(wallet.address);
+      // await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseUnits("100", 8) )
+      // let balanceBefore = await chyme.balanceOf(wallet.address);
 
-      expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
+      // expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
 
-      await chyme.approve(mrAlchemist.address,ethers.utils.parseEther("10"));     
-      let tx = await mrAlchemist.split(ethers.utils.parseEther("10"));
+      // await chyme.approve(mrAlchemist.address,ethers.utils.parseUnits("10", 8));     
+      // let tx = await mrAlchemist.split(ethers.utils.parseUnits("10", 8));
 
-      let balanceAfter = await chyme.balanceOf(wallet.address);
-      console.log("balanceAfter Split Chyme --",  balanceAfter);
+      let balanceBeforeMerge = await chyme.balanceOf(wallet.address);
+      console.log("balanceBefore Merge Chyme --",  balanceBeforeMerge);
 
-      expect(balanceBefore.sub(balanceAfter)).to.equal(ethers.utils.parseEther("10"));
       let balSteady = await steadyImpl.balanceOf(wallet.address);
       let balElixir = await elixirImpl.balanceOf(wallet.address);
-      expect(balElixir).to.equal(ethers.BigNumber.from("2"));
+      expect(balElixir).to.equal(ethers.BigNumber.from("1"));
       //time to merge the first elixir
       //approve tokens
-      await sdt.mint(wallet.address, ethers.utils.parseEther("10000"));
-      await sdt.approve(mrAlchemist.address, ethers.utils.parseEther("10000"));
-      await steadyImpl.approve(mrAlchemist.address, ethers.utils.parseEther("10000"));
+      await sdt.mint(wallet.address, ethers.utils.parseUnits("1000", 8));
+      await sdt.approve(mrAlchemist.address, ethers.utils.parseUnits("1000",8));
+      await steadyImpl.approve(mrAlchemist.address, ethers.utils.parseUnits("1000", 8));
       await elixirImpl.approve(mrAlchemist.address, 0);
+
+      //find the steady Required 
+      let steadyRequired = await elixirImpl.getSteadyRequired(0);
+      console.log(steadyRequired)
       await mrAlchemist.merge(0);
       
-      await chyme.transferFrom(mrAlchemist.address,wallet.address,ethers.utils.parseEther("10"));
+      await chyme.transferFrom(mrAlchemist.address,wallet.address,ethers.utils.parseUnits("10", 8));
 
       let balanceAfterMerge = await chyme.balanceOf(wallet.address);
       console.log("balanceAfterMerge Of Chyme --",  balanceAfterMerge);
-  
+      expect(balanceAfterMerge.sub(balanceBeforeMerge)).to.equal(ethers.utils.parseUnits("10", 8));
+
     });
 
   });

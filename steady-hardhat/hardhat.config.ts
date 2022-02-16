@@ -6,6 +6,8 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-solhint";
 import "hardhat-abi-exporter";
+import "hardhat-contract-sizer";
+import "hardhat-gas-reporter"
 import { HardhatUserConfig, task } from "hardhat/config";
 import { removeConsoleLog } from "hardhat-preprocessor";
 import "solidity-coverage";
@@ -54,9 +56,10 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     hardhat: {
       forking: {
         enabled: true,
-        url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-        blockNumber: 22897375
+        url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+        blockNumber: 24786530
       },
+      blockGasLimit : 5470440
     },
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`, 
@@ -92,6 +95,7 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
       gasPrice: 31000000000,
       accounts,
+      blockGasLimit : 10470440
     },
   },
   preprocess: {
@@ -104,6 +108,16 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
     apiKey: process.env.ETHERSCAN_KEY
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  },
+  gasReporter: {
+    showMethodSig: false,
+    enabled: (process.env.REPORT_GAS) ? true : false
   },
   typechain: {
     outDir: 'src/types',

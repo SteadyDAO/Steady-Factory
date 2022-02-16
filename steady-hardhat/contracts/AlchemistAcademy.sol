@@ -89,26 +89,28 @@ contract AlchemistAcademy is Initializable {
 
     function createNewChyme
     (
+        uint8 _decimals,
+        uint8 _ratioOfSteady,
+        uint8 _fees,
+        uint8 _approvalStatus,
         address _chyme, 
         address _oracleAddress,
-        uint256 _fees,
-        uint256 _rewardAmount,
         uint256 _timeToMaturity,
-        uint256 _approvalStatus,
-        uint256 _ratioOfSteady
+        uint256 _rewardAmount
     ) 
         external 
     {
         _onlyDAO();
 
         IChyme.Chyme memory chyme = IChyme.Chyme(
+            _decimals,
+            _ratioOfSteady,
+            _fees,
+            _approvalStatus,
             _oracleAddress,
             "",
-            _fees,
             _rewardAmount,
-            _timeToMaturity,
-            _approvalStatus,
-            _ratioOfSteady
+            _timeToMaturity
         );
         chymeList[_chyme] = chyme;
         emit Chymed(_chyme, _fees, _approvalStatus);
@@ -126,7 +128,21 @@ contract AlchemistAcademy is Initializable {
         require(msg.sender == DAOAddress, "Requires Governance!");
     }
 
-    function getChymeInfo(address _chyme) public view returns (address oracleAddress, uint fees, uint ratio) {
-        return(chymeList[_chyme].oracleAddress, chymeList[_chyme].fees, chymeList[_chyme].ratioOfSteady);
+    function getChymeInfo(address _chyme) public view returns 
+    (
+        address oracleAddress, 
+        uint8 fees, 
+        uint8 ratio,
+        uint8 decimals,
+        uint timeToMaturity
+        ) {
+        return
+        (
+            chymeList[_chyme].oracleAddress, 
+            chymeList[_chyme].fees, 
+            chymeList[_chyme].ratioOfSteady,
+            chymeList[_chyme].decimals,  
+            chymeList[_chyme].timeToMaturity
+        );
     }
 }

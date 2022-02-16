@@ -18,7 +18,7 @@ import {
   Elixir } from '../src/types/index';
 
 const feeAddress = '0x3E924146306957bD453502e33B9a7B6AbA6e4D3a';
-let wallet: Wallet, Wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
+let wallet: Wallet, wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 let alchemistAcademy: AlchemistAcademy;
 let sdt: SteadyDaoToken;
 let stt: SimpleToken;
@@ -30,35 +30,39 @@ const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
 
 async function main() {
-  [wallet, Wallet2, Wallet3, treasury, DAOAddress] = await (ethers as any).getSigners()
-  console.log("DAOAddress addresses ",DAOAddress.address)
+  [wallet, wallet2, Wallet3, treasury, DAOAddress] = await (ethers as any).getSigners()
+  console.log("addresses ",wallet2.address,DAOAddress.address)
 
   const Alchemist = await ethers.getContractFactory("Alchemist");
-  alchemistImpl = await Alchemist.connect(Wallet2).deploy() as Alchemist;
+  alchemistImpl = await Alchemist.connect(wallet2).deploy() as Alchemist;
   await alchemistImpl.deployed();
 
   const SteadyDaoToken = await ethers.getContractFactory("SteadyDaoToken");
-  sdt = await SteadyDaoToken.connect(Wallet2).deploy(ufoTokenAddr) as SteadyDaoToken;
+  sdt = await SteadyDaoToken.connect(wallet2).deploy(ufoTokenAddr) as SteadyDaoToken;
   await sdt.deployed();
 
   const SimpleToken = await ethers.getContractFactory("SimpleToken");
-  stt = await SimpleToken.connect(Wallet2).deploy() as SimpleToken;
+  stt = await SimpleToken.connect(wallet2).deploy() as SimpleToken;
   await stt.deployed();
 
   const Steady = await ethers.getContractFactory("Steady");
-  steadyImpl = await Steady.connect(Wallet2).deploy() as Steady;
+  steadyImpl = await Steady.connect(wallet2).deploy() as Steady;
   console.log("steadyImpl steadyImpl" , steadyImpl.address);
   await steadyImpl.deployed();
+
+  const TreasureChest = await ethers.getContractFactory("Treasure");
+    const treasureChest = await TreasureChest.connect(wallet2).deploy();
+    await treasureChest.deployed();
   const ElixirFactory = await ethers.getContractFactory("Elixir");
-  elixirImpl = await ElixirFactory.connect(Wallet2).deploy("NFT","Elixir") as Elixir;
+  elixirImpl = await ElixirFactory.connect(wallet2).deploy("NFT","Elixir", treasureChest.address) as Elixir;
   await elixirImpl.deployed();
 
   const AlchemistAcademyFactory = await ethers.getContractFactory("AlchemistAcademy");
-  alchemistAcademy = await AlchemistAcademyFactory.connect(Wallet2).deploy() as AlchemistAcademy;
+  alchemistAcademy = await AlchemistAcademyFactory.connect(wallet2).deploy() as AlchemistAcademy;
   console.log("AlchemistAcademyFactory deployed to:", alchemistAcademy.address);
   await alchemistAcademy.deployed();
   
-  await alchemistAcademy.connect(Wallet2).initialize(
+  await alchemistAcademy.connect(wallet2).initialize(
     sdt.address,
     steadyImpl.address, 
     elixirImpl.address,
@@ -68,10 +72,10 @@ async function main() {
   );
   await delay(20000);
 
-  elixirImpl.connect(Wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+  elixirImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
   await delay(20000);
 
-  steadyImpl.connect(Wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+  steadyImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
   await delay(20000);
 
   console.log("DEFAULT_ADMIN_ROLE granted");
@@ -79,62 +83,72 @@ async function main() {
 
 
   console.log("alchemistAcademy initialized");
-  await alchemistAcademy.connect(DAOAddress).createNewChyme( 
-    stt.address,           
-    "0x9dd18534b8f456557d11B9DDB14dA89b2e52e308",
-    100,
-    0,
-    3600000,
-    1,
-    75
-    );
-
+    await alchemistAcademy.connect(DAOAddress).createNewChyme( 
+      8,
+      75,
+      100,
+      1,
+      stt.address,                
+      "0x9dd18534b8f456557d11B9DDB14dA89b2e52e308",
+      157680000,//5 years in seconds
+      10
+      );
     console.log("createNewChyme done");
 
 
 
 await delay(20000);
   console.log("Academy deployed to:", alchemistAcademy.address);
-  console.log("Now verifying...",sdt.address,
-  steadyImpl.address, 
-  elixirImpl.address,
-  treasury.address,
-  alchemistImpl.address,
-  DAOAddress.address);
+  console.log("Now verifying...\n",
+  sdt.address, "Steady DAO Token Address\n",
+  steadyImpl.address,"steadyImpl Address\n",
+  stt.address,"stt Address\n",
+  elixirImpl.address,"elixirImpl Address\n",
+  treasury.address,"treasury Address\n",
+  treasureChest.address,"treasureChest Address\n",
+  alchemistImpl.address,"alchemistImpl Address\n",
+  DAOAddress.address,"DAOAddress Address\n",);
+  elixirImpl.connect(wallet2).setAcademy(alchemistAcademy.address);
 
 
   await verify(sdt.address, ufoTokenAddr);
   await verify(stt.address);
-  await verify(elixirImpl.address);
+  await verify(elixirImpl.address,"NFT","Elixir", treasureChest.address );
   await verify(alchemistAcademy.address);
-
-  // await verify("0xF295f6DD9D0E11C5A974972f3266a0934Ded8201", "0xF295f6DD9D0E11C5A974972f3266a0934Ded8201");
-  // await verify("0x97abbcaf6c598256d53a271755ffb16013b30dfa");
-  // await verify("0x851872cE18789a62c5986A4BdE43996ED181CDea");
-  // await verify("0xfe8b129AA60C6CD9c7A1904f6716Fe5d3A8A8944", "NFT","Elixir");
-
+  await verify(alchemistImpl.address);
   console.log("Verified!");
   return alchemistAcademy.address;
 }
 
 async function verify(contractAddress:string, ...args:Array<any>) {
   console.log("verifying", contractAddress, ...args);
-  await hre.run("verify:verify", {
-    address: contractAddress,
-    constructorArguments: [
-      ...args
-    ],
-  });
+  try{
+    await hre.run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: [
+        ...args
+      ],
+    });
+  }
+  catch(err){
+    console.log(err)
+  }
+
 }
 
 function delay(ms: number) {
   return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
+async function singleFn() {
+  await verify("0xD245630fa7f43879D7629475FCba9f086c4EDca3");
+  // await verify("0x1bEdD6e959bE719D46612ad90F387d1f0dDACBdF","NFT","Elixir", "0x583D1fDfD9189EE4a2b971afEe10AcF53d6fCECd" );
+}
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-main()
+singleFn()
+// main()
   .then( async (deployedData) => {
     process.exit(0)
   })

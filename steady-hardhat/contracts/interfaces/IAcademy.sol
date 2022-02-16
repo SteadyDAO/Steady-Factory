@@ -10,5 +10,6 @@ interface IAcademy{
     function steadyDAOToken() external;
     function DAOAddress() external;
     function chymeList(address _chyme) external returns (IChyme.Chyme memory);
-    function getChymeInfo(address _chyme) external view returns (address oracleAddress, uint fees, uint ratio);
+    function getChymeInfo(address _chyme) external view returns (address oracleAddress, uint8 fees, uint8 ratio, uint8 decimals, uint timeToMaturity);
+    function priceFromOracle(address _priceOracle) external view returns (int256 price);
 }
