@@ -196,38 +196,5 @@ describe('Check the Alchemy', () => {
 
   });
 
-  describe.skip('Time based alchemy cases for Alchemist with constant price', () => {
-  
-   it('can split CGT belonging to it that accrues storage fees for a year', async () => {
-
-    });
-
-    it('cannot split CGT belonging to it that accrues too much storage fees for a year', async () => {
-    });
-
-
-    it('can split CGT belonging to it that accrues storage fees for ten years', async () => {
-    });
-
-    it('cannot split CGT belonging to it that accrues too much storage fees for ten years', async () => {
-    });
-
-
-    it('can split and merge CGT belonging to it that accrues storage fees for a year', async () => {
-    });
-
-    xit('can split and merge CGT belonging to it that accrues storage fees for a year and then kept in unsteady for a year', async () => {
-    });
-  });
-
-  describe.skip('Alchemy cases for Alchemist with fluctuating price', () => {
-  
-    it('should not be able to split at a lower price and merge CGT belonging to it at a higher price', async () => {
-    });
-
-    it('can split at a higher price and merge CGT belonging to it at a lower price', async () => {
-    });
-  });
-
 })
 
