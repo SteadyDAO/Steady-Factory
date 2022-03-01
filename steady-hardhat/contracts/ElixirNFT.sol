@@ -57,11 +57,12 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         treasure = _treasure;
     }
 
-    function getSteadyRequired(uint256 tokenId) public view returns(uint256 steadyRequired, uint256 chymeAmount) {
+    function getSteadyRequired(uint256 tokenId) public view returns(uint256 steadyRequired, uint256 chymeAmount, uint256 timeToMaturity) {
         Spagyria memory myElixir = elements[tokenId];
-        (,, uint8 ratioOfSteady, uint8 decimals,) = IAcademy(address(academy)).getChymeInfo(address(elements[tokenId].chyme));
-        uint divisor = 100 * 10 ** decimals;
-        return (myElixir.forgePrice *  ratioOfSteady * myElixir.amount / divisor, myElixir.amount);
+        (,, uint8 ratioOfSteady,uint8 decimals,) = IAcademy(address(academy)).getChymeInfo(address(elements[tokenId].chyme));
+        uint divisor =  10 ** decimals;
+        return (((myElixir.amount * ratioOfSteady * uint256(myElixir.forgePrice)) / (100 * (divisor * divisor))) * (10 ** 18), 
+                    myElixir.amount, elements[tokenId].timeToMaturity);
     }
 
     function safeMint
@@ -95,12 +96,12 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
 
             string memory name = string(abi.encodePacked('Elxir Spagyria #', toString(tokenId)));
             string memory description = "Elixir NFT Spagyria";
-            (string memory elixirCurrentSteadyValue,
+            (uint256 elixirCurrentSteadyValue,
             uint256 currentPrice,
             uint256 forgeConstant,
             uint256 timeLeft ) = calculateParams(tokenId);
-            string memory attributes = generateAttributes(tokenId,elixirCurrentSteadyValue, currentPrice,forgeConstant);
-            string memory image = generateBase64Image(tokenId,timeLeft,elixirCurrentSteadyValue);
+            string memory attributes = generateAttributes(tokenId,toString(elixirCurrentSteadyValue),currentPrice,forgeConstant);
+            string memory image = generateBase64Image(tokenId,timeLeft,toString(elixirCurrentSteadyValue));
             return string(
                 abi.encodePacked(
                     'data:application/json;base64,',
@@ -125,7 +126,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         }
     
     function calculateParams(uint256 tokenId) public view returns (
-        string memory elixirCurrentSteadyValue,
+        uint256 elixirCurrentSteadyValue,
         uint256 currentPrice,
         uint256 forgeConstant,
         uint256 timeLeft )  {
@@ -133,9 +134,9 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                                         IAcademy(address(academy)).getChymeInfo(elements[tokenId].chyme);
             currentPrice = uint256(IAcademy(academy).priceFromOracle(oracleAddress));
             forgeConstant = elements[tokenId].forgePrice * ratioOfSteady / 100;
-            elixirCurrentSteadyValue = toString((currentPrice  
+            elixirCurrentSteadyValue = (currentPrice  
                                                 - forgeConstant) 
-                                                * elements[tokenId].amount / 10 ** decimals);
+                                                * elements[tokenId].amount / (2 * 10 ** decimals);
             timeLeft = 0;
             if(elements[tokenId].timeToMaturity > block.timestamp){
                 timeLeft = (elements[tokenId].timeToMaturity - block.timestamp) / 86400;
@@ -170,7 +171,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
             return string(
                 abi.encodePacked(
                     ITreasure(treasure).generateHeader(),
-                    '<text x="14" y="215" font-size="10px" font-family="Arial">Value</text>',
+                    '<text x="14" y="215" font-size="10px" font-family="Arial">Value - $</text>',
                     '<text x="79" y="215" font-size="14px"  font-family="Arial">',elixirCurrentSteadyValue,'</text>',
                     '<text x="14" y="265" font-family="Arial">Alchemist</text>',
                     '<text x="14" y="280"  font-size="7px"  font-family="Arial">',toHexString(uint160(elements[tokenId].alchemistId), 20),' </text>',

@@ -8,11 +8,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SimpleToken is ERC20, Ownable {
-    constructor() ERC20("SimpleToken", "STT") {
+    uint8 public decimal = 8;
+    constructor(uint8 _decimals) ERC20("SimpleToken", "STT") {
+        decimal = _decimals;
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 8;
+        return decimal;
     }
 //TODO:Access control
     function mint(address account, uint256 amount) external {

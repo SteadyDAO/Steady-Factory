@@ -23,6 +23,7 @@ contract AlchemistAcademy is Initializable {
     address public steadyDAOToken;
     address public treasury;
     address public DAOAddress;
+    address public steadyDAOReward;
 
     uint256 public alchemistCounter;
     uint256 public constant CREATION_FEE = 0.00001 ether;
@@ -38,7 +39,8 @@ contract AlchemistAcademy is Initializable {
         address _elixirImpl,
         address _treasury,
         address _alchemistImpl,
-        address _DAOAddress
+        address _DAOAddress,
+        address _steadyDAOReward
     ) 
         public 
         initializer 
@@ -49,6 +51,12 @@ contract AlchemistAcademy is Initializable {
         alchemistImpl = _alchemistImpl;
         steadyDAOToken = _steadyDAOToken;
         DAOAddress = _DAOAddress;
+        steadyDAOReward = _steadyDAOReward;
+    }
+
+    function setDAORewardContract(address _steadyDAOReward) external {
+        _onlyDAO();
+        steadyDAOReward = _steadyDAOReward;
     }
 
     ///@dev alchemist alchemists that can be used to split a chyme at a specific price
@@ -74,7 +82,9 @@ contract AlchemistAcademy is Initializable {
             elixirImpl,
             treasury,
             uint256(forgePrice), 
-            alchemistCounter++); //TODO :Check on counter security
+            alchemistCounter++,
+            steadyDAOReward); 
+            //TODO : Give transfer authority to the alchemists for upto the max amount that they hold.
         IAccessControlEnumerableUpgradeable(steadyImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         emit AlchemistForged(alchemistDeployed, chyme.oracleAddress, forgePrice);

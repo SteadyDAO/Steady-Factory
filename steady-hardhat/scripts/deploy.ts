@@ -10,14 +10,13 @@ import fs from 'fs';
 import * as hre from "hardhat";
 import {  
   AlchemistAcademy,
-  Alchemist,
-  DummyPriceOracleForTesting, 
+  Alchemist, 
   SteadyDaoToken,
+  SteadyDAOReward,
   SimpleToken,
   Steady,
   Elixir } from '../src/types/index';
 
-const feeAddress = '0x3E924146306957bD453502e33B9a7B6AbA6e4D3a';
 let wallet: Wallet, wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 let alchemistAcademy: AlchemistAcademy;
 let sdt: SteadyDaoToken;
@@ -26,6 +25,7 @@ let steadyImpl: Contract;
 let elixirImpl: Contract;
 let alchI: Contract;
 let alchemistImpl: Alchemist;
+let steadyDAOReward: SteadyDAOReward;
 const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
 
@@ -42,7 +42,7 @@ async function main() {
   await sdt.deployed();
 
   const SimpleToken = await ethers.getContractFactory("SimpleToken");
-  stt = await SimpleToken.connect(wallet2).deploy() as SimpleToken;
+  stt = await SimpleToken.connect(wallet2).deploy(8) as SimpleToken;
   await stt.deployed();
 
   const Steady = await ethers.getContractFactory("Steady");
@@ -51,8 +51,8 @@ async function main() {
   await steadyImpl.deployed();
 
   const TreasureChest = await ethers.getContractFactory("Treasure");
-    const treasureChest = await TreasureChest.connect(wallet2).deploy();
-    await treasureChest.deployed();
+  const treasureChest = await TreasureChest.connect(wallet2).deploy();
+  await treasureChest.deployed();
   const ElixirFactory = await ethers.getContractFactory("Elixir");
   elixirImpl = await ElixirFactory.connect(wallet2).deploy("NFT","Elixir", treasureChest.address) as Elixir;
   await elixirImpl.deployed();
@@ -61,14 +61,17 @@ async function main() {
   alchemistAcademy = await AlchemistAcademyFactory.connect(wallet2).deploy() as AlchemistAcademy;
   console.log("AlchemistAcademyFactory deployed to:", alchemistAcademy.address);
   await alchemistAcademy.deployed();
-  
+  const SteadyDAOReward = await ethers.getContractFactory("SteadyDAOReward");
+  steadyDAOReward = await SteadyDAOReward.connect(wallet2).deploy() as SteadyDAOReward;
+  await steadyDAOReward.deployed();
   await alchemistAcademy.connect(wallet2).initialize(
     sdt.address,
     steadyImpl.address, 
     elixirImpl.address,
     treasury.address,
     alchemistImpl.address,
-    DAOAddress.address
+    DAOAddress.address,
+    steadyDAOReward.address
   );
   await delay(20000);
 
@@ -112,10 +115,11 @@ await delay(20000);
 
 
   await verify(sdt.address, ufoTokenAddr);
-  await verify(stt.address);
+  await verify(stt.address, 8);
   await verify(elixirImpl.address,"NFT","Elixir", treasureChest.address );
   await verify(alchemistAcademy.address);
   await verify(alchemistImpl.address);
+  await verify(steadyImpl.address);
   console.log("Verified!");
   return alchemistAcademy.address;
 }
@@ -141,14 +145,14 @@ function delay(ms: number) {
 }
 
 async function singleFn() {
-  await verify("0xD245630fa7f43879D7629475FCba9f086c4EDca3");
+  await verify("0x2B242F7718272D5852F2C0bb9dE9322350dec720");
   // await verify("0x1bEdD6e959bE719D46612ad90F387d1f0dDACBdF","NFT","Elixir", "0x583D1fDfD9189EE4a2b971afEe10AcF53d6fCECd" );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-singleFn()
-// main()
+// singleFn()
+main()
   .then( async (deployedData) => {
     process.exit(0)
   })

@@ -9,6 +9,7 @@ import "./interfaces/IElixir.sol";
 
 import "./interfaces/IChyme.sol";
 import "./interfaces/IAcademy.sol";
+import "./interfaces/ISteadyDAORewards.sol";
 
 /// @title Split and Merge Token Chyme
 contract Alchemist is ReentrancyGuard, Initializable {
@@ -21,6 +22,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
     address public steadyImpl;
     address public elixirImpl;
     address public treasury;
+    address public steadyDAORewards;
     uint256 public forgePrice;
     uint256 public alchemistId;
 
@@ -40,7 +42,8 @@ contract Alchemist is ReentrancyGuard, Initializable {
         address _elixirImpl,
         address _treasury,
         uint256 _forgePrice,
-        uint256 _alchemistId
+        uint256 _alchemistId,
+        address _steadyDAORewards
     ) 
         public 
         initializer 
@@ -53,7 +56,8 @@ contract Alchemist is ReentrancyGuard, Initializable {
                 _elixirImpl, 
                 _treasury, 
                 _forgePrice, 
-                _alchemistId
+                _alchemistId,
+                _steadyDAORewards
             );
     }
 
@@ -64,7 +68,8 @@ contract Alchemist is ReentrancyGuard, Initializable {
         address _elixirImpl,
         address _treasury,
         uint256 _forgePrice,
-        uint256 _alchemistId
+        uint256 _alchemistId,
+        address _steadyDAORewards
     )  internal {
         chyme = _chyme;
         steadyDAOToken = _steadyDAOToken;
@@ -74,6 +79,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         steadyImpl = _steadyImpl;
         elixirImpl = _elixirImpl;
         treasury = _treasury;
+        steadyDAORewards = _steadyDAORewards;
     }
 
     /// @notice This splits an amount of Chyme into two parts one is Steady tokens which takes the ratio of $ value
@@ -86,10 +92,13 @@ contract Alchemist is ReentrancyGuard, Initializable {
         require(amount >= 10); //minimum amount that can be split is 10 units
         IERC20Burnable steady = IERC20Burnable(address(steadyImpl));
         IElixir elixir = IElixir(address(elixirImpl));
-        (,,uint ratioOfSteady,uint decimals,uint durationForMaturity) = IAcademy(address(academy)).getChymeInfo(chyme);
-        uint256 sChymeAmt = ((amount * ratioOfSteady * uint256(forgePrice)) / (100 * 10 ** decimals));
+        (,uint fees,uint ratioOfSteady,uint8 decimals,uint durationForMaturity) = IAcademy(address(academy)).getChymeInfo(chyme);
+        uint divisor = 10 ** decimals;
+        //two operands with decimals specified to token so ** 2 and 100 for ratioOfSteady to decimal conversion
+        uint256 sChymeAmt = ((amount * ratioOfSteady * uint256(forgePrice)) / (100 * (divisor * divisor))) * (10 ** 18);
         //transfer the Chyme tokens to the splitter contract
         IERC20Upgradeable(address(chyme)).safeTransferFrom(msg.sender, address(this), amount);
+        ISteadyDAORewards(steadyDAORewards).performAction(ISteadyDAORewards.actionType.SPLIT, sChymeAmt, fees);
         steady.mint(msg.sender, sChymeAmt);
         elixir.safeMint(msg.sender, chyme, forgePrice, amount, block.timestamp + durationForMaturity);
         emit Split(msg.sender, amount, alchemistId);
@@ -102,21 +111,32 @@ contract Alchemist is ReentrancyGuard, Initializable {
         nonReentrant() 
         returns (bool) 
     {
-        TokenInfo memory __steady;
+        TokenInfo memory _steady;
+        uint chymeAmountToMerge;
+        uint timeToMaturity;
         IERC20Burnable steady = IERC20Burnable(address(steadyImpl));
         IElixir elixir = IElixir(address(elixirImpl));
-        (,uint fees,,,) = IAcademy(address(academy)).getChymeInfo(chyme);
-        require(elixir.ownerOf(tokenId) == msg.sender, "Ye do not have elixir!");
-        uint chymeAmountToMerge;
-        (__steady.amount, chymeAmountToMerge) = elixir.getSteadyRequired(tokenId);
-        __steady.balance = steady.balanceOf(msg.sender);
-        require(__steady.amount <= __steady.balance, "Need more Steady");
-        //approve Chyme from this address to the msg.sender
-        //TODO: check maturity and split tokens accordingly
-        IERC20Upgradeable(chyme).approve(msg.sender, chymeAmountToMerge);
-        IERC20Burnable(steadyDAOToken).safeTransferFrom(msg.sender, address(treasury), chymeAmountToMerge * fees);
+        address chymeBeneficiary = elixir.ownerOf(tokenId);
+        (,uint fees,uint ratioOfSteady,,) = IAcademy(address(academy)).getChymeInfo(chyme);
+        (_steady.amount, chymeAmountToMerge, timeToMaturity) = elixir.getSteadyRequired(tokenId);
+        _steady.balance = steady.balanceOf(msg.sender);
+        
+        require(_steady.amount <= _steady.balance, "Need more Steady");
+        
+        if(timeToMaturity > block.timestamp){
+            require(chymeBeneficiary == msg.sender, "Ye have no elixir!");
+            //approve Chyme from this address to the msg.sender proportional to the total value
+            IERC20Upgradeable(chyme).safeIncreaseAllowance(chymeBeneficiary, chymeAmountToMerge);
+        }
+        else {// the maturity time has expired anyone can now call to mature this chyme
+            //approve Chyme from this address to the chymeBeneficiary proportional to the value in elixir
+            IERC20Upgradeable(chyme).safeIncreaseAllowance(chymeBeneficiary, chymeAmountToMerge * (100 - ratioOfSteady) / 100);
+            //approve Chyme from this address to the msg.sender proportional to the value in steady
+            IERC20Upgradeable(chyme).safeIncreaseAllowance(msg.sender, chymeAmountToMerge * ratioOfSteady / 100);
+        }
+        ISteadyDAORewards(steadyDAORewards).performAction(ISteadyDAORewards.actionType.MERGE, _steady.amount, fees);
+        steady.burnFrom(msg.sender, _steady.amount);
         elixir.burn(tokenId);
-        steady.burnFrom(msg.sender, __steady.amount);
         emit Merge(msg.sender, chymeAmountToMerge, forgePrice);
         return true;
     }
