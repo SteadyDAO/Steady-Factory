@@ -27,7 +27,7 @@ Approve - (100 = 10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D9
 1. goto alchemist contract 
 2. https://mumbai.polygonscan.com/address/0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1#writeContract
 3. Splittokens (100 = 10000000000)  -> https://mumbai.polygonscan.com/tx/0xc6e4872174be863d29497d46a9aadff01eba52723a9b11e888cbe1d694eea30f
-4. Verify the transaction information (Note that sometimes you need to wait like 5seconds and refresh the etherscan page) . Take note of the number of steady tokens you receive.
+4. Verify the transaction information (note that you may need to increase the default gas price to get a quick confirmation). Take note of the number of steady tokens you receive.
 5. Verify that the Elixir information is correct https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#readContract
 
 ## 5. Merge the token back
