@@ -6,7 +6,7 @@ https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95d
 where 0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df is a simple test token
 
 Connect your wallet address to etherscan.
-Goto, function mint -  key in your address and an amount of tokens with powers raised to 8 decimals
+Goto, function mint -  key in your address and an amount of tokens you want plus 8 decimals (example 100 tokens = 10000000000)
 
 ## 2. Create new alchemist (this will take the current oracle price of the token) / Alternatively use the existing pool skip to step 3
 
@@ -17,17 +17,17 @@ eg. https://mumbai.polygonscan.com/address/0x2955591086bB33eeA5E0c803C8C8bF3D3ba
 3. Check logs for "AlchemistForged" to find the address of newly deployed alchemist eg. 
 4. https://mumbai.polygonscan.com/tx/0x656d73de25047067d87476b3a6c595f96af4902375a7b938460311e43a2b7e35#eventlog
 
-Where the Alchemist is at  - 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
+Alchemist  - 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
 
 ## 3. Approve transfer of chyme tokens to the alchemist 
 Goto - https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df#writeContract
-Approve - eg. 100  (10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df  to alchemist 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
+Approve - (100 = 10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df to alchemist 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
 
 ## 4. Split some chyme stt tokens 
 1. goto alchemist contract 
 2. https://mumbai.polygonscan.com/address/0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1#writeContract
-3. Split 100 (10000000000) tokens eg  -> https://mumbai.polygonscan.com/tx/0xc6e4872174be863d29497d46a9aadff01eba52723a9b11e888cbe1d694eea30f
-4. Verify the transaction information (Note that sometimes you need to wait like 5seconds and refresh the etherscan page) . Note down the STEADY TOKENS U GET
+3. Splittokens (100 = 10000000000)  -> https://mumbai.polygonscan.com/tx/0xc6e4872174be863d29497d46a9aadff01eba52723a9b11e888cbe1d694eea30f
+4. Verify the transaction information (Note that sometimes you need to wait like 5seconds and refresh the etherscan page) . Take note of the number of steady tokens you receive.
 5. Verify that the Elixir information is correct https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#readContract
 
 ## 5. Merge the token back
