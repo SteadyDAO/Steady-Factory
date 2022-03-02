@@ -21,7 +21,7 @@ Where the Alchemist is at  - 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
 
 ## 3. Approve transfer of chyme tokens to the alchemist 
 Goto - https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df#writeContract
-Approve - eg. 100  (10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df  to alchemist 0x493d63e98b709beab0ea676a5d4280025a3624b8
+Approve - eg. 100  (10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df  to alchemist 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
 
 ## 4. Split some chyme stt tokens 
 1. goto alchemist contract 
