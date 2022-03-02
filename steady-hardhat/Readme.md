@@ -36,5 +36,5 @@ Approve - (100 = 10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D9
 2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 10000000000), spender 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1 - https://mumbai.polygonscan.com/address/0x2B242F7718272D5852F2C0bb9dE9322350dec720#writeContract
 3. Call the Merge  https://mumbai.polygonscan.com/address/0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1#writeContract
   with the NFT token id from step 4.
-4. Now you should have the right to pull your original chyme, you can do this by going to https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df#writeContract and calling transferFrom
+4. Now you should have the right to pull your original chyme, you can do this by going to https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df#writeContract and calling transferFrom - recepient is your address, sender is 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1 and amount is the amount you original split (100 = 10000000000).
   eg. https://mumbai.polygonscan.com/tx/0x4a4c01c5a111fadc4442ef418aaaccc0869efad99ec2a69c328df42c4e562114
