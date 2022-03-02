@@ -27,14 +27,14 @@ Approve - (100 = 10000000000) stt tokens 0x51F6a023D48ceb22F30E71f87AF695ba0a4D9
 1. goto alchemist contract 
 2. https://mumbai.polygonscan.com/address/0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1#writeContract
 3. Splittokens (100 = 10000000000)  -> https://mumbai.polygonscan.com/tx/0xc6e4872174be863d29497d46a9aadff01eba52723a9b11e888cbe1d694eea30f
-4. Verify the transaction information (note that you may need to increase the default gas price to get a quick confirmation). Take note of the number of steady tokens you receive.
+4. Verify the transaction information (note that you may need to increase the default gas price to get a quick confirmation). Take note of the number of steady tokens you receive and the Elixer token ID.
 5. Verify that the Elixir information is correct https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#readContract
 
 ## 5. Merge the token back
-1. give approval for your Elixir NFT back - tokenId 1, spender 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
+1. give approval for your Elixir NFT back - Elixer NFT tokenId from step 4, spender 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1
   https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#writeContract 
 2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 10000000000), spender 0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1 - https://mumbai.polygonscan.com/address/0x2B242F7718272D5852F2C0bb9dE9322350dec720#writeContract
 3. Call the Merge  https://mumbai.polygonscan.com/address/0x7cD7b74dDDf9E77eC567895b8Ce1191DB9bfAAe1#writeContract
-  with the NFT token id
+  with the NFT token id from step 4.
 4. Now you should have the right to pull your original chyme, you can do this by going to https://mumbai.polygonscan.com/address/0x51F6a023D48ceb22F30E71f87AF695ba0a4D95df#writeContract and calling transferFrom
   eg. https://mumbai.polygonscan.com/tx/0x4a4c01c5a111fadc4442ef418aaaccc0869efad99ec2a69c328df42c4e562114
