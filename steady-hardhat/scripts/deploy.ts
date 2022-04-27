@@ -37,10 +37,6 @@ async function main() {
   alchemistImpl = await Alchemist.connect(wallet2).deploy() as Alchemist;
   await alchemistImpl.deployed();
 
-  const SteadyDaoToken = await ethers.getContractFactory("SteadyDaoToken");
-  sdt = await SteadyDaoToken.connect(wallet2).deploy(ufoTokenAddr) as SteadyDaoToken;
-  await sdt.deployed();
-
   const SimpleToken = await ethers.getContractFactory("SimpleToken");
   stt = await SimpleToken.connect(wallet2).deploy(8) as SimpleToken;
   await stt.deployed();
@@ -65,7 +61,6 @@ async function main() {
   steadyDAOReward = await SteadyDAOReward.connect(wallet2).deploy() as SteadyDAOReward;
   await steadyDAOReward.deployed();
   await alchemistAcademy.connect(wallet2).initialize(
-    sdt.address,
     steadyImpl.address, 
     elixirImpl.address,
     treasury.address,

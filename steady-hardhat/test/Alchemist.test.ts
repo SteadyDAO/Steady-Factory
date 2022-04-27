@@ -9,7 +9,6 @@ import {
   AlchemistAcademy,
   Alchemist,
   DummyPriceOracleForTesting, 
-  SteadyDaoToken,
   SteadyDAOReward,
   Steady,
   Elixir, 
@@ -17,7 +16,6 @@ import {
 import * as hre from "hardhat";
 let mrAlchemist:Alchemist;
 let alchemistAcademy: AlchemistAcademy;
-let sdt: SteadyDaoToken;
 let steadyImpl: Contract;
 let elixirImpl: Contract;
 let alchI: Contract;
@@ -58,8 +56,7 @@ describe('Check the Alchemy', () => {
         "0xA688906BD8B00000",
     ]);
     chymeHolder = await (ethers as any).getSigner(chymeImpersonate);
-    const SteadyDaoToken = await ethers.getContractFactory("SteadyDaoToken");
-    sdt = await SteadyDaoToken.deploy(ufoTokenAddr) as SteadyDaoToken;
+    
     const SteadyDAOReward = await ethers.getContractFactory("SteadyDAOReward");
     steadyDAOReward = await SteadyDAOReward.deploy() as SteadyDAOReward;
     await steadyDAOReward.deployed();
@@ -85,7 +82,6 @@ describe('Check the Alchemy', () => {
       const Alchemist = await ethers.getContractFactory("Alchemist");
       alchemistImpl = await Alchemist.deploy() as Alchemist;
       await alchemistAcademy.initialize(
-        sdt.address,
         steadyImpl.address, 
         elixirImpl.address,
         treasury.address,
@@ -97,7 +93,7 @@ describe('Check the Alchemy', () => {
       await alchemistAcademy.connect(DAOAddress).createNewChyme( 
         8,
         75,
-        100,
+        0,
         1,
         chymeAddress,           
         oracleAddress,
@@ -107,8 +103,7 @@ describe('Check the Alchemy', () => {
       
       elixirImpl.setAcademy(alchemistAcademy.address);
 
-      let tx = await alchemistAcademy.alchemist(chymeAddress,
-        {value: ethers.utils.parseEther("0.00001")});   
+      let tx = await alchemistAcademy.alchemist(chymeAddress);   
       const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
       const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist, address priceOracle, int256 forgePrice)"]);
       const data = receipt.logs[2].data;
@@ -147,9 +142,7 @@ describe('Check the Alchemy', () => {
       let balElixir = await elixirImpl.balanceOf(wallet.address);
       expect(balElixir).to.equal(ethers.BigNumber.from("1"));
       //time to merge the first elixir
-      //approve tokens
-      await sdt.mint(wallet.address, ethers.utils.parseUnits("1000", 8));
-      await sdt.approve(mrAlchemist.address, ethers.utils.parseUnits("1000",8));
+      
       await steadyImpl.approve(mrAlchemist.address, ethers.utils.parseUnits("350000000000000000000", 18));
       await elixirImpl.approve(mrAlchemist.address, 0);
 
@@ -177,7 +170,7 @@ describe('Check the Alchemy', () => {
       await alchemistAcademy.connect(DAOAddress).createNewChyme( 
         18,
         75,
-        100,
+        0,
         1,
         chyme.address,           
         oracleAddressWith18DecimalPlaces,
@@ -186,8 +179,7 @@ describe('Check the Alchemy', () => {
         );
       await chyme.mint(chymeHolder.address,ethers.utils.parseEther("10000"));
 
-      let tx = await alchemistAcademy.alchemist(chyme.address,
-        {value: ethers.utils.parseEther("0.00001")});   
+      let tx = await alchemistAcademy.alchemist(chyme.address);   
       const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
       const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist, address priceOracle, int256 forgePrice)"]);
       const data = receipt.logs[2].data;
@@ -220,8 +212,7 @@ describe('Check the Alchemy', () => {
       expect(balElixir).to.gte(ethers.BigNumber.from("1"));// 1 here because now we have burned the elixir from previous test
       //time to merge the first elixir
       //approve tokens
-      await sdt.mint(wallet.address, ethers.utils.parseUnits("1000", 18));
-      await sdt.approve(mrAlchemist.address, ethers.utils.parseUnits("1000",18));
+      
       await steadyImpl.approve(mrAlchemist.address, ethers.utils.parseUnits("76800000000000000000000", 18));
       await elixirImpl.approve(mrAlchemist.address, 1);
       //find the steady Required 

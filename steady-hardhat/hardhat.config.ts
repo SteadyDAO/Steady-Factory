@@ -11,6 +11,7 @@ import "hardhat-gas-reporter"
 import { HardhatUserConfig, task } from "hardhat/config";
 import { removeConsoleLog } from "hardhat-preprocessor";
 import "solidity-coverage";
+import "hardhat-watcher";
 
 const accounts = {
   mnemonic:
@@ -109,30 +110,41 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     // Obtain one at https://etherscan.io/
     apiKey: process.env.ETHERSCAN_KEY
   },
-  contractSizer: {
-    alphaSort: true,
-    disambiguatePaths: false,
-    runOnCompile: true,
-    strict: true,
-  },
-  gasReporter: {
-    showMethodSig: false,
-    enabled: (process.env.REPORT_GAS) ? true : false
-  },
-  typechain: {
-    outDir: 'src/types',
-    target: 'ethers-v5',
-    alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
-    externalArtifacts: ['externalArtifacts/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
-  },
-  abiExporter: {
-    path: './data/abi',
-    clear: false,
-    flat: true,
-    spacing: 2
-  },
+  // contractSizer: {
+  //   alphaSort: true,
+  //   disambiguatePaths: false,
+  //   runOnCompile: true,
+  //   strict: true,
+  // },
+  // gasReporter: {
+  //   showMethodSig: false,
+  //   enabled: (process.env.REPORT_GAS) ? true : false
+  // },
+  // typechain: {
+  //   outDir: 'src/types',
+  //   target: 'ethers-v5',
+  //   alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
+  //   externalArtifacts: ['externalArtifacts/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
+  // },
+  // abiExporter: {
+  //   path: './data/abi',
+  //   clear: false,
+  //   flat: true,
+  //   spacing: 2
+  // },
   mocha: {
     timeout: 40000
+  },
+  watcher: {
+    compilation: {
+      tasks: ["compile"],
+      files: ["./contracts"],
+      verbose: true,
+    },
+    ci: {
+      tasks: ["clean", { command: "compile", params: { quiet: true } }, { command: "test", params: { noCompile: true, testFiles: ["test/Academy.test.ts","test/Alchemist.test.ts"] } } ],
+      files: ["./contracts", "./test"],
+    }
   }
 };
 

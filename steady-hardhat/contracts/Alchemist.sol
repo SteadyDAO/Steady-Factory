@@ -37,7 +37,6 @@ contract Alchemist is ReentrancyGuard, Initializable {
     function initialize
     (
         address _chyme,
-        address _steadyDAOToken,
         address _steadyImpl,
         address _elixirImpl,
         address _treasury,
@@ -50,8 +49,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
     {
         __Alchemist_init
             (
-                _chyme, 
-                _steadyDAOToken, 
+                _chyme,  
                 _steadyImpl, 
                 _elixirImpl, 
                 _treasury, 
@@ -63,7 +61,6 @@ contract Alchemist is ReentrancyGuard, Initializable {
 
     function __Alchemist_init(
         address _chyme,
-        address _steadyDAOToken,
         address _steadyImpl,
         address _elixirImpl,
         address _treasury,
@@ -72,7 +69,6 @@ contract Alchemist is ReentrancyGuard, Initializable {
         address _steadyDAORewards
     )  internal {
         chyme = _chyme;
-        steadyDAOToken = _steadyDAOToken;
         forgePrice = _forgePrice;
         alchemistId = _alchemistId;
         academy = msg.sender;

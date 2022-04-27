@@ -9,14 +9,13 @@ import {
   AlchemistAcademy,
   Alchemist,
   DummyPriceOracleForTesting, 
-  SteadyDaoToken,
+  SteadyDAOReward,
   Steady,
   Elixir, 
   ERC20} from '../src/types/index';
 import * as hre from "hardhat";
 let mrAlchemist:Alchemist;
 let alchemistAcademy: AlchemistAcademy;
-let sdt: SteadyDaoToken;
 let steadyImpl: Contract;
 let elixirImpl: Contract;
 let alchI: Contract;
@@ -57,8 +56,6 @@ describe('Elixir NFT works as expected', async () => {
         chymeHolder = await (ethers as any).getSigner(chymeImpersonate);
         const TreasureChest = await ethers.getContractFactory("Treasure");
         const treasureChest = await TreasureChest.deploy();
-        const SteadyDaoToken = await ethers.getContractFactory("SteadyDaoToken");
-        sdt = await SteadyDaoToken.deploy(ufoTokenAddr) as SteadyDaoToken;
     
         const Steady = await ethers.getContractFactory("Steady");
         steadyImpl = await Steady.deploy() as Steady;
@@ -79,14 +76,19 @@ describe('Elixir NFT works as expected', async () => {
         dummyPriceOracleForTesting = await _dummyPriceOracleForTesting.deploy() as DummyPriceOracleForTesting;
     
         await dummyPriceOracleForTesting.setLatestAnswer(5778003570);
+
+        const SteadyDAOReward = await ethers.getContractFactory("SteadyDAOReward");
+        const steadyDAOReward = await SteadyDAOReward.connect(wallet2).deploy() as SteadyDAOReward;
+        await steadyDAOReward.deployed();
+
         console.log("starting Academy Creation");
         await alchemistAcademy.initialize(
-          sdt.address,
           steadyImpl.address, 
           elixirImpl.address,
           treasury.address,
           alchemistImpl.address,
-          DAOAddress.address
+          DAOAddress.address,
+          steadyDAOReward.address
         );
      
         await alchemistAcademy.connect(DAOAddress).createNewChyme( 
@@ -99,8 +101,7 @@ describe('Elixir NFT works as expected', async () => {
           157680000,
           10
           );
-        let tx = await alchemistAcademy.alchemist(chymeAddress,
-          {value: ethers.utils.parseEther("0.0001")});   
+        let tx = await alchemistAcademy.alchemist(chymeAddress);   
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
         const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist, address priceOracle, int256 forgePrice)"]);
         const data = receipt.logs[2].data;

@@ -20,7 +20,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     Counters.Counter private _tokenIdCounter;
 
-    // todo, change to UF specific owner.
+    // Below owner is the owner for the purpose of setting the page details in opensea.
     address public owner = 0xc1c5da1673935527d4EFE1714Ef8dcbee12a9380;
     address public academy;
     address public treasure;

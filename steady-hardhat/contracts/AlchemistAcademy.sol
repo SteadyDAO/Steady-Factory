@@ -26,7 +26,6 @@ contract AlchemistAcademy is Initializable {
     address public steadyDAOReward;
 
     uint256 public alchemistCounter;
-    uint256 public constant CREATION_FEE = 0.00001 ether;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     event Chymed(address chyme, uint256 fees, uint256 approvalStatus);
@@ -34,7 +33,6 @@ contract AlchemistAcademy is Initializable {
 
     function initialize
     (
-        address _steadyDAOToken,
         address _steadyImpl, 
         address _elixirImpl,
         address _treasury,
@@ -49,7 +47,6 @@ contract AlchemistAcademy is Initializable {
         elixirImpl = _elixirImpl;
         treasury = _treasury;
         alchemistImpl = _alchemistImpl;
-        steadyDAOToken = _steadyDAOToken;
         DAOAddress = _DAOAddress;
         steadyDAOReward = _steadyDAOReward;
     }
@@ -59,41 +56,31 @@ contract AlchemistAcademy is Initializable {
         steadyDAOReward = _steadyDAOReward;
     }
 
-    ///@dev alchemist alchemists that can be used to split a chyme at a specific price
+    ///@dev alchemist creates a new vault. In the vault that can be used to split/merge a chyme at a specific price
     function alchemist
     (
         address _chyme
     ) 
         external
-        payable
         returns 
         (address) 
     {
-        IChyme.Chyme memory chyme = chymeList[_chyme];
+        IChyme.Chyme memory chyme = chymeList[_chyme];//the type of erc20 that will be split
         require(chyme.DAOApproved == 1, "Ye Chyme is Impure!");
-        require(msg.value >= CREATION_FEE);
         int256 forgePrice = priceFromOracle(chyme.oracleAddress);
         address alchemistDeployed = ClonesUpgradeable.clone(alchemistImpl);
         Alchemist(alchemistDeployed)
         .initialize(
             _chyme,
-            steadyDAOToken,
             steadyImpl,
             elixirImpl,
             treasury,
             uint256(forgePrice), 
             alchemistCounter++,
-            steadyDAOReward); 
-            //TODO : Give transfer authority to the alchemists for upto the max amount that they hold.
+            steadyDAOReward);
         IAccessControlEnumerableUpgradeable(steadyImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(MINTER_ROLE, alchemistDeployed);
         emit AlchemistForged(alchemistDeployed, chyme.oracleAddress, forgePrice);
-        //transfer the creation fee to the treasury
-        // payable(DAOAddress).transfer(CREATION_FEE);
-        // //transfer steady DAO tokens to the creator for this alchemist creation
-        // if(chyme.reward > 0){
-        //     IERC20Upgradeable(steadyDAOToken).transfer(msg.sender, chyme.reward);
-        // }
         return alchemistDeployed;
     }
 

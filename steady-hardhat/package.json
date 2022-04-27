@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "compile": "npx hardhat compile",
+    "watch":" npx hardhat watch",
     "deploym": "npx hardhat run scripts/deploy.ts --network mumbai",
     "custom": "npx hardhat run scripts/custom.ts --network mumbai",
     "deployMaster": "npx hardhat run scripts/deployMaster.ts --network mumbai",
@@ -39,6 +40,7 @@
     "dotenv": "^10.0.0",
     "hardhat-gas-reporter": "^1.0.7",
     "hardhat-preprocessor": "^0.1.4",
+    "hardhat-watcher": "^2.1.1",
     "openzeppelin-solidity": "^2.3.0",
     "solidity-coverage": "^0.7.17"
   }
