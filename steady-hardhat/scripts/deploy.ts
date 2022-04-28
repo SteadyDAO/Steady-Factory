@@ -11,7 +11,6 @@ import * as hre from "hardhat";
 import {  
   AlchemistAcademy,
   Alchemist, 
-  SteadyDaoToken,
   SteadyDAOReward,
   SimpleToken,
   Steady,
@@ -19,14 +18,14 @@ import {
 
 let wallet: Wallet, wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 let alchemistAcademy: AlchemistAcademy;
-let sdt: SteadyDaoToken;
+
 let stt: SimpleToken;
 let steadyImpl: Contract;
 let elixirImpl: Contract;
 let alchI: Contract;
 let alchemistImpl: Alchemist;
 let steadyDAOReward: SteadyDAOReward;
-const ufoTokenAddr = "0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b";
+
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
 
 async function main() {
@@ -49,18 +48,21 @@ async function main() {
   const TreasureChest = await ethers.getContractFactory("Treasure");
   const treasureChest = await TreasureChest.connect(wallet2).deploy();
   await treasureChest.deployed();
+
   const ElixirFactory = await ethers.getContractFactory("Elixir");
   elixirImpl = await ElixirFactory.connect(wallet2).deploy("NFT","Elixir", treasureChest.address) as Elixir;
   await elixirImpl.deployed();
+
 
   const AlchemistAcademyFactory = await ethers.getContractFactory("AlchemistAcademy");
   alchemistAcademy = await AlchemistAcademyFactory.connect(wallet2).deploy() as AlchemistAcademy;
   console.log("AlchemistAcademyFactory deployed to:", alchemistAcademy.address);
   await alchemistAcademy.deployed();
+
   const SteadyDAOReward = await ethers.getContractFactory("SteadyDAOReward");
   steadyDAOReward = await SteadyDAOReward.connect(wallet2).deploy() as SteadyDAOReward;
   await steadyDAOReward.deployed();
-  await alchemistAcademy.connect(wallet2).initialize(
+  const init = await alchemistAcademy.connect(wallet2).initialize(
     steadyImpl.address, 
     elixirImpl.address,
     treasury.address,
@@ -68,23 +70,19 @@ async function main() {
     DAOAddress.address,
     steadyDAOReward.address
   );
-  await delay(20000);
+  await init.wait();
+  const grantA = await elixirImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+  await grantA.wait();
+  const grantB = await steadyImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+  await grantB.wait();
 
-  elixirImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
-  await delay(20000);
-
-  steadyImpl.connect(wallet2).grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
-  await delay(20000);
-
-  console.log("DEFAULT_ADMIN_ROLE granted");
-
-
+  console.log("DEFAULT_ADMIN_ROLE granted to both the implementation");
 
   console.log("alchemistAcademy initialized");
-    await alchemistAcademy.connect(DAOAddress).createNewChyme( 
+  const newChyme =  await alchemistAcademy.connect(DAOAddress).createNewChyme( 
       8,
       75,
-      100,
+      0,
       1,
       stt.address,                
       "0x9dd18534b8f456557d11B9DDB14dA89b2e52e308",
@@ -95,10 +93,9 @@ async function main() {
 
 
 
-await delay(20000);
+  await newChyme.wait();
   console.log("Academy deployed to:", alchemistAcademy.address);
   console.log("Now verifying...\n",
-  sdt.address, "Steady DAO Token Address\n",
   steadyImpl.address,"steadyImpl Address\n",
   stt.address,"stt Address\n",
   elixirImpl.address,"elixirImpl Address\n",
@@ -109,7 +106,6 @@ await delay(20000);
   elixirImpl.connect(wallet2).setAcademy(alchemistAcademy.address);
 
 
-  await verify(sdt.address, ufoTokenAddr);
   await verify(stt.address, 8);
   await verify(elixirImpl.address,"NFT","Elixir", treasureChest.address );
   await verify(alchemistAcademy.address);
