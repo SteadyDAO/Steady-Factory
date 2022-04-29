@@ -1,0 +1,11 @@
+.MergeContainer {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.ElixirNftsContainer {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}

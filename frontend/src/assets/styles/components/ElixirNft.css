@@ -1,0 +1,20 @@
+.ElixirNftContainer {
+  background: #675B5B;
+  box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.35);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.ElixirNftActions {
+  display: flex;
+  justify-content: center;
+  padding: .5rem 0;
+  width: 100%;
+}
+
+.ElixirNftImage {
+  cursor: pointer;
+  width: 225px;
+}

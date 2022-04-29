@@ -1,0 +1,46 @@
+.HeaderContainer {
+  align-items: center;
+  display: flex;
+  height: 90px;
+  justify-content: space-between;
+  padding: 0 50px;
+  width: 100%;
+}
+
+.Logo {
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.RightSideContainer {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.NavbarContainer {
+  align-items: center;
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin-right: 4rem;
+}
+
+.NavbarItem {
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.NavbarItem:hover {
+  color: #E6CCA9;
+}
+
+.NavbarItemActive {
+  color: #E6CCA9;
+}
