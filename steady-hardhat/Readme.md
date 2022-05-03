@@ -33,7 +33,7 @@ Approve - (100 = 10000000000) stt tokens 0x904282C0e2Bb3c6BA0D6e23C0c4FC73356B45
 ## 5. Merge the token back
 1. give approval for your Elixir NFT back - Elixer NFT tokenId from step 4, spender 0x5d6557152888c74b317c569a68f3673207dd1523
   https://mumbai.polygonscan.com/address/0x92636edd3a7273cce16e91366f595d576f80c6b4#writeContract 
-2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 10000000000), spender 0x5d6557152888c74b317c569a68f3673207dd1523 - https://mumbai.polygonscan.com/address/0x53c96cc2eb9753e4bcaea0638833b2ac2e09702c#writeContract
+2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 100000000000000000000), spender 0x5d6557152888c74b317c569a68f3673207dd1523 - https://mumbai.polygonscan.com/address/0x53c96cc2eb9753e4bcaea0638833b2ac2e09702c#writeContract
 3. Call the Merge  https://mumbai.polygonscan.com/address/0x5d6557152888c74b317c569a68f3673207dd1523#writeContract
   with the NFT token id from step 4.
 4. Now you should have the right to pull your original chyme, you can do this by going to https://mumbai.polygonscan.com/address/0x904282C0e2Bb3c6BA0D6e23C0c4FC73356B45989#writeContract and calling transferFrom - recepient is your address, sender is 0x5d6557152888c74b317c569a68f3673207dd1523 and amount is the amount you original split (100 = 10000000000).
