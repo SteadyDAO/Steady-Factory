@@ -1,5 +1,25 @@
 .MergeContainer {
   display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.MergeTitleContainer {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.MergeTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.MergeActions {
+  display: flex;
   justify-content: flex-start;
   width: 100%;
 }
@@ -8,4 +28,10 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+.NoElixirNftMessage {
+  color: #a99b9b;
+  font-weight: 600;
+  font-style: italic;
 }
