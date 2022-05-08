@@ -25,3 +25,8 @@ export const getContractByName = (name: string, wallet: Wallet): ethers.Contract
   const contract = new ethers.Contract(contractAddress, getABIs([{ contractName: name, contractAddress }])[0][1], wallet);
   return contract;
 }
+
+export const getContractByAddressName = (address: string, name: string, wallet: Wallet): ethers.Contract => {
+  const contract = new ethers.Contract(address, getABIs([{ contractName: name, contractAddress: address }])[0][1], wallet);
+  return contract;
+}

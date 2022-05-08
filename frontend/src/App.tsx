@@ -75,6 +75,5 @@ export default App;
 });
 
 (window as any).ethereum?.on('accountsChanged', (accounts: any) => {
-  console.log(accounts)
   window.location.reload();
 });

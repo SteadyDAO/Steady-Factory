@@ -1,11 +1,13 @@
 import { Button } from "@mui/material";
 
-const ElixirNft = () => {
+const ElixirNft = (props: {
+  imageUri: string
+}) => {
   return (
     <div className="ElixirNftContainer">
-      <img className="ElixirNftImage" src="https://openseauserdata.com/files/995031591ba7f888922563cb5e51c4df.svg" alt="" />
+      <img className="ElixirNftImage" src={props.imageUri} alt="" />
       <div className="ElixirNftActions">
-      <Button color="secondary" variant="contained">Merge</Button>
+        <Button color="secondary" variant="contained">Merge</Button>
       </div>
     </div>
   );
