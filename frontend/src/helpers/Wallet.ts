@@ -30,3 +30,35 @@ export const pollingTransaction = (hash: string, txCompletedCallBack: Function) 
       });
   }, 3000);
 }
+
+export const errorHandler = (err: any, setSnackbar: Function) => {
+  if (err && err.data && err.data.message) {
+    setSnackbar({
+      isOpen: true,
+      timeOut: 60000,
+      type: 'error',
+      message: err.data.message
+    });
+  } else if (err && err.error && err.error.message) {
+    setSnackbar({
+      isOpen: true,
+      timeOut: 60000,
+      type: 'error',
+      message: err.error.message
+    });
+  } else if (err && err.message) {
+    setSnackbar({
+      isOpen: true,
+      timeOut: 60000,
+      type: 'error',
+      message: err.message
+    });
+  } else {
+    setSnackbar({
+      isOpen: true,
+      timeOut: 60000,
+      type: 'error',
+      message: 'Something went wrong, please try again later.'
+    });
+  }
+}

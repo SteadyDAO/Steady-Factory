@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, FormControl, InputAdornment, MenuItem, Select, Skeleton, TextField } from "@mui/material";
+import { Button, CircularProgress, FormControl, InputAdornment, MenuItem, Select, Skeleton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist, IChyme, IStrike } from "../models/Alchemist";
@@ -10,8 +10,10 @@ import config from '../config/config.json';
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
 import { IFormControl } from "../models/Form";
-import { connectWallet, pollingTransaction } from "../helpers/Wallet";
+import { connectWallet, errorHandler, pollingTransaction } from "../helpers/Wallet";
 import { TransactionResponse } from "@ethersproject/providers";
+import SnackbarMessage from "./Snackbar";
+import { ISnackbarConfig } from "../models/Material";
 
 const Split = () => {
   const { account, active, activate, chainId, library } = useWeb3React();
@@ -19,6 +21,7 @@ const Split = () => {
   const [chymeDecimal, setChymeDecimal] = useState<number>();
   const [isNotEnoughBalance, setIsNotEnoughBalance] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [disableForm, setDisableForm] = useState<boolean>(false);
   const [strikePrices, setStrikePrices] = useState<Array<IStrike>>([]);
   const [chymeControl, setChymeControl] = useState<IFormControl>({
     value: 'default',
@@ -37,6 +40,9 @@ const Split = () => {
   const { data: getAlchemists } = useQuery(GET_ALCHEMISTS, {
     pollInterval: 3000
   });
+  const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
+    isOpen: false
+  } as any);
 
   useEffect(() => {
     if (getAlchemists && getAlchemists.alchemists) {
@@ -119,149 +125,209 @@ const Split = () => {
   }, [chymeControl.value, strikeControl.value, amountControl.value, isNotEnoughBalance]);
 
   const approve = async () => {
+    setDisableForm(true);
     const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
     const allowance = await chymeContract.allowance(account?.toString(), strikeControl.value);
     if (allowance?.gte(parseUnits(amountControl.value.toString(), chymeDecimal))) {
       splitChyme();
     } else {
       chymeContract.approve(strikeControl.value, parseUnits(amountControl.value.toString(), chymeDecimal))
-      .then((transactionResponse: TransactionResponse) => {
-        pollingTransaction(transactionResponse.hash, approveCompleted);
-      }, (err: any) => {
-      });
+        .then((transactionResponse: TransactionResponse) => {
+          setSnackbar({
+            isOpen: true,
+            timeOut: 500000,
+            type: 'warning',
+            message: 'Transaction is processing'
+          });
+          pollingTransaction(transactionResponse.hash, approveCompleted);
+        }, (err: any) => {
+          setDisableForm(false);
+          errorHandler(err, setSnackbar);
+        });
     }
   }
 
   const approveCompleted = (status: number) => {
     if (status === 1) {
       splitChyme();
+      setSnackbar({
+        isOpen: false,
+        type: 'warning',
+        message: ''
+      } as any);
     } else if (status === 0) {
+      setDisableForm(false);
+      setSnackbar({
+        isOpen: true,
+        timeOut: 5000,
+        type: 'error',
+        message: 'Approve failed'
+      });
     }
   }
 
   const splitChyme = () => {
     const alchemistContract = getContractByAddressName(strikeControl.value, 'Alchemist', library.getSigner());
     alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal))
-    .then((transactionResponse: TransactionResponse) => {
-      pollingTransaction(transactionResponse.hash, splitCompleted);
-    }, (err: any) => {
-    });
+      .then((transactionResponse: TransactionResponse) => {
+        setSnackbar({
+          isOpen: true,
+          timeOut: 500000,
+          type: 'warning',
+          message: 'Transaction is processing'
+        });
+        pollingTransaction(transactionResponse.hash, splitCompleted);
+      }, (err: any) => {
+        setDisableForm(false);
+        errorHandler(err, setSnackbar);
+      });
   }
 
   const splitCompleted = (status: number) => {
     if (status === 1) {
-      console.log('completed');
+      setDisableForm(false);
+      setSnackbar({
+        isOpen: true,
+        timeOut: 5000,
+        type: 'success',
+        message: 'Successfully splitted'
+      });
+      const getBalance = async () => {
+        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
+        const bl = await chymeContract.balanceOf(account);
+        const sb = await chymeContract.symbol();
+        const dcm = await chymeContract.decimal();
+        setBalance(formatUnits(bl, dcm));
+        setSymbol(sb);
+        setChymeDecimal(dcm);
+      }
+      getBalance();
     } else if (status === 0) {
+      setDisableForm(false);
+      setSnackbar({
+        isOpen: true,
+        timeOut: 5000,
+        type: 'error',
+        message: 'Split failed'
+      });
     }
   }
 
   return (
-    <div className="SplitContainer">
-      <span className="SplitLabel">Split Chyme</span>
-      <div className="SplitFormContainer">
-        <div className="SplitChymeControl SplitFormControl">
-          <FormControl required fullWidth>
-            <Select value={chymeControl.value} onChange={(event) => {
-              if (event.target.value) {
-                setChymeControl({
-                  value: event.target.value,
-                  invalid: false
-                });
-              } else {
-                setChymeControl({
-                  value: 'default',
-                  invalid: true
-                });
-              }
-            }}>
-              <MenuItem selected disabled value="default">Chyme</MenuItem>
-              {chymes.length > 0 && chymes.map((chyme: IChyme) =>
-                <MenuItem key={chyme.address} value={chyme.address}>
-                  {chyme.symbol}
-                </MenuItem>
-              )}
-            </Select>
-          </FormControl>
-        </div>
-        <div className="SplitStrikeControl SplitFormControl">
-          <FormControl required fullWidth>
-            <Select value={strikeControl.value} disabled={!chymeControl.value || chymeControl.value === 'default'} onChange={(event) => {
-              if (event.target.value) {
-                setStrikeControl({
-                  value: event.target.value,
-                  invalid: false
-                });
-              } else {
-                setStrikeControl({
-                  value: 'default',
-                  invalid: true
-                });
-              }
-            }}>
-              <MenuItem selected disabled value="default">Strike Price</MenuItem>
-              {strikePrices.length > 0 && strikePrices.map((strike: IStrike) =>
-                <MenuItem key={strike.alchemist} value={strike.alchemist}>
-                  {strike.strikePrice ? `${strike.strikePrice.toLocaleString()} (${strike.ratio}%)` : <Skeleton width={80} height={35} variant="text" />}
-                </MenuItem>
-              )}
-            </Select>
-          </FormControl>
-        </div>
-        <span className="SplitBalance">Balance: {balance} {symbol}</span>
-        <div className="SplitAmountControl SplitFormControl">
-          <FormControl required fullWidth>
-            <TextField
-              value={amountControl.value}
-              disabled={!+balance}
-              type="text"
-              placeholder="Amount"
-              InputProps={{
-                endAdornment:
-                  <InputAdornment position="end">
-                    <Button className="SplitMaxAmountButton" color="secondary" variant="contained" disabled={!+balance} onClick={() => {
-                      if (+balance) {
-                        setAmountControl({
-                          value: +balance,
-                          invalid: false
-                        });
-                      } else {
-                        setAmountControl({
-                          value: '',
-                          invalid: true
-                        });
-                      }
-                    }}>Max</Button>
-                  </InputAdornment>,
-              }}
-              onChange={(e) => {
-                if (+e.target.value && +e.target.value > 0) {
-                  setAmountControl({
-                    value: +e.target.value,
+    <>
+      <div className="SplitContainer">
+        <span className="SplitLabel">Split Chyme</span>
+        <div className="SplitFormContainer">
+          <div className="SplitChymeControl SplitFormControl">
+            <FormControl required fullWidth>
+              <Select value={chymeControl.value} disabled={disableForm} onChange={(event) => {
+                if (event.target.value) {
+                  setChymeControl({
+                    value: event.target.value,
                     invalid: false
                   });
                 } else {
-                  setAmountControl({
-                    value: '',
+                  setChymeControl({
+                    value: 'default',
                     invalid: true
                   });
                 }
-              }}
-            />
-          </FormControl>
+              }}>
+                <MenuItem selected disabled value="default">Chyme</MenuItem>
+                {chymes.length > 0 && chymes.map((chyme: IChyme) =>
+                  <MenuItem key={chyme.address} value={chyme.address}>
+                    {chyme.symbol}
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </div>
+          <div className="SplitStrikeControl SplitFormControl">
+            <FormControl required fullWidth>
+              <Select value={strikeControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
+                if (event.target.value) {
+                  setStrikeControl({
+                    value: event.target.value,
+                    invalid: false
+                  });
+                } else {
+                  setStrikeControl({
+                    value: 'default',
+                    invalid: true
+                  });
+                }
+              }}>
+                <MenuItem selected disabled value="default">Strike Price</MenuItem>
+                {strikePrices.length > 0 && strikePrices.map((strike: IStrike) =>
+                  <MenuItem key={strike.alchemist} value={strike.alchemist}>
+                    {strike.strikePrice ? `${strike.strikePrice.toLocaleString()} (${strike.ratio}%)` : <Skeleton width={80} height={35} variant="text" />}
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </div>
+          <span className="SplitBalance">Balance: {balance} {symbol}</span>
+          <div className="SplitAmountControl SplitFormControl">
+            <FormControl required fullWidth>
+              <TextField
+                value={amountControl.value}
+                disabled={!+balance || disableForm}
+                type="text"
+                placeholder="Amount"
+                InputProps={{
+                  endAdornment:
+                    <InputAdornment position="end">
+                      <Button className="SplitMaxAmountButton" color="secondary" variant="contained" disabled={!+balance || disableForm} onClick={() => {
+                        if (+balance) {
+                          setAmountControl({
+                            value: +balance,
+                            invalid: false
+                          });
+                        } else {
+                          setAmountControl({
+                            value: '',
+                            invalid: true
+                          });
+                        }
+                      }}>Max</Button>
+                    </InputAdornment>,
+                }}
+                onChange={(e) => {
+                  if (+e.target.value && +e.target.value > 0) {
+                    setAmountControl({
+                      value: +e.target.value,
+                      invalid: false
+                    });
+                  } else {
+                    setAmountControl({
+                      value: '',
+                      invalid: true
+                    });
+                  }
+                }}
+              />
+            </FormControl>
+          </div>
+          {isNotEnoughBalance ?
+            <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
+          }
         </div>
-        {isNotEnoughBalance ?
-          <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
-        }
+        <div className="SplitActions">
+          {active && chainId ?
+            <Button className="SplitButton" color="secondary" variant="contained" disabled={!isFormValid || disableForm} onClick={approve}>
+              {disableForm ?
+                <CircularProgress color="secondary" size={25} /> : <></>
+              }
+              Split
+            </Button> :
+            <Button className="SplitButton" color="secondary" variant="contained" onClick={() => {
+              connectWallet(activate)
+            }}>Connect Wallet</Button>
+          }
+        </div>
       </div>
-      <div className="SplitActions">
-        {active && chainId ?
-          <Button className="SplitButton" color="secondary" variant="contained" disabled={!isFormValid} onClick={approve}>Split</Button> :
-          <Button className="SplitButton" color="secondary" variant="contained" onClick={() => {
-            connectWallet(activate)
-          }}>Connect Wallet</Button>
-        }
-      </div>
-    </div>
+      <SnackbarMessage snackbar={snackbar} setSnackbar={setSnackbar} />
+    </>
   );
 }
 
