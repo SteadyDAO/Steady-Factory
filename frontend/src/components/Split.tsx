@@ -3,7 +3,7 @@ import { Button, CircularProgress, FormControl, InputAdornment, MenuItem, Select
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist, IChyme, IStrike } from "../models/Alchemist";
-import * as _ from "lodash";
+// import * as _ from "lodash";
 import { getContractByAddressName } from "../helpers/Contract";
 import { getDefaultProvider } from "ethers";
 import config from '../config/config.json';
@@ -52,14 +52,14 @@ const Split = () => {
           chyme: `0x${alchemist.chyme.slice(34, 74)}`
         }
       });
-      const temp = _.groupBy(als, 'chyme');
+      // const temp = _.groupBy(als, 'chyme');
       const tempChymes: Array<IChyme> = [];
-      _.forIn(temp, (value, key) => {
-        tempChymes.push({
-          address: key,
-          alchemists: value
-        } as any);
-      });
+      // _.forIn(temp, (value, key) => {
+      //   tempChymes.push({
+      //     address: key,
+      //     alchemists: value
+      //   } as any);
+      // });
       const getSymbols = async () => {
         tempChymes.forEach(async (chyme: IChyme, index: number) => {
           const chymeContract = getContractByAddressName(chyme.address, 'Chyme', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
