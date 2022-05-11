@@ -38,7 +38,7 @@ const Split = () => {
   const [balance, setBalance] = useState<string>('-');
   const [symbol, setSymbol] = useState<string>('-');
   const { data: getAlchemists } = useQuery(GET_ALCHEMISTS, {
-    pollInterval: 3000
+    pollInterval: 30000
   });
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
     isOpen: false
@@ -106,7 +106,8 @@ const Split = () => {
       }
       getStrikePrice();
     }
-  }, [chymeControl]);
+    // eslint-disable-next-line
+  }, [chymeControl, account, chymes]);
 
   useEffect(() => {
     if (amountControl.value && balance && +amountControl.value > +balance) {
@@ -114,7 +115,7 @@ const Split = () => {
     } else {
       setIsNotEnoughBalance(false);
     }
-  }, [amountControl.value]);
+  }, [amountControl, balance]);
 
   useEffect(() => {
     if (!isNotEnoughBalance && !chymeControl.invalid && !strikeControl.invalid && !amountControl.invalid) {
@@ -122,7 +123,7 @@ const Split = () => {
     } else {
       setIsFormValid(false);
     }
-  }, [chymeControl.value, strikeControl.value, amountControl.value, isNotEnoughBalance]);
+  }, [chymeControl, strikeControl, amountControl, isNotEnoughBalance]);
 
   const approve = async () => {
     setDisableForm(true);

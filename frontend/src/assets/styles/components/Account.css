@@ -42,3 +42,31 @@
   height: 100%;
   padding: 0 10px;
 }
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+  .AccountContainer {
+    gap: .85rem;
+  }
+  .AccountInfoBalance,
+  .AccountInfoAddress {
+    font-size: .95rem;
+  }
+}
+
+@media only screen and (max-width: 640px) {
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

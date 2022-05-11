@@ -6,7 +6,9 @@
   display: flex;
   flex-direction: column;
   gap: .5rem;
+  max-width: 500px;
   padding: 2rem;
+  width: 100%;
 }
 
 .SplitLabel {
@@ -68,4 +70,38 @@
   font-size: 1.25rem !important;
   height: 50px !important;
   width: 250px !important;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+}
+
+@media only screen and (max-width: 480px) {
+  .SplitContainer {
+    padding: 1rem;
+  }
+  .SplitFormContainer {
+    flex-direction: column;
+    gap: .5rem;
+  }
+  .SplitFormControl {
+    width: 100%;
+  }
+  .SplitBalance {
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 320px) {
 }

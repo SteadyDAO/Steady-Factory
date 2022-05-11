@@ -35,3 +35,39 @@
   font-weight: 600;
   font-style: italic;
 }
+
+.ElixirNftsSpinnerContainer {
+  align-items: center;
+  display: flex;
+  height: 200px;
+  width: 100%;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+}
+
+@media only screen and (max-width: 480px) {
+  .MergeTitleContainer,
+  .MergeActions {
+    justify-content: center;
+  }
+  .ElixirNftsContainer {
+    align-items: center;
+    flex-direction: column;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+}
