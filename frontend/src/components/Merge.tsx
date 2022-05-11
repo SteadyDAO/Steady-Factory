@@ -22,7 +22,7 @@ const Merge = () => {
 
   const fetchData = () => {
     setIsLoadingElixirNfts(true);
-    return fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`)
+    return fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, {cache: 'no-cache'})
       .then((response) => response.json())
       .then((data: OpenseaResponse) => {
         const nfts = data.assets.filter(
