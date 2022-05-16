@@ -55,7 +55,7 @@ const Merge = () => {
             <>
               {elixirNfts.length > 0 ?
                 <div className="ElixirNftsContainer">
-                  {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} imageUri={elixirNft.image_preview_url} permalink={elixirNft.permalink} />)}
+                  {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
                 </div> :
                 <span className="NoElixirNftMessage">You have no Elixir NFT yet.</span>
               }

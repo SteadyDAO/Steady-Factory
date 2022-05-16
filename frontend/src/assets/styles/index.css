@@ -24,3 +24,16 @@ code {
   border-radius: 12px !important;
 }
 
+.MuiStepLabel-root
+.Mui-completed {
+  color: #FFFFFF !important;
+}
+
+.CompletedColor {
+  color: #12da33 !important;
+}
+
+.ErrorColor {
+  color: #dd563e !important;
+}
+

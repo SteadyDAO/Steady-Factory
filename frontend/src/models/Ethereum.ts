@@ -27,4 +27,14 @@ export interface IOpenseaAsset {
     description: string;
   };
   permalink: string;
+  traits: Array<IOpenseaTrait>;
+}
+
+export interface IOpenseaTrait {
+  display_type: string;
+  max_value: any;
+  order: any;
+  trait_count: number;
+  trait_type: string;
+  value: any;
 }

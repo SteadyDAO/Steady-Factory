@@ -1,5 +1,15 @@
 .HomePageContainer {
+  align-items: center;
   display: flex;
+  flex-direction: column;
+  padding: 80px 120px;
+}
+
+.LaunchAppContainer {
+  align-items: center;
+  display: none;
+  justify-content: center;
+  width: 100%;
 }
 
 @media only screen and (max-width: 1366px) {
@@ -15,6 +25,9 @@
 }
 
 @media only screen and (max-width: 640px) {
+  .LaunchAppContainer {
+    display: flex;
+  }
 }
 
 @media only screen and (max-width: 480px) {

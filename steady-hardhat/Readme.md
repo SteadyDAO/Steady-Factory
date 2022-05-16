@@ -33,7 +33,7 @@ Approve - (100 = 10000000000) stt tokens 0xd7659f8168b9144ede632ebc08e2822479028
 ## 5. Merge the token back
 1. give approval for your Elixir NFT back - Elixer NFT tokenId from step 4, spender 0x3c516282045f3e7b3a65b75412240fed76cb03ee
   https://rinkeby.etherscan.io/address/0xba159d729fc61d6a965b7c40fc121df08d9f8b7b#writeContract 
-2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 100000000000000000000), spender 0x3c516282045f3e7b3a65b75412240fed76cb03ee - https://rinkeby.etherscan.io/address/0x71a37310a97f7ddac78c531b99d806dd23e1c695
+2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 100000000000000000000), spender 0x3c516282045f3e7b3a65b75412240fed76cb03ee - https://rinkeby.etherscan.io/address/0x71a37310a97f7ddac78c531b99d806dd23e1c695#writeContract
 3. Call the Merge  https://rinkeby.etherscan.io/address/0x3c516282045f3e7b3a65b75412240fed76cb03ee#writeContract
   with the NFT token id from step 4.
 4. Now you should have the right to pull your original chyme, you can do this by going to https://rinkeby.etherscan.io/address/0xd7659f8168b9144ede632ebc08e282247902844e and calling transferFrom - recepient is your address, sender is 0x3c516282045f3e7b3a65b75412240fed76cb03ee and amount is the amount you original split (100 = 10000000000).

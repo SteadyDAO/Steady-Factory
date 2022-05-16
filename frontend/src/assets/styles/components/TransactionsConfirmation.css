@@ -1,0 +1,37 @@
+
+.TransactionsConfirmationContainer {
+  background: #675B5B;
+  display: flex;
+  flex-direction: column;
+}
+
+.TransactionsConfirmationHeaderContainer {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.TransactionsConfirmationContentContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem;
+}
+
+.TransactionsConfirmationMessage {
+  color: #FFFFFF;
+  text-align: center;
+  width: 100%;
+}
+
+.TransactionsConfirmationStepper {
+  width: 100% !important;
+}
+
+.TransactionsConfirmationActionsContainer {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+}

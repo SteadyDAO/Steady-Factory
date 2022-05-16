@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, FormControl, InputAdornment, MenuItem, Select, Skeleton, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist, IChyme, IStrike } from "../models/Alchemist";
@@ -14,6 +14,10 @@ import { connectWallet, errorHandler, pollingTransaction } from "../helpers/Wall
 import { TransactionResponse } from "@ethersproject/providers";
 import SnackbarMessage from "./Snackbar";
 import { ISnackbarConfig } from "../models/Material";
+import { Transition } from "./Transition";
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const Split = () => {
   const { account, active, activate, chainId, library } = useWeb3React();
@@ -21,6 +25,11 @@ const Split = () => {
   const [chymeDecimal, setChymeDecimal] = useState<number>();
   const [isNotEnoughBalance, setIsNotEnoughBalance] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [isTryAgain, setIsTryAgain] = useState<boolean>(false);
+  const [isSplitCompleted, setIsSplitCompleted] = useState<boolean>(false);
+  const [isConfirmation, setIsConfirmation] = useState<boolean>(false);
+  const [confirmationStep, setConfirmationStep] = useState<number>(0);
+  const [confirmationMessage, setConfirmationMessage] = useState<string>('');
   const [disableForm, setDisableForm] = useState<boolean>(false);
   const [strikePrices, setStrikePrices] = useState<Array<IStrike>>([]);
   const [chymeControl, setChymeControl] = useState<IFormControl>({
@@ -125,6 +134,34 @@ const Split = () => {
     }
   }, [chymeControl, strikeControl, amountControl, isNotEnoughBalance]);
 
+  useEffect(() => {
+    if (chymes.length > 0) {
+      setChymeControl({
+        value: chymes[0].address,
+        invalid: false
+      });
+    } else {
+      setChymeControl({
+        value: 'default',
+        invalid: true
+      });
+    }
+  }, [chymes]);
+
+  useEffect(() => {
+    if (strikePrices.length > 0) {
+      setStrikeControl({
+        value: strikePrices[0].alchemist,
+        invalid: false
+      });
+    } else {
+      setStrikeControl({
+        value: 'default',
+        invalid: true
+      });
+    }
+  }, [strikePrices]);
+
   const approve = async () => {
     setDisableForm(true);
     const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
@@ -132,6 +169,11 @@ const Split = () => {
     if (allowance?.gte(parseUnits(amountControl.value.toString(), chymeDecimal))) {
       splitChyme();
     } else {
+      setConfirmationStep(0);
+      setIsConfirmation(true);
+      setIsTryAgain(false);
+      setIsSplitCompleted(false);
+      setConfirmationMessage('Waiting for transaction confirmation...');
       chymeContract.approve(strikeControl.value, parseUnits(amountControl.value.toString(), chymeDecimal))
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
@@ -142,6 +184,8 @@ const Split = () => {
           });
           pollingTransaction(transactionResponse.hash, approveCompleted);
         }, (err: any) => {
+          setConfirmationMessage('Something went wrong. Please try again.');
+          setIsTryAgain(true);
           setDisableForm(false);
           errorHandler(err, setSnackbar);
         });
@@ -168,6 +212,11 @@ const Split = () => {
   }
 
   const splitChyme = () => {
+    setConfirmationStep(1);
+    setIsConfirmation(true);
+    setIsTryAgain(false);
+    setIsSplitCompleted(false);
+    setConfirmationMessage('Waiting for transaction confirmation...');
     const alchemistContract = getContractByAddressName(strikeControl.value, 'Alchemist', library.getSigner());
     alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal))
       .then((transactionResponse: TransactionResponse) => {
@@ -179,6 +228,8 @@ const Split = () => {
         });
         pollingTransaction(transactionResponse.hash, splitCompleted);
       }, (err: any) => {
+        setConfirmationMessage('Something went wrong. Please try again.');
+        setIsTryAgain(true);
         setDisableForm(false);
         errorHandler(err, setSnackbar);
       });
@@ -187,6 +238,9 @@ const Split = () => {
   const splitCompleted = (status: number) => {
     if (status === 1) {
       setDisableForm(false);
+      setIsSplitCompleted(true);
+      setConfirmationMessage('Successfully splitted.');
+      setConfirmationStep(2);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
@@ -211,6 +265,14 @@ const Split = () => {
         type: 'error',
         message: 'Split failed'
       });
+    }
+  }
+
+  const tryAgain = () => {
+    if (confirmationStep === 0) {
+      approve();
+    } else if (confirmationStep === 1) {
+      splitChyme();
     }
   }
 
@@ -327,6 +389,49 @@ const Split = () => {
           }
         </div>
       </div>
+      <Dialog
+        className="TransactionsConfirmationDialog"
+        open={isConfirmation}
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <div className="TransactionsConfirmationContainer">
+          <div className="TransactionsConfirmationHeaderContainer">
+            <IconButton onClick={() => {
+              setIsConfirmation(false);
+            }}>
+              <CloseIcon color="primary" />
+            </IconButton>
+          </div>
+          <div className="TransactionsConfirmationContentContainer">
+            {!isTryAgain && !isSplitCompleted ?
+              <CircularProgress color="secondary" size={50} /> : <></>
+            }
+            {isSplitCompleted ?
+              <CheckCircleIcon className="CompletedColor" fontSize="large" /> : <></>
+            }
+            {isTryAgain ?
+              <ErrorIcon className="ErrorColor" fontSize="large" /> : <></>
+            }
+            <span className="TransactionsConfirmationMessage">{confirmationMessage}</span>
+            <Stepper className="TransactionsConfirmationStepper" activeStep={confirmationStep} alternativeLabel>
+              <Step>
+                <StepLabel>Approve Amount</StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>Split Chyme</StepLabel>
+              </Step>
+            </Stepper>
+          </div>
+          {isTryAgain ?
+            <div className="TransactionsConfirmationActionsContainer">
+              <Button variant="contained" onClick={tryAgain}>
+                Try again
+              </Button>
+            </div> : <></>
+          }
+        </div>
+      </Dialog>
       <SnackbarMessage snackbar={snackbar} setSnackbar={setSnackbar} />
     </>
   );
