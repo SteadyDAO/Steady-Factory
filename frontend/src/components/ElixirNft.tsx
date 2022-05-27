@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { getContractAddressByName, getContractByAddressName } from "../helpers/Contract";
 import { useWeb3React } from "@web3-react/core";
 import { errorHandler, pollingTransaction } from "../helpers/Wallet";
+import useEtherSWR from "ether-swr";
 
 const ElixirNft = (props: {
   elixirNft: IOpenseaAsset
@@ -29,12 +30,19 @@ const ElixirNft = (props: {
     isOpen: false
   } as any);
   // console.log(props.elixirNft);
-  const elixirNftContractAddress = props.elixirNft.asset_contract.address;
-  const elixirNftContract = getContractByAddressName(elixirNftContractAddress, 'ElixirNft', library.getSigner());
+  const elixirContractAddress = getContractAddressByName('ElixirNft');
+  const academyContractAddress = getContractAddressByName('Academy');
+  const elixirNftContract = getContractByAddressName(elixirContractAddress, 'ElixirNft', library.getSigner());
   const alchemistContractAddress = props.elixirNft.traits.filter((trait: IOpenseaTrait) => trait.trait_type === 'Alchemist')[0]?.value;
   const alchemistContract = getContractByAddressName(alchemistContractAddress, 'Alchemist', library.getSigner());
   // const steadyTokenContractAddress = getContractAddressByName('SteadyToken');
   // const steadyTokenContract = getContractByAddressName(steadyTokenContractAddress, 'SteadyToken', library.getSigner());
+  
+  const { data: elements } = useEtherSWR([
+    elixirContractAddress,
+    'elements',
+    props.elixirNft.token_id
+  ]);
 
   useEffect(() => {
     const getApproved = async () => {

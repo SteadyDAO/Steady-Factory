@@ -20,7 +20,10 @@ export interface IElixir {
   ratio: IRatio;
 }
 
-export type IRatio = 'LowRisk' | 'MediumRisk' | 'HighRisk';
+export interface IRatio {
+  label: string;
+  value: number;
+};
 
 export interface IStrike {
   strikePrice: number;

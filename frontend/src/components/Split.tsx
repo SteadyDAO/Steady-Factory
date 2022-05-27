@@ -1,8 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
-import { IAlchemist, IStrike } from "../models/Alchemist";
+import { IAlchemist, IRatio, IStrike } from "../models/Alchemist";
 import { getContractByAddressName } from "../helpers/Contract";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
@@ -17,6 +17,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import ConnectWallet from "./ConnectWallet";
 import config from '../config/config.json';
+import InfoIcon from '@mui/icons-material/Info';
+import { ratios } from "../consts/Alchemist";
 
 const Split = () => {
   const { account, active, activate, chainId, library } = useWeb3React();
@@ -30,12 +32,11 @@ const Split = () => {
   const [confirmationStep, setConfirmationStep] = useState<number>(0);
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
   const [disableForm, setDisableForm] = useState<boolean>(false);
-  const [strikePrices, setStrikePrices] = useState<Array<IStrike>>([]);
   const [chymeControl, setChymeControl] = useState<IFormControl>({
     value: 'default',
     invalid: true
   });
-  const [strikeControl, setStrikeControl] = useState<IFormControl>({
+  const [ratioControl, setRatioControl] = useState<IFormControl>({
     value: 'default',
     invalid: true
   });
@@ -70,25 +71,10 @@ const Split = () => {
         setChymeDecimal(dcm);
       }
       getBalance();
-    }
-    if (isAddress(chymeControl.value) && chainId === config.NETWORK.CHAIN_ID) {
-      const tempStrikePrices: Array<IStrike> = alchemists.map((alchemist: IAlchemist) => {
-        return {
-          ratio: 'LowRisk',
-          alchemist: alchemist.alchemist,
-          priceOracle: alchemist.chyme.priceOracle
-        } as any;
+      setRatioControl({
+        value: 0,
+        invalid: false
       });
-      const getStrikePrice = async () => {
-        tempStrikePrices.forEach(async (strike: IStrike, index: number) => {
-          const oracleContract = getContractByAddressName(strike.priceOracle, 'Oracle', library.getSigner());
-          const latestAnswer = await oracleContract.latestAnswer();
-          const decimals = await oracleContract.decimals();
-          tempStrikePrices[index].forgePrice = +formatUnits(latestAnswer, decimals);
-          setStrikePrices([...tempStrikePrices]);
-        });
-      }
-      getStrikePrice();
     }
     // eslint-disable-next-line
   }, [chymeControl, account, chainId]);
@@ -102,12 +88,12 @@ const Split = () => {
   }, [amountControl, balance]);
 
   useEffect(() => {
-    if (!isNotEnoughBalance && !chymeControl.invalid && !strikeControl.invalid && !amountControl.invalid) {
+    if (!isNotEnoughBalance && !chymeControl.invalid && !ratioControl.invalid && !amountControl.invalid) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
     }
-  }, [chymeControl, strikeControl, amountControl, isNotEnoughBalance]);
+  }, [chymeControl, ratioControl, amountControl, isNotEnoughBalance]);
 
   useEffect(() => {
     if (alchemists.length > 0) {
@@ -123,24 +109,11 @@ const Split = () => {
     }
   }, [alchemists]);
 
-  useEffect(() => {
-    if (strikePrices.length > 0) {
-      setStrikeControl({
-        value: strikePrices[0].alchemist,
-        invalid: false
-      });
-    } else {
-      setStrikeControl({
-        value: 'default',
-        invalid: true
-      });
-    }
-  }, [strikePrices]);
-
   const approve = async () => {
     setDisableForm(true);
     const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-    const allowance = await chymeContract.allowance(account?.toString(), strikeControl.value);
+    const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
+    const allowance = await chymeContract.allowance(account?.toString(), alchemistAdd);
     if (allowance?.gte(parseUnits(amountControl.value.toString(), chymeDecimal))) {
       splitChyme();
     } else {
@@ -149,7 +122,7 @@ const Split = () => {
       setIsTryAgain(false);
       setIsSplitCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      chymeContract.approve(strikeControl.value, parseUnits(amountControl.value.toString(), chymeDecimal))
+      chymeContract.approve(alchemistAdd, parseUnits(amountControl.value.toString(), chymeDecimal))
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
             isOpen: true,
@@ -192,8 +165,9 @@ const Split = () => {
     setIsTryAgain(false);
     setIsSplitCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
-    const alchemistContract = getContractByAddressName(strikeControl.value, 'Alchemist', library.getSigner());
-    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), 0)
+    const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
+    const alchemistContract = getContractByAddressName(alchemistAdd, 'Alchemist', library.getSigner());
+    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), ratioControl.value)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
           isOpen: true,
@@ -251,6 +225,51 @@ const Split = () => {
     }
   }
 
+  const getTestToken = () => {
+    const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
+    chymeContract.mint(account, parseUnits(10000 + '', chymeDecimal))
+      .then((transactionResponse: TransactionResponse) => {
+        setSnackbar({
+          isOpen: true,
+          timeOut: 500000,
+          type: 'warning',
+          message: 'Transaction is processing'
+        });
+        pollingTransaction(transactionResponse.hash, getTestTokenCompleted);
+      }, (err: any) => {
+        setConfirmationMessage('Something went wrong. Please try again.');
+        errorHandler(err, setSnackbar);
+      });
+  }
+
+  const getTestTokenCompleted = (status: number) => {
+    if (status === 1) {
+      setSnackbar({
+        isOpen: true,
+        timeOut: 5000,
+        type: 'success',
+        message: 'Successfully'
+      });
+      const getBalance = async () => {
+        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
+        const bl = await chymeContract.balanceOf(account);
+        const sb = await chymeContract.symbol();
+        const dcm = await chymeContract.decimal();
+        setBalance(formatUnits(bl, dcm));
+        setSymbol(sb);
+        setChymeDecimal(dcm);
+      }
+      getBalance();
+    } else if (status === 0) {
+      setSnackbar({
+        isOpen: true,
+        timeOut: 5000,
+        type: 'error',
+        message: 'Split failed'
+      });
+    }
+  }
+
   return (
     <>
       <div className="SplitContainer">
@@ -282,23 +301,23 @@ const Split = () => {
           </div>
           <div className="SplitStrikeControl SplitFormControl">
             <FormControl required fullWidth>
-              <Select value={strikeControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
+              <Select value={ratioControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
                 if (event.target.value) {
-                  setStrikeControl({
+                  setRatioControl({
                     value: event.target.value,
                     invalid: false
                   });
                 } else {
-                  setStrikeControl({
+                  setRatioControl({
                     value: 'default',
                     invalid: true
                   });
                 }
               }}>
-                <MenuItem selected disabled value="default">Strike Price</MenuItem>
-                {strikePrices.length > 0 && strikePrices.map((strike: IStrike) =>
-                  <MenuItem key={strike.alchemist} value={strike.alchemist}>
-                    {strike.forgePrice ? `${strike.forgePrice.toLocaleString()} (${strike.ratio})` : <Skeleton width={80} height={35} variant="text" />}
+                <MenuItem selected disabled value="default">Ratio</MenuItem>
+                {ratios.map((ratio: IRatio) =>
+                  <MenuItem key={ratio.value} value={ratio.value}>
+                    {ratio.label}
                   </MenuItem>
                 )}
               </Select>
@@ -349,6 +368,12 @@ const Split = () => {
           {isNotEnoughBalance ?
             <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
           }
+          <div className="GetTokenContainer">
+            <Button variant="contained" disabled={!isAddress(chymeControl.value)} onClick={getTestToken}>Get token</Button>
+            <Tooltip title="This use for test only. On production this button will be removed.">
+              <InfoIcon />
+            </Tooltip>
+          </div>
         </div>
         <div className="SplitActions">
           {active && chainId === config.NETWORK.CHAIN_ID ?

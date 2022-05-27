@@ -17,6 +17,7 @@ import ConnectWallet from "./ConnectWallet";
 const Merge = () => {
   const { account, active, activate, chainId, library } = useWeb3React();
   const elixirContractAddress = getContractAddressByName('ElixirNft');
+  const academyContractAddress = getContractAddressByName('Academy');
   const [elixirNfts, setElixirNfts] = useState<Array<IOpenseaAsset>>([]);
   const [isLoadingElixirNfts, setIsLoadingElixirNfts] = useState<boolean>(false);
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
@@ -87,7 +88,17 @@ const Merge = () => {
                 <>
                   {elixirNfts.length > 0 ?
                     <div className="ElixirNftsContainer">
-                      {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
+                      <EtherSWRConfig
+                        value={{
+                          web3Provider: library,
+                          ABIs: new Map(getABIs([
+                            { contractName: 'ElixirNft', contractAddress: elixirContractAddress },
+                            { contractName: 'Academy', contractAddress: academyContractAddress },
+                          ])),
+                          refreshInterval: 1000
+                        }}>
+                        {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
+                      </EtherSWRConfig>
                     </div> :
                     <span className="NoElixirNftMessage">You have no Elixir NFT yet.</span>
                   }
