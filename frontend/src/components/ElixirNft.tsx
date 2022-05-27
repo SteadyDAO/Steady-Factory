@@ -33,24 +33,24 @@ const ElixirNft = (props: {
   const elixirNftContract = getContractByAddressName(elixirNftContractAddress, 'ElixirNft', library.getSigner());
   const alchemistContractAddress = props.elixirNft.traits.filter((trait: IOpenseaTrait) => trait.trait_type === 'Alchemist')[0]?.value;
   const alchemistContract = getContractByAddressName(alchemistContractAddress, 'Alchemist', library.getSigner());
-  const steadyTokenContractAddress = getContractAddressByName('SteadyToken');
-  const steadyTokenContract = getContractByAddressName(steadyTokenContractAddress, 'SteadyToken', library.getSigner());
+  // const steadyTokenContractAddress = getContractAddressByName('SteadyToken');
+  // const steadyTokenContract = getContractByAddressName(steadyTokenContractAddress, 'SteadyToken', library.getSigner());
 
   useEffect(() => {
     const getApproved = async () => {
-      try {
-        const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
-        setIsApprovedNft(approvedAddress.toLowerCase() === (alchemistContractAddress).toLowerCase());
-        const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
-        const allowance = await steadyTokenContract.allowance(account, alchemistContractAddress);
-        const steadyDecimals = await steadyTokenContract.decimals();
-        setSteadyRequiredAmount(steadyRequired.steadyRequired);
-        setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
-        setDisableMerge(false);
-      } catch (err) {
-        console.error(err);
-        setDisableMerge(true);
-      }
+      // try {
+      //   const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
+      //   setIsApprovedNft(approvedAddress.toLowerCase() === (alchemistContractAddress).toLowerCase());
+      //   const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
+      //   const allowance = await steadyTokenContract.allowance(account, alchemistContractAddress);
+      //   const steadyDecimals = await steadyTokenContract.decimals();
+      //   setSteadyRequiredAmount(steadyRequired.steadyRequired);
+      //   setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
+      //   setDisableMerge(false);
+      // } catch (err) {
+      //   console.error(err);
+      //   setDisableMerge(true);
+      // }
     };
     getApproved();
     // eslint-disable-next-line
@@ -109,20 +109,20 @@ const ElixirNft = (props: {
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      steadyTokenContract.approve(alchemistContractAddress, steadyRequiredAmount)
-        .then((transactionResponse: TransactionResponse) => {
-          setSnackbar({
-            isOpen: true,
-            timeOut: 500000,
-            type: 'warning',
-            message: 'Transaction is processing'
-          });
-          pollingTransaction(transactionResponse.hash, approveSteadyTokenCompleted);
-        }, (err: any) => {
-          setConfirmationMessage('Something went wrong. Please try again.');
-          setIsTryAgain(true);
-          errorHandler(err, setSnackbar);
-        });
+      // steadyTokenContract.approve(alchemistContractAddress, steadyRequiredAmount)
+      //   .then((transactionResponse: TransactionResponse) => {
+      //     setSnackbar({
+      //       isOpen: true,
+      //       timeOut: 500000,
+      //       type: 'warning',
+      //       message: 'Transaction is processing'
+      //     });
+      //     pollingTransaction(transactionResponse.hash, approveSteadyTokenCompleted);
+      //   }, (err: any) => {
+      //     setConfirmationMessage('Something went wrong. Please try again.');
+      //     setIsTryAgain(true);
+      //     errorHandler(err, setSnackbar);
+      //   });
     }
   }
 

@@ -6,10 +6,12 @@ export const GET_ALCHEMISTS = gql`
       id
       count
       alchemist
-      priceOracle
-      ratio
-      chyme
-      symbol
+      chyme {
+        id
+        symbol
+        priceOracle
+        steadyToken
+      }
     }
   }
 `;

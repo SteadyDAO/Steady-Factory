@@ -1,9 +1,13 @@
+import { ApolloProvider } from "@apollo/client";
 import Merge from "../components/Merge";
+import { steadyApolloClient } from "../helpers/Subgraph";
 
 const MergePage = () => {
   return (
     <div className="MergePageContainer">
-      <Merge />
+      <ApolloProvider client={steadyApolloClient}>
+        <Merge />
+      </ApolloProvider>
     </div>
   );
 }

@@ -2,11 +2,8 @@ import { useQuery } from "@apollo/client";
 import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
-import { IAlchemist, IChyme, IStrike } from "../models/Alchemist";
-import * as _ from "lodash";
+import { IAlchemist, IStrike } from "../models/Alchemist";
 import { getContractByAddressName } from "../helpers/Contract";
-import { getDefaultProvider } from "ethers";
-import config from '../config/config.json';
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
 import { IFormControl } from "../models/Form";
@@ -18,10 +15,12 @@ import { Transition } from "./Transition";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import ConnectWallet from "./ConnectWallet";
+import config from '../config/config.json';
 
 const Split = () => {
   const { account, active, activate, chainId, library } = useWeb3React();
-  const [chymes, setChymes] = useState<Array<IChyme>>([]);
+  const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [chymeDecimal, setChymeDecimal] = useState<number>();
   const [isNotEnoughBalance, setIsNotEnoughBalance] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
@@ -55,35 +54,13 @@ const Split = () => {
 
   useEffect(() => {
     if (getAlchemists && getAlchemists.alchemists) {
-      const als = getAlchemists.alchemists.map((alchemist: IAlchemist) => {
-        return {
-          ...alchemist,
-          chyme: `0x${alchemist.chyme.slice(34, 74)}`
-        }
-      });
-      const temp = _.groupBy(als, 'chyme');
-      const tempChymes: Array<IChyme> = [];
-      _.forIn(temp, (value, key) => {
-        tempChymes.push({
-          address: key,
-          alchemists: value
-        } as any);
-      });
-      const getSymbols = async () => {
-        tempChymes.forEach(async (chyme: IChyme, index: number) => {
-          const chymeContract = getContractByAddressName(chyme.address, 'Chyme', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
-          const sb = await chymeContract.symbol();
-          tempChymes[index].symbol = sb;
-          setChymes([...tempChymes]);
-        });
-      }
-      getSymbols();
+      setAlchemists(getAlchemists.alchemists);
     }
   }, [getAlchemists]);
 
   useEffect(() => {
-    if (isAddress(chymeControl.value) && account) {
-      const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
+    if (isAddress(chymeControl.value) && account && chainId === config.NETWORK.CHAIN_ID) {
+      const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
       const getBalance = async () => {
         const bl = await chymeContract.balanceOf(account);
         const sb = await chymeContract.symbol();
@@ -94,29 +71,27 @@ const Split = () => {
       }
       getBalance();
     }
-    if (isAddress(chymeControl.value)) {
-      const alchemists = chymes.filter((chyme: IChyme) => chyme.address === chymeControl.value)[0]?.alchemists;
+    if (isAddress(chymeControl.value) && chainId === config.NETWORK.CHAIN_ID) {
       const tempStrikePrices: Array<IStrike> = alchemists.map((alchemist: IAlchemist) => {
         return {
-          ratio: alchemist.ratio,
+          ratio: 'LowRisk',
           alchemist: alchemist.alchemist,
-          priceOracle: alchemist.priceOracle
+          priceOracle: alchemist.chyme.priceOracle
         } as any;
       });
       const getStrikePrice = async () => {
         tempStrikePrices.forEach(async (strike: IStrike, index: number) => {
-          const oracleContract = getContractByAddressName(strike.priceOracle, 'Oracle', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
+          const oracleContract = getContractByAddressName(strike.priceOracle, 'Oracle', library.getSigner());
           const latestAnswer = await oracleContract.latestAnswer();
           const decimals = await oracleContract.decimals();
           tempStrikePrices[index].forgePrice = +formatUnits(latestAnswer, decimals);
-          tempStrikePrices[index].strikePrice = (+formatUnits(latestAnswer, decimals) * strike.ratio) / 100;
           setStrikePrices([...tempStrikePrices]);
         });
       }
       getStrikePrice();
     }
     // eslint-disable-next-line
-  }, [chymeControl, account, chymes]);
+  }, [chymeControl, account, chainId]);
 
   useEffect(() => {
     if (amountControl.value && balance && +amountControl.value > +balance) {
@@ -135,9 +110,9 @@ const Split = () => {
   }, [chymeControl, strikeControl, amountControl, isNotEnoughBalance]);
 
   useEffect(() => {
-    if (chymes.length > 0) {
+    if (alchemists.length > 0) {
       setChymeControl({
-        value: chymes[0].address,
+        value: alchemists[0].chyme.id,
         invalid: false
       });
     } else {
@@ -146,7 +121,7 @@ const Split = () => {
         invalid: true
       });
     }
-  }, [chymes]);
+  }, [alchemists]);
 
   useEffect(() => {
     if (strikePrices.length > 0) {
@@ -218,7 +193,7 @@ const Split = () => {
     setIsSplitCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
     const alchemistContract = getContractByAddressName(strikeControl.value, 'Alchemist', library.getSigner());
-    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal))
+    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), 0)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
           isOpen: true,
@@ -248,7 +223,7 @@ const Split = () => {
         message: 'Successfully splitted'
       });
       const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', getDefaultProvider(config.NETWORK.CHAIN_ID) as any);
+        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
         const bl = await chymeContract.balanceOf(account);
         const sb = await chymeContract.symbol();
         const dcm = await chymeContract.decimal();
@@ -297,9 +272,9 @@ const Split = () => {
                 }
               }}>
                 <MenuItem selected disabled value="default">Chyme</MenuItem>
-                {chymes.length > 0 && chymes.map((chyme: IChyme) =>
-                  <MenuItem key={chyme.address} value={chyme.address}>
-                    {chyme.symbol}
+                {alchemists.length > 0 && alchemists.map((alchemist: IAlchemist) =>
+                  <MenuItem key={alchemist.id} value={alchemist.chyme.id}>
+                    {alchemist.chyme?.symbol}
                   </MenuItem>
                 )}
               </Select>
@@ -323,7 +298,7 @@ const Split = () => {
                 <MenuItem selected disabled value="default">Strike Price</MenuItem>
                 {strikePrices.length > 0 && strikePrices.map((strike: IStrike) =>
                   <MenuItem key={strike.alchemist} value={strike.alchemist}>
-                    {strike.strikePrice ? `${strike.strikePrice.toLocaleString()} (${strike.ratio}%)` : <Skeleton width={80} height={35} variant="text" />}
+                    {strike.forgePrice ? `${strike.forgePrice.toLocaleString()} (${strike.ratio})` : <Skeleton width={80} height={35} variant="text" />}
                   </MenuItem>
                 )}
               </Select>
@@ -376,16 +351,14 @@ const Split = () => {
           }
         </div>
         <div className="SplitActions">
-          {active && chainId ?
+          {active && chainId === config.NETWORK.CHAIN_ID ?
             <Button className="SplitButton" color="secondary" variant="contained" disabled={!isFormValid || disableForm} onClick={approve}>
               {disableForm ?
                 <CircularProgress color="secondary" size={25} /> : <></>
               }
               Split
             </Button> :
-            <Button className="SplitButton" color="secondary" variant="contained" onClick={() => {
-              connectWallet(activate)
-            }}>Connect Wallet</Button>
+            <ConnectWallet />
           }
         </div>
       </div>
