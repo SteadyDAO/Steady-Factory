@@ -99,7 +99,7 @@ const Merge = () => {
                         {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
                       </EtherSWRConfig>
                     </div> :
-                    <span className="NoElixirNftMessage">You have no Elixir NFT yet.</span>
+                    <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
                   }
                 </>
               }
@@ -130,8 +130,7 @@ const Merge = () => {
                             }}>
                             <TokenItem steadyToken={alchemist.chyme.steadyToken} />
                           </EtherSWRConfig>)}
-                      </> :
-                      <span className="NoElixirNftMessage">You have no steady token yet.</span>
+                      </> : <></>
                     }
                   </>
                 }
