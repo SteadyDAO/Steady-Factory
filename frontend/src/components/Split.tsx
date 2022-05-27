@@ -1,13 +1,13 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
-import { IAlchemist, IRatio, IStrike } from "../models/Alchemist";
+import { IAlchemist, IRatio } from "../models/Alchemist";
 import { getContractByAddressName } from "../helpers/Contract";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
 import { IFormControl } from "../models/Form";
-import { connectWallet, errorHandler, pollingTransaction } from "../helpers/Wallet";
+import { errorHandler, pollingTransaction } from "../helpers/Wallet";
 import { TransactionResponse } from "@ethersproject/providers";
 import SnackbarMessage from "./Snackbar";
 import { ISnackbarConfig } from "../models/Material";
@@ -21,7 +21,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import { ratios } from "../consts/Alchemist";
 
 const Split = () => {
-  const { account, active, activate, chainId, library } = useWeb3React();
+  const { account, active, chainId, library } = useWeb3React();
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [chymeDecimal, setChymeDecimal] = useState<number>();
   const [isNotEnoughBalance, setIsNotEnoughBalance] = useState<boolean>(false);

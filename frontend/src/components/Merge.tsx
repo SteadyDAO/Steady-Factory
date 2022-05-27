@@ -6,7 +6,6 @@ import { IOpenseaAsset, OpenseaResponse } from "../models/Ethereum";
 import { getABIs, getContractAddressByName } from "../helpers/Contract";
 import { Button, CircularProgress, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { connectWallet } from "../helpers/Wallet";
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist } from "../models/Alchemist";
@@ -15,7 +14,7 @@ import TokenItem from "./TokenItem";
 import ConnectWallet from "./ConnectWallet";
 
 const Merge = () => {
-  const { account, active, activate, chainId, library } = useWeb3React();
+  const { account, active, chainId, library } = useWeb3React();
   const elixirContractAddress = getContractAddressByName('ElixirNft');
   const academyContractAddress = getContractAddressByName('Academy');
   const [elixirNfts, setElixirNfts] = useState<Array<IOpenseaAsset>>([]);

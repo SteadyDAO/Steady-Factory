@@ -29,40 +29,46 @@ const ElixirNft = (props: {
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
     isOpen: false
   } as any);
-  // console.log(props.elixirNft);
   const elixirContractAddress = getContractAddressByName('ElixirNft');
   const academyContractAddress = getContractAddressByName('Academy');
   const elixirNftContract = getContractByAddressName(elixirContractAddress, 'ElixirNft', library.getSigner());
   const alchemistContractAddress = props.elixirNft.traits.filter((trait: IOpenseaTrait) => trait.trait_type === 'Alchemist')[0]?.value;
   const alchemistContract = getContractByAddressName(alchemistContractAddress, 'Alchemist', library.getSigner());
-  // const steadyTokenContractAddress = getContractAddressByName('SteadyToken');
-  // const steadyTokenContract = getContractByAddressName(steadyTokenContractAddress, 'SteadyToken', library.getSigner());
   
   const { data: elements } = useEtherSWR([
     elixirContractAddress,
     'elements',
     props.elixirNft.token_id
   ]);
+  
+  const { data: chymeInfo } = useEtherSWR([
+    academyContractAddress,
+    'getChymeInfo',
+    elements?.chyme
+  ]);
 
   useEffect(() => {
     const getApproved = async () => {
-      // try {
-      //   const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
-      //   setIsApprovedNft(approvedAddress.toLowerCase() === (alchemistContractAddress).toLowerCase());
-      //   const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
-      //   const allowance = await steadyTokenContract.allowance(account, alchemistContractAddress);
-      //   const steadyDecimals = await steadyTokenContract.decimals();
-      //   setSteadyRequiredAmount(steadyRequired.steadyRequired);
-      //   setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
-      //   setDisableMerge(false);
-      // } catch (err) {
-      //   console.error(err);
-      //   setDisableMerge(true);
-      // }
+      try {
+        const steadyTokenContract = getContractByAddressName(chymeInfo?.steadyImplForChyme, 'SteadyToken', library.getSigner());
+        const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
+        setIsApprovedNft(approvedAddress.toLowerCase() === (alchemistContractAddress).toLowerCase());
+        const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
+        const allowance = await steadyTokenContract.allowance(account, alchemistContractAddress);
+        const steadyDecimals = await steadyTokenContract.decimals();
+        setSteadyRequiredAmount(steadyRequired.steadyRequired);
+        setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
+        setDisableMerge(false);
+      } catch (err) {
+        console.error(err);
+        setDisableMerge(true);
+      }
     };
-    getApproved();
+    if (elements?.chyme && chymeInfo?.steadyImplForChyme) {
+      getApproved();
+    }
     // eslint-disable-next-line
-  }, []);
+  }, [elements, chymeInfo]);
 
   const approveNft = async () => {
     if (isApprovedNft) {
@@ -117,20 +123,21 @@ const ElixirNft = (props: {
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      // steadyTokenContract.approve(alchemistContractAddress, steadyRequiredAmount)
-      //   .then((transactionResponse: TransactionResponse) => {
-      //     setSnackbar({
-      //       isOpen: true,
-      //       timeOut: 500000,
-      //       type: 'warning',
-      //       message: 'Transaction is processing'
-      //     });
-      //     pollingTransaction(transactionResponse.hash, approveSteadyTokenCompleted);
-      //   }, (err: any) => {
-      //     setConfirmationMessage('Something went wrong. Please try again.');
-      //     setIsTryAgain(true);
-      //     errorHandler(err, setSnackbar);
-      //   });
+      const steadyTokenContract = getContractByAddressName(chymeInfo?.steadyImplForChyme, 'SteadyToken', library.getSigner());
+      steadyTokenContract.approve(alchemistContractAddress, steadyRequiredAmount)
+        .then((transactionResponse: TransactionResponse) => {
+          setSnackbar({
+            isOpen: true,
+            timeOut: 500000,
+            type: 'warning',
+            message: 'Transaction is processing'
+          });
+          pollingTransaction(transactionResponse.hash, approveSteadyTokenCompleted);
+        }, (err: any) => {
+          setConfirmationMessage('Something went wrong. Please try again.');
+          setIsTryAgain(true);
+          errorHandler(err, setSnackbar);
+        });
     }
   }
 
