@@ -369,7 +369,7 @@ const Split = () => {
             <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
           }
           <div className="GetTokenContainer">
-            <Button variant="contained" disabled={!isAddress(chymeControl.value)} onClick={getTestToken}>Get token</Button>
+            <Button variant="contained" disabled={!isAddress(chymeControl.value) || !chymeDecimal} onClick={getTestToken}>Get token</Button>
             <Tooltip title="This use for test only. On production this button will be removed.">
               <InfoIcon />
             </Tooltip>

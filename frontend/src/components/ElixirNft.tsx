@@ -60,7 +60,6 @@ const ElixirNft = (props: {
         setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
         setDisableMerge(false);
       } catch (err) {
-        console.error(err);
         setDisableMerge(true);
       }
     };
