@@ -37,9 +37,6 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
  const config: HardhatUserConfig =  {
   defaultNetwork: "hardhat",
   solidity: {compilers: [
-    // {
-    //   version: "0.5.16",
-    // },
     {
       version: "0.8.11",
       settings: {},

@@ -57,7 +57,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         treasure = _treasure;
     }
 
-    function getSteadyRequired(uint256 tokenId) public view returns(uint256 steadyRequired, uint256 chymeAmount, uint256 timeToMaturity) {
+    function getSteadyRequired(uint256 tokenId) public view returns (uint256 steadyRequired, uint256 chymeAmount, uint256 timeToMaturity) {
         Spagyria memory myElixir = elements[tokenId];
         (,, uint8 ratioOfSteady,uint8 decimals,) = IAcademy(address(academy)).getChymeInfo(address(elements[tokenId].chyme));
         uint divisor =  10 ** decimals;
@@ -65,22 +65,21 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                     myElixir.amount, elements[tokenId].timeToMaturity);
     }
 
-    function safeMint
-        (
+    function safeMint(
         address _to, 
         address _chyme,
         uint256 _forgePrice,
         uint256 _amount,
         uint256 _timeToMaturity
-        ) 
+    ) 
         public 
         onlyRole(MINTER_ROLE) 
-        {
-            uint256 tokenId = _tokenIdCounter.current();
-            _tokenIdCounter.increment();
-            _safeMint(_to, tokenId);
-            elements[tokenId] = Spagyria(_amount, _forgePrice, _chyme, msg.sender, _timeToMaturity);
-        }
+    {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(_to, tokenId);
+        elements[tokenId] = Spagyria(_amount, _forgePrice, _chyme, msg.sender, _timeToMaturity);
+     }
     
     /**
      * @dev See {IERC721Metadata-tokenURI}.
@@ -91,60 +90,69 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         virtual 
         override 
         returns (string memory) 
-        {
-            require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-            string memory name = string(abi.encodePacked('Elxir Spagyria #', toString(tokenId)));
-            string memory description = "Elixir NFT Spagyria";
-            (uint256 elixirCurrentSteadyValue,
-            uint256 currentPrice,
-            uint256 forgeConstant,
-            uint256 timeLeft ) = calculateParams(tokenId);
-            string memory attributes = generateAttributes(tokenId,toString(elixirCurrentSteadyValue),currentPrice,forgeConstant);
-            string memory image = generateBase64Image(tokenId,timeLeft,toString(elixirCurrentSteadyValue));
-            return string(
-                abi.encodePacked(
-                    'data:application/json;base64,',
-                    Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name":"', 
-                                name,
-                                '", "description":"', 
-                                description,
-                                '", "attributes":[', 
-                                attributes,
-                                '], "image": "', 
-                                'data:image/svg+xml;base64,', 
-                                image,
-                                '"}'
-                            )
+        string memory name = string(abi.encodePacked('Elxir Spagyria #', toString(tokenId)));
+        string memory description = "Elixir NFT Spagyria";
+        (int256 elixirCurrentSteadyValue,
+        uint256 currentPrice,
+        uint256 forgeConstant,
+        uint256 timeLeft ) = calculateParams(tokenId);
+        string memory attributes = generateAttributes(
+            tokenId,
+            elixirCurrentSteadyValue > 0 ? toString(uint256(elixirCurrentSteadyValue)) : int2str(elixirCurrentSteadyValue),
+            currentPrice,
+            forgeConstant
+        );
+        string memory image = generateBase64Image(
+            tokenId,
+            timeLeft,
+            elixirCurrentSteadyValue > 0 ? toString(uint256(elixirCurrentSteadyValue)) : int2str(elixirCurrentSteadyValue)
+        );
+        return string(
+            abi.encodePacked(
+                'data:application/json;base64,',
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"', 
+                            name,
+                            '", "description":"', 
+                            description,
+                            '", "attributes":[', 
+                            attributes,
+                            '], "image": "', 
+                            'data:image/svg+xml;base64,', 
+                            image,
+                            '"}'
                         )
                     )
                 )
-            );
-        }
+            )
+        );
+    }
     
     function calculateParams(uint256 tokenId) public view returns (
-        uint256 elixirCurrentSteadyValue,
+        int256 elixirCurrentSteadyValue,
         uint256 currentPrice,
         uint256 forgeConstant,
-        uint256 timeLeft )  {
-        (address oracleAddress,, uint8 ratioOfSteady, uint8 decimals,) = 
+        uint256 timeLeft )  
+    {
+        (address oracleAddress, , uint8 ratioOfSteady, uint8 decimals,) = 
                                         IAcademy(address(academy)).getChymeInfo(elements[tokenId].chyme);
-            currentPrice = uint256(IAcademy(academy).priceFromOracle(oracleAddress));
-            forgeConstant = elements[tokenId].forgePrice * ratioOfSteady / 100;
-            elixirCurrentSteadyValue = (currentPrice  
-                                                - forgeConstant) 
-                                                * elements[tokenId].amount / (2 * 10 ** decimals);
-            timeLeft = 0;
-            if(elements[tokenId].timeToMaturity > block.timestamp){
-                timeLeft = (elements[tokenId].timeToMaturity - block.timestamp) / 86400;
-            }
-        return (elixirCurrentSteadyValue,currentPrice,forgeConstant,timeLeft);
+        currentPrice = uint256(IAcademy(academy).priceFromOracle(oracleAddress));
+        forgeConstant = elements[tokenId].forgePrice * ratioOfSteady / 100; 
+        elixirCurrentSteadyValue = (int256(currentPrice) - int256(forgeConstant)) 
+                                    * int256(elements[tokenId].amount) / int256(2 * 10**decimals);
+        timeLeft = 0;
+        if (elements[tokenId].timeToMaturity > block.timestamp) {
+            timeLeft = (elements[tokenId].timeToMaturity - block.timestamp) / 86400;
+        }
+        return (elixirCurrentSteadyValue, currentPrice, forgeConstant, timeLeft);
     }
 
-    function generateAttributes(uint256 tokenId,string memory elixirCurrentSteadyValue, uint256 currentPrice, uint256 forgeConstant) 
+    function generateAttributes(uint256 tokenId, string memory elixirCurrentSteadyValue, uint256 currentPrice, uint256 forgeConstant) 
         public view returns (string memory) {
             return string(
                 abi.encodePacked(
@@ -154,16 +162,17 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                     ',{"display_type": "number", "trait_type": "Current Price", "value":',toString(currentPrice),'}',
                     ',{"display_type": "number", "trait_type": "elixirCurrentSteadyValue Price", "value":',elixirCurrentSteadyValue,'}',
                     ',{"trait_type": "Alchemist", "value":"',toHexString(uint160(elements[tokenId].alchemistId), 20),'"}',
-                    ',{"display_type": "number", "trait_type": "forgeConstant", "value":',toString(forgeConstant),'}')
-                    );
-}
-
-    function generateBase64Image(uint256 tokenId,uint256 timeLeft,string memory elixirCurrentSteadyValue) 
-        public view returns (string memory) {
-        return Base64.encode(bytes(generateImage(tokenId,timeLeft,elixirCurrentSteadyValue)));
+                    ',{"display_type": "number", "trait_type": "forgeConstant", "value":',toString(forgeConstant),'}'
+                )
+            );
     }
 
-    function generateImage(uint256 tokenId,uint256 timeLeft,string memory elixirCurrentSteadyValue) 
+    function generateBase64Image(uint256 tokenId, uint256 timeLeft, string memory elixirCurrentSteadyValue) 
+        public view returns (string memory) {
+        return Base64.encode(bytes(generateImage(tokenId, timeLeft, elixirCurrentSteadyValue)));
+    }
+
+    function generateImage(uint256 tokenId, uint256 timeLeft, string memory elixirCurrentSteadyValue) 
         public view returns (string memory) {
             
             //display a treasure chest with remaining time in days and also a percentage to show progress 1825 = days in 5 years
@@ -182,11 +191,12 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
                 )
             );
     }
+
     // from: https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-contracts/master/contracts/utils/Strings.sol
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
      */
-    function toString(uint256 value) public pure returns (string memory) {
+    function toString(uint256 value) private pure returns (string memory) {
         // Inspired by OraclizeAPI's implementation - MIT licence
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
 
@@ -207,13 +217,39 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
         }
         return string(buffer);
     }
+
+    /**
+     * @dev Converts an `int256` to its ASCII `string` decimal representation.
+     */
+    function int2str(int256 i) private pure returns (string memory) {
+        if (i == 0) return "0";
+        bool negative = i < 0;
+        uint j = uint(negative ? -i : i);
+        uint l = j;     // Keep an unsigned copy
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        if (negative) ++len;  // Make room for '-' sign
+        bytes memory bstr = new bytes(len);
+        uint k = len - 1;
+        while (l != 0) {
+            bstr[k--] = bytes1(uint8(48 + uint256(l % 10)));
+            l /= 10;
+        }
+        if (negative) {    // Prepend '-'
+            bstr[0] = '-';
+        }
+        return string(bstr);
+    }
   
     bytes16 private constant _ALPHABET = "0123456789abcdef";
 
     /**
      * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
      */
-    function toHexString(uint256 value, uint256 length) public pure returns (string memory) {
+    function toHexString(uint256 value, uint256 length) private pure returns (string memory) {
         bytes memory buffer = new bytes(2 * length + 2);
         buffer[0] = "0";
         buffer[1] = "x";
@@ -228,5 +264,4 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl  {
     function burn(uint256 tokenId) public override(ERC721Burnable) {
         super.burn(tokenId);
     }
-
 }
