@@ -1,6 +1,7 @@
 import { Wallet } from "@ethersproject/wallet";
 import { ethers } from "ethers";
 import { IContract } from "../models/Contract";
+import { isAddress } from "ethers/lib/utils";
 
 export const getABIs = (contractList: Array<IContract>) => {
   let accumulator: any = [];
@@ -27,6 +28,9 @@ export const getContractByName = (name: string, wallet: Wallet): ethers.Contract
 }
 
 export const getContractByAddressName = (address: string, name: string, wallet: Wallet): ethers.Contract => {
+  if (!isAddress(address)) {
+    return {} as any;
+  }
   const contract = new ethers.Contract(address, getABIs([{ contractName: name, contractAddress: address }])[0][1], wallet);
   return contract;
 }

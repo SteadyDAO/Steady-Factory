@@ -18,6 +18,7 @@ export interface IElixir {
   id: string;
   tokenId: string;
   ratio: IRatio;
+  chyme: IChyme;
 }
 
 export interface IRatio {
