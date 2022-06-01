@@ -46,7 +46,6 @@ const ElixirNft = (props: {
           const steadyTokenContract = getContractByAddressName(getElixirs.elixirs[0].chyme?.steadyToken, 'SteadyToken', library.getSigner());
           const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
           setIsApprovedNft(approvedAddress?.toLowerCase() === (getElixirs.elixirs[0].chyme?.alchemist?.id)?.toLowerCase());
-          console.log(approvedAddress, getElixirs.elixirs[0].chyme?.alchemist?.id, getElixirs.elixirs[0].chyme?.steadyToken);
           const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
           const allowance = await steadyTokenContract.allowance(account, getElixirs.elixirs[0].chyme?.alchemist?.id);
           const steadyDecimals = await steadyTokenContract.decimals();
