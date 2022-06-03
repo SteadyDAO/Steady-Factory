@@ -302,7 +302,7 @@ const Split = () => {
           <div className="SplitStrikeControl SplitFormControl">
             <FormControl required fullWidth>
               <Select value={ratioControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
-                if (event.target.value) {
+                if (typeof event.target.value === 'number') {
                   setRatioControl({
                     value: event.target.value,
                     invalid: false
