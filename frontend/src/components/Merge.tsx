@@ -40,6 +40,7 @@ const Merge = () => {
 
   const fetchData = () => {
     setIsLoadingElixirNfts(true);
+    fetch('https://api.bittrex.com/v3/markets/CGT-USDT/ticker').then(res => console.log(res));
     return fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' })
       .then((response) => response.json())
       .then((data: OpenseaResponse) => {
