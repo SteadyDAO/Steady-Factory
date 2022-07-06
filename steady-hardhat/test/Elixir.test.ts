@@ -121,18 +121,29 @@ describe('Elixir NFT works as expected', async () => {
         
     })
 
-    it('can fetch a token URI string', async () => {
-        let forgePrice =  await mrAlchemist.forgePrice();
-        console.log("forge Price --- ", forgePrice);
+  it('can fetch a token URI string', async () => {
+    let forgePrice =  await mrAlchemist.forgePrice();
+    console.log("forge Price --- ", forgePrice.toString());
 
-        await elixirImpl.safeMint(
-          wallet2.address,
-          chymeAddress,
-          forgePrice,
-          100,
-          1775925203);
+    await elixirImpl.safeMint(
+      wallet2.address,
+      chymeAddress,
+      forgePrice,
+      100,
+      1775925203
+    );
+      
+    const tokenURI = await elixirImpl.tokenURI(0);
+    console.log("generateBase64Image  - ",tokenURI);       
+  });
 
-        const tokenURI = await elixirImpl.tokenURI(0);
-        console.log("generateBase64Image  - ",tokenURI);       
-    });
+  it('can fetch the params', async () => {        
+    const params = await elixirImpl.calculateParams(0);
+    console.log(params);    
+  });
+
+  it('can check the number of days left to maturity', async () => {      
+    const params = await elixirImpl.calculateParams(0);
+    console.log("days left:", params.timeLeft.toString());    
+  });
 });

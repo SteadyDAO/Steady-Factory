@@ -50,8 +50,6 @@ interface ElixirInterface extends ethers.utils.Interface {
     "setTreasure(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "toHexString(uint256,uint256)": FunctionFragment;
-    "toString(uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "treasure()": FunctionFragment;
@@ -150,14 +148,6 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "toHexString",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "toString",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
   ): string;
@@ -241,11 +231,6 @@ interface ElixirInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "toHexString",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "toString", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
@@ -520,14 +505,6 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    toString(value: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -710,14 +687,6 @@ export class Elixir extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  toHexString(
-    value: BigNumberish,
-    length: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  toString(value: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   transferFrom(
@@ -887,14 +856,6 @@ export class Elixir extends BaseContract {
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    toString(value: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1168,17 +1129,6 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    toString(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1351,17 +1301,6 @@ export class Elixir extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    toString(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: BigNumberish,
