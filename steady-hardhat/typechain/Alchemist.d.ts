@@ -24,15 +24,14 @@ interface AlchemistInterface extends ethers.utils.Interface {
     "academy()": FunctionFragment;
     "alchemistId()": FunctionFragment;
     "chyme()": FunctionFragment;
+    "chymeVaultImpl()": FunctionFragment;
     "elixirImpl()": FunctionFragment;
-    "forgePrice()": FunctionFragment;
     "getChyme()": FunctionFragment;
-    "initialize(address,address,address,address,uint256,uint256,address)": FunctionFragment;
+    "initialize(address,address,address,uint256,address)": FunctionFragment;
     "merge(uint256)": FunctionFragment;
-    "split(uint256)": FunctionFragment;
+    "split(uint256,uint8)": FunctionFragment;
     "steadyDAORewards()": FunctionFragment;
     "steadyDAOToken()": FunctionFragment;
-    "steadyImpl()": FunctionFragment;
     "treasury()": FunctionFragment;
   };
 
@@ -43,30 +42,29 @@ interface AlchemistInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "chyme", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "elixirImpl",
+    functionFragment: "chymeVaultImpl",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "forgePrice",
+    functionFragment: "elixirImpl",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "getChyme", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string, BigNumberish, BigNumberish, string]
+    values: [string, string, string, BigNumberish, string]
   ): string;
   encodeFunctionData(functionFragment: "merge", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "split", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "split",
+    values: [BigNumberish, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "steadyDAORewards",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "steadyDAOToken",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "steadyImpl",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
@@ -77,8 +75,11 @@ interface AlchemistInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "chyme", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "chymeVaultImpl",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "elixirImpl", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "forgePrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getChyme", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "merge", data: BytesLike): Result;
@@ -91,31 +92,37 @@ interface AlchemistInterface extends ethers.utils.Interface {
     functionFragment: "steadyDAOToken",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "steadyImpl", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
 
   events: {
-    "Merge(address,uint256,uint256)": EventFragment;
-    "Split(address,uint256,uint256)": EventFragment;
+    "Initialized(uint8)": EventFragment;
+    "Merge(address,uint256,address,uint256)": EventFragment;
+    "Split(address,uint256,address,address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Merge"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Split"): EventFragment;
 }
 
+export type InitializedEvent = TypedEvent<[number] & { version: number }>;
+
 export type MergeEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
+  [string, BigNumber, string, BigNumber] & {
     source: string;
     mergedAmount: BigNumber;
-    price: BigNumber;
+    chyme: string;
+    tokenid: BigNumber;
   }
 >;
 
 export type SplitEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
+  [string, BigNumber, string, string, BigNumber] & {
     source: string;
     splitAmount: BigNumber;
-    poolId: BigNumber;
+    chymeVaultDeployed: string;
+    chyme: string;
+    tokenId: BigNumber;
   }
 >;
 
@@ -169,18 +176,16 @@ export class Alchemist extends BaseContract {
 
     chyme(overrides?: CallOverrides): Promise<[string]>;
 
-    elixirImpl(overrides?: CallOverrides): Promise<[string]>;
+    chymeVaultImpl(overrides?: CallOverrides): Promise<[string]>;
 
-    forgePrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+    elixirImpl(overrides?: CallOverrides): Promise<[string]>;
 
     getChyme(overrides?: CallOverrides): Promise<[string]>;
 
     initialize(
       _chyme: string,
-      _steadyImpl: string,
       _elixirImpl: string,
       _treasury: string,
-      _forgePrice: BigNumberish,
       _alchemistId: BigNumberish,
       _steadyDAORewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -193,14 +198,13 @@ export class Alchemist extends BaseContract {
 
     split(
       amount: BigNumberish,
+      ratioOfSteady: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     steadyDAORewards(overrides?: CallOverrides): Promise<[string]>;
 
     steadyDAOToken(overrides?: CallOverrides): Promise<[string]>;
-
-    steadyImpl(overrides?: CallOverrides): Promise<[string]>;
 
     treasury(overrides?: CallOverrides): Promise<[string]>;
   };
@@ -211,18 +215,16 @@ export class Alchemist extends BaseContract {
 
   chyme(overrides?: CallOverrides): Promise<string>;
 
-  elixirImpl(overrides?: CallOverrides): Promise<string>;
+  chymeVaultImpl(overrides?: CallOverrides): Promise<string>;
 
-  forgePrice(overrides?: CallOverrides): Promise<BigNumber>;
+  elixirImpl(overrides?: CallOverrides): Promise<string>;
 
   getChyme(overrides?: CallOverrides): Promise<string>;
 
   initialize(
     _chyme: string,
-    _steadyImpl: string,
     _elixirImpl: string,
     _treasury: string,
-    _forgePrice: BigNumberish,
     _alchemistId: BigNumberish,
     _steadyDAORewards: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -235,14 +237,13 @@ export class Alchemist extends BaseContract {
 
   split(
     amount: BigNumberish,
+    ratioOfSteady: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   steadyDAORewards(overrides?: CallOverrides): Promise<string>;
 
   steadyDAOToken(overrides?: CallOverrides): Promise<string>;
-
-  steadyImpl(overrides?: CallOverrides): Promise<string>;
 
   treasury(overrides?: CallOverrides): Promise<string>;
 
@@ -253,18 +254,16 @@ export class Alchemist extends BaseContract {
 
     chyme(overrides?: CallOverrides): Promise<string>;
 
-    elixirImpl(overrides?: CallOverrides): Promise<string>;
+    chymeVaultImpl(overrides?: CallOverrides): Promise<string>;
 
-    forgePrice(overrides?: CallOverrides): Promise<BigNumber>;
+    elixirImpl(overrides?: CallOverrides): Promise<string>;
 
     getChyme(overrides?: CallOverrides): Promise<string>;
 
     initialize(
       _chyme: string,
-      _steadyImpl: string,
       _elixirImpl: string,
       _treasury: string,
-      _forgePrice: BigNumberish,
       _alchemistId: BigNumberish,
       _steadyDAORewards: string,
       overrides?: CallOverrides
@@ -272,52 +271,90 @@ export class Alchemist extends BaseContract {
 
     merge(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
-    split(amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+    split(
+      amount: BigNumberish,
+      ratioOfSteady: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     steadyDAORewards(overrides?: CallOverrides): Promise<string>;
 
     steadyDAOToken(overrides?: CallOverrides): Promise<string>;
 
-    steadyImpl(overrides?: CallOverrides): Promise<string>;
-
     treasury(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
-    "Merge(address,uint256,uint256)"(
+    "Initialized(uint8)"(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
+
+    Initialized(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
+
+    "Merge(address,uint256,address,uint256)"(
       source?: string | null,
       mergedAmount?: null,
-      price?: null
+      chyme?: null,
+      tokenid?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { source: string; mergedAmount: BigNumber; price: BigNumber }
+      [string, BigNumber, string, BigNumber],
+      {
+        source: string;
+        mergedAmount: BigNumber;
+        chyme: string;
+        tokenid: BigNumber;
+      }
     >;
 
     Merge(
       source?: string | null,
       mergedAmount?: null,
-      price?: null
+      chyme?: null,
+      tokenid?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { source: string; mergedAmount: BigNumber; price: BigNumber }
+      [string, BigNumber, string, BigNumber],
+      {
+        source: string;
+        mergedAmount: BigNumber;
+        chyme: string;
+        tokenid: BigNumber;
+      }
     >;
 
-    "Split(address,uint256,uint256)"(
+    "Split(address,uint256,address,address,uint256)"(
       source?: string | null,
       splitAmount?: null,
-      poolId?: null
+      chymeVaultDeployed?: null,
+      chyme?: null,
+      tokenId?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { source: string; splitAmount: BigNumber; poolId: BigNumber }
+      [string, BigNumber, string, string, BigNumber],
+      {
+        source: string;
+        splitAmount: BigNumber;
+        chymeVaultDeployed: string;
+        chyme: string;
+        tokenId: BigNumber;
+      }
     >;
 
     Split(
       source?: string | null,
       splitAmount?: null,
-      poolId?: null
+      chymeVaultDeployed?: null,
+      chyme?: null,
+      tokenId?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { source: string; splitAmount: BigNumber; poolId: BigNumber }
+      [string, BigNumber, string, string, BigNumber],
+      {
+        source: string;
+        splitAmount: BigNumber;
+        chymeVaultDeployed: string;
+        chyme: string;
+        tokenId: BigNumber;
+      }
     >;
   };
 
@@ -328,18 +365,16 @@ export class Alchemist extends BaseContract {
 
     chyme(overrides?: CallOverrides): Promise<BigNumber>;
 
-    elixirImpl(overrides?: CallOverrides): Promise<BigNumber>;
+    chymeVaultImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
-    forgePrice(overrides?: CallOverrides): Promise<BigNumber>;
+    elixirImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
     getChyme(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
       _chyme: string,
-      _steadyImpl: string,
       _elixirImpl: string,
       _treasury: string,
-      _forgePrice: BigNumberish,
       _alchemistId: BigNumberish,
       _steadyDAORewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -352,14 +387,13 @@ export class Alchemist extends BaseContract {
 
     split(
       amount: BigNumberish,
+      ratioOfSteady: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     steadyDAORewards(overrides?: CallOverrides): Promise<BigNumber>;
 
     steadyDAOToken(overrides?: CallOverrides): Promise<BigNumber>;
-
-    steadyImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
     treasury(overrides?: CallOverrides): Promise<BigNumber>;
   };
@@ -371,18 +405,16 @@ export class Alchemist extends BaseContract {
 
     chyme(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    elixirImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    chymeVaultImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    forgePrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    elixirImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getChyme(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
       _chyme: string,
-      _steadyImpl: string,
       _elixirImpl: string,
       _treasury: string,
-      _forgePrice: BigNumberish,
       _alchemistId: BigNumberish,
       _steadyDAORewards: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -395,14 +427,13 @@ export class Alchemist extends BaseContract {
 
     split(
       amount: BigNumberish,
+      ratioOfSteady: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     steadyDAORewards(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     steadyDAOToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    steadyImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };

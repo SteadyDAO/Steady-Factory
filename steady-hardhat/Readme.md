@@ -28,11 +28,11 @@ Approve - (100 = 10000000000) stt tokens 0x904282C0e2Bb3c6BA0D6e23C0c4FC73356B45
 2. https://mumbai.polygonscan.com/address/0x5d6557152888c74b317c569a68f3673207dd1523#writeContract
 3. Splittokens (100 = 10000000000)  -> https://mumbai.polygonscan.com/tx/0xc6e4872174be863d29497d46a9aadff01eba52723a9b11e888cbe1d694eea30f
 4. Verify the transaction information (note that you may need to increase the default gas price to get a quick confirmation). Take note of the number of steady tokens you receive and the Elixer token ID.
-5. Verify that the Elixir information is correct https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#readContract
+5. Verify that the Elixir information is correct https://mumbai.polygonscan.com/address/0x92636Edd3A7273cce16e91366F595D576f80c6B4#readContract
 
 ## 5. Merge the token back
 1. give approval for your Elixir NFT back - Elixer NFT tokenId from step 4, spender 0x5d6557152888c74b317c569a68f3673207dd1523
-  https://mumbai.polygonscan.com/address/0xb5498259b96a2659fc73d9257c762a829e9bbe2e#writeContract 
+  https://mumbai.polygonscan.com/address/0x92636Edd3A7273cce16e91366F595D576f80c6B4#writeContract 
 2. give approval for Steady Tokens back - use the amount of Steady (STY) tokens received in step 4 (example 100 = 10000000000), spender 0x5d6557152888c74b317c569a68f3673207dd1523 - https://mumbai.polygonscan.com/address/0x2B242F7718272D5852F2C0bb9dE9322350dec720#writeContract
 3. Call the Merge  https://mumbai.polygonscan.com/address/0x5d6557152888c74b317c569a68f3673207dd1523#writeContract
   with the NFT token id from step 4.

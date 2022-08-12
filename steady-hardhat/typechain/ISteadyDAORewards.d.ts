@@ -21,12 +21,12 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface ISteadyDAORewardsInterface extends ethers.utils.Interface {
   functions: {
-    "performAction(uint8,uint256,uint256)": FunctionFragment;
+    "performAction(uint8,uint256,uint256,address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "performAction",
-    values: [BigNumberish, BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish, string]
   ): string;
 
   decodeFunctionResult(
@@ -85,6 +85,7 @@ export class ISteadyDAORewards extends BaseContract {
       action: BigNumberish,
       steadyAmount: BigNumberish,
       fees: BigNumberish,
+      chyme: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -93,6 +94,7 @@ export class ISteadyDAORewards extends BaseContract {
     action: BigNumberish,
     steadyAmount: BigNumberish,
     fees: BigNumberish,
+    chyme: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -101,6 +103,7 @@ export class ISteadyDAORewards extends BaseContract {
       action: BigNumberish,
       steadyAmount: BigNumberish,
       fees: BigNumberish,
+      chyme: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -112,6 +115,7 @@ export class ISteadyDAORewards extends BaseContract {
       action: BigNumberish,
       steadyAmount: BigNumberish,
       fees: BigNumberish,
+      chyme: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -121,6 +125,7 @@ export class ISteadyDAORewards extends BaseContract {
       action: BigNumberish,
       steadyAmount: BigNumberish,
       fees: BigNumberish,
+      chyme: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

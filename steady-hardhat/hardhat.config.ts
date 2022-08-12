@@ -37,11 +37,8 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
  const config: HardhatUserConfig =  {
   defaultNetwork: "hardhat",
   solidity: {compilers: [
-    // {
-    //   version: "0.5.16",
-    // },
     {
-      version: "0.8.11",
+      version: "0.8.16",
       settings: {},
     },
   ]},
@@ -57,13 +54,11 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     hardhat: {
       forking: {
         enabled: true,
-        url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-        blockNumber: 24786530
-      },
-      blockGasLimit : 5470440
-    },
+        url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`,
+        blockNumber: 10702595
+      }},
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`, 
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_RINKEBY_API_KEY}`, 
       accounts,
     },
     kovan: {
@@ -116,22 +111,22 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
   //   runOnCompile: true,
   //   strict: true,
   // },
-  // gasReporter: {
-  //   showMethodSig: false,
-  //   enabled: (process.env.REPORT_GAS) ? true : false
-  // },
+  gasReporter: {
+    showMethodSig: false,
+    enabled: (process.env.REPORT_GAS) ? true : false
+  },
   // typechain: {
   //   outDir: 'src/types',
   //   target: 'ethers-v5',
   //   alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
   //   externalArtifacts: ['externalArtifacts/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
   // },
-  // abiExporter: {
-  //   path: './data/abi',
-  //   clear: false,
-  //   flat: true,
-  //   spacing: 2
-  // },
+  abiExporter: {
+    path: './data/abi',
+    clear: true,
+    flat: true,
+    spacing: 2
+  },
   mocha: {
     timeout: 40000
   },

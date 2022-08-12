@@ -150,12 +150,13 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, number, BigNumber] & {
+      [string, number, number, BigNumber, string, string] & {
         oracleAddress: string;
         fees: number;
-        ratio: number;
         decimals: number;
         timeToMaturity: BigNumber;
+        symbol: string;
+        steadyImplForChyme: string;
       }
     >;
 
@@ -194,12 +195,13 @@ export class IAcademy extends BaseContract {
     _chyme: string,
     overrides?: CallOverrides
   ): Promise<
-    [string, number, number, number, BigNumber] & {
+    [string, number, number, BigNumber, string, string] & {
       oracleAddress: string;
       fees: number;
-      ratio: number;
       decimals: number;
       timeToMaturity: BigNumber;
+      symbol: string;
+      steadyImplForChyme: string;
     }
   >;
 
@@ -225,14 +227,13 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, number, string, string, BigNumber, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber] & {
         decimals: number;
-        ratioOfSteady: number;
         fees: number;
         DAOApproved: number;
         oracleAddress: string;
-        infoUri: string;
-        reward: BigNumber;
+        steadyImplForChyme: string;
+        symbol: string;
         timeToMaturity: BigNumber;
       }
     >;
@@ -243,12 +244,13 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, number, BigNumber] & {
+      [string, number, number, BigNumber, string, string] & {
         oracleAddress: string;
         fees: number;
-        ratio: number;
         decimals: number;
         timeToMaturity: BigNumber;
+        symbol: string;
+        steadyImplForChyme: string;
       }
     >;
 

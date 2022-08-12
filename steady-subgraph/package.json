@@ -1,0 +1,16 @@
+{
+  "name": "Steady",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ vitamind3inj/Steady",
+    "create-local": "graph create --node http://localhost:8020/ vitamind3inj/Steady",
+    "remove-local": "graph remove --node http://localhost:8020/ vitamind3inj/Steady",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 vitamind3inj/Steady"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  }
+}

@@ -152,6 +152,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getCurrentTokenId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -175,6 +188,11 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -236,6 +254,11 @@ const _abi = [
         type: "address",
       },
       {
+        internalType: "uint8",
+        name: "ratio",
+        type: "uint8",
+      },
+      {
         internalType: "uint256",
         name: "_forgePrice",
         type: "uint256",
@@ -250,9 +273,20 @@ const _abi = [
         name: "_timeToMaturity",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "chymeVault",
+        type: "address",
+      },
     ],
     name: "safeMint",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },

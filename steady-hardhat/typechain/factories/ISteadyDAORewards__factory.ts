@@ -27,6 +27,11 @@ const _abi = [
         name: "fees",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "chyme",
+        type: "address",
+      },
     ],
     name: "performAction",
     outputs: [],

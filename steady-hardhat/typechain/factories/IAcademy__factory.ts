@@ -40,11 +40,6 @@ const _abi = [
           },
           {
             internalType: "uint8",
-            name: "ratioOfSteady",
-            type: "uint8",
-          },
-          {
-            internalType: "uint8",
             name: "fees",
             type: "uint8",
           },
@@ -59,14 +54,14 @@ const _abi = [
             type: "address",
           },
           {
-            internalType: "string",
-            name: "infoUri",
-            type: "string",
+            internalType: "address",
+            name: "steadyImplForChyme",
+            type: "address",
           },
           {
-            internalType: "uint256",
-            name: "reward",
-            type: "uint256",
+            internalType: "string",
+            name: "symbol",
+            type: "string",
           },
           {
             internalType: "uint256",
@@ -111,11 +106,6 @@ const _abi = [
       },
       {
         internalType: "uint8",
-        name: "ratio",
-        type: "uint8",
-      },
-      {
-        internalType: "uint8",
         name: "decimals",
         type: "uint8",
       },
@@ -123,6 +113,16 @@ const _abi = [
         internalType: "uint256",
         name: "timeToMaturity",
         type: "uint256",
+      },
+      {
+        internalType: "string",
+        name: "symbol",
+        type: "string",
+      },
+      {
+        internalType: "address",
+        name: "steadyImplForChyme",
+        type: "address",
       },
     ],
     stateMutability: "view",

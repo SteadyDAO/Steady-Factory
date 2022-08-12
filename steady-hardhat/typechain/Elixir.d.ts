@@ -43,15 +43,14 @@ interface ElixirInterface extends ethers.utils.Interface {
     "ownerOf(uint256)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "safeMint(address,address,uint256,uint256,uint256)": FunctionFragment;
+    "safeMint(address,address,uint8,uint256,uint256,uint256,address)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setAcademy(address)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setTreasure(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "toHexString(uint256,uint256)": FunctionFragment;
-    "toString(uint256)": FunctionFragment;
+    "tokenIdCounter()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "treasure()": FunctionFragment;
@@ -132,7 +131,15 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "safeMint",
-    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -150,12 +157,8 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "toHexString",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "toString",
-    values: [BigNumberish]
+    functionFragment: "tokenIdCounter",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
@@ -242,10 +245,9 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "toHexString",
+    functionFragment: "tokenIdCounter",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "toString", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
@@ -385,12 +387,14 @@ export class Elixir extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, string, string, BigNumber] & {
+      [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
         amount: BigNumber;
+        ratioOfSteady: number;
         forgePrice: BigNumber;
         chyme: string;
         alchemistId: string;
         timeToMaturity: BigNumber;
+        chymeVault: string;
       }
     >;
 
@@ -427,10 +431,11 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, string] & {
         steadyRequired: BigNumber;
-        chymeAmount: BigNumber;
+        ratioOfSteady: BigNumber;
         timeToMaturity: BigNumber;
+        chymeVault: string;
       }
     >;
 
@@ -476,9 +481,11 @@ export class Elixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      _ratioOfSteady: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -520,13 +527,9 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
+    tokenIdCounter(
       overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    toString(value: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    ): Promise<[BigNumber] & { _value: BigNumber }>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -578,12 +581,14 @@ export class Elixir extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, string, string, BigNumber] & {
+    [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
       amount: BigNumber;
+      ratioOfSteady: number;
       forgePrice: BigNumber;
       chyme: string;
       alchemistId: string;
       timeToMaturity: BigNumber;
+      chymeVault: string;
     }
   >;
 
@@ -620,10 +625,11 @@ export class Elixir extends BaseContract {
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, string] & {
       steadyRequired: BigNumber;
-      chymeAmount: BigNumber;
+      ratioOfSteady: BigNumber;
       timeToMaturity: BigNumber;
+      chymeVault: string;
     }
   >;
 
@@ -666,9 +672,11 @@ export class Elixir extends BaseContract {
   safeMint(
     _to: string,
     _chyme: string,
+    _ratioOfSteady: BigNumberish,
     _forgePrice: BigNumberish,
     _amount: BigNumberish,
     _timeToMaturity: BigNumberish,
+    chymeVault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -710,13 +718,7 @@ export class Elixir extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  toHexString(
-    value: BigNumberish,
-    length: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  toString(value: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -762,12 +764,14 @@ export class Elixir extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, string, string, BigNumber] & {
+      [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
         amount: BigNumber;
+        ratioOfSteady: number;
         forgePrice: BigNumber;
         chyme: string;
         alchemistId: string;
         timeToMaturity: BigNumber;
+        chymeVault: string;
       }
     >;
 
@@ -804,10 +808,11 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, string] & {
         steadyRequired: BigNumber;
-        chymeAmount: BigNumber;
+        ratioOfSteady: BigNumber;
         timeToMaturity: BigNumber;
+        chymeVault: string;
       }
     >;
 
@@ -850,11 +855,13 @@ export class Elixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      _ratioOfSteady: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -888,13 +895,7 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    toString(value: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1124,9 +1125,11 @@ export class Elixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      _ratioOfSteady: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1168,16 +1171,7 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    toString(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -1308,9 +1302,11 @@ export class Elixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      _ratioOfSteady: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1352,16 +1348,7 @@ export class Elixir extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    toHexString(
-      value: BigNumberish,
-      length: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    toString(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    tokenIdCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: BigNumberish,

@@ -1,0 +1,45 @@
+type Platform @entity {
+  id: ID!
+  totalValueLocked: BigInt
+  totalSplit: BigInt
+  totalMerged: BigInt
+}
+
+type Alchemist @entity {
+  id: ID!
+  count: BigInt!
+  alchemist: Bytes! # address
+  elixir: Elixir! # number
+  chyme: Chyme!
+}
+
+type Chyme @entity(immutable: true) { 
+  id: ID!
+  symbol: String!
+  priceOracle: Bytes! # address
+  steadyToken: Bytes! # address
+  alchemist: Alchemist
+}
+
+type Elixir @entity {
+  id: ID!
+  tokenId: BigInt!
+  status: Status
+  chyme: Chyme 
+}
+
+type Transaction @entity {
+  id: ID!
+  chyme: Chyme!
+}
+
+enum Status{
+  Split
+  Merged
+}
+
+enum Ratios {
+  LowRisk
+  MediumRisk
+  HighRisk
+}

@@ -1,0 +1,48 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AlchemistAcademy
+    network: rinkeby
+    source:
+      address: "0x0b3F91A7bf157a40e9F809765289b963728D3C20"
+      abi: AlchemistAcademy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AlchemistForged
+        - Chymed
+      abis:
+        - name: AlchemistAcademy
+          file: AlchemistAcademy/abis/AlchemistAcademy.json
+      eventHandlers:
+        - event: AlchemistForged(indexed address,address,uint8,address)
+          handler: handleAlchemistForged
+        - event: Chymed(address,uint256,uint256,string)
+          handler: handleChymed
+      file: AlchemistAcademy/AlchemistAcademy.wasm
+templates:
+  - kind: ethereum/contract
+    name: AlchemistInstance
+    network: rinkeby
+    source:
+      abi: Alchemist
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Completed
+        - StageTransition
+      abis:
+        - name: Alchemist
+          file: AlchemistInstance/abis/Alchemist.json
+      eventHandlers:
+        - event: Merge(indexed address,uint256,address,uint256)
+          handler: handleMerge
+        - event: Split(indexed address,uint256,address,address,uint256)
+          handler: handleSplit
+      file: AlchemistAcademy/AlchemistAcademy.wasm

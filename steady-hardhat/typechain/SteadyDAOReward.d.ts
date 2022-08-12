@@ -21,12 +21,12 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SteadyDAORewardInterface extends ethers.utils.Interface {
   functions: {
-    "performAction(uint8,uint256,uint256)": FunctionFragment;
+    "performAction(uint8,uint256,uint256,address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "performAction",
-    values: [BigNumberish, BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish, string]
   ): string;
 
   decodeFunctionResult(
@@ -91,6 +91,7 @@ export class SteadyDAOReward extends BaseContract {
       action: BigNumberish,
       arg1: BigNumberish,
       arg2: BigNumberish,
+      arg3: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -99,6 +100,7 @@ export class SteadyDAOReward extends BaseContract {
     action: BigNumberish,
     arg1: BigNumberish,
     arg2: BigNumberish,
+    arg3: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -107,6 +109,7 @@ export class SteadyDAOReward extends BaseContract {
       action: BigNumberish,
       arg1: BigNumberish,
       arg2: BigNumberish,
+      arg3: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -126,6 +129,7 @@ export class SteadyDAOReward extends BaseContract {
       action: BigNumberish,
       arg1: BigNumberish,
       arg2: BigNumberish,
+      arg3: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -135,6 +139,7 @@ export class SteadyDAOReward extends BaseContract {
       action: BigNumberish,
       arg1: BigNumberish,
       arg2: BigNumberish,
+      arg3: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

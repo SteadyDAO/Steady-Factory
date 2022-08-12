@@ -23,11 +23,10 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
   functions: {
     "DAOAddress()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
-    "alchemist(address)": FunctionFragment;
     "alchemistCounter()": FunctionFragment;
     "alchemistImpl()": FunctionFragment;
     "chymeList(address)": FunctionFragment;
-    "createNewChyme(uint8,uint8,uint8,uint8,address,address,uint256,uint256)": FunctionFragment;
+    "createNewChyme(uint8,uint8,uint8,address,address,uint256)": FunctionFragment;
     "elixirImpl()": FunctionFragment;
     "getChymeInfo(address)": FunctionFragment;
     "initialize(address,address,address,address,address,address)": FunctionFragment;
@@ -47,7 +46,6 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     functionFragment: "MINTER_ROLE",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "alchemist", values: [string]): string;
   encodeFunctionData(
     functionFragment: "alchemistCounter",
     values?: undefined
@@ -63,10 +61,8 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
       BigNumberish,
       BigNumberish,
       BigNumberish,
-      BigNumberish,
       string,
       string,
-      BigNumberish,
       BigNumberish
     ]
   ): string;
@@ -109,7 +105,6 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "alchemist", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "alchemistCounter",
     data: BytesLike
@@ -149,29 +144,35 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
 
   events: {
-    "AlchemistForged(address,address,int256)": EventFragment;
-    "Chymed(address,uint256,uint256)": EventFragment;
+    "AlchemistForged(address,address,uint8,address)": EventFragment;
+    "Chymed(address,uint256,uint256,string)": EventFragment;
+    "Initialized(uint8)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AlchemistForged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Chymed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
 }
 
 export type AlchemistForgedEvent = TypedEvent<
-  [string, string, BigNumber] & {
+  [string, string, number, string] & {
     alchemist: string;
     priceOracle: string;
-    forgePrice: BigNumber;
+    fees: number;
+    steadyImplForChyme: string;
   }
 >;
 
 export type ChymedEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
+  [string, BigNumber, BigNumber, string] & {
     chyme: string;
     fees: BigNumber;
     approvalStatus: BigNumber;
+    symbol: string;
   }
 >;
+
+export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 
 export class AlchemistAcademy extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -221,11 +222,6 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    alchemist(
-      _chyme: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     alchemistCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     alchemistImpl(overrides?: CallOverrides): Promise<[string]>;
@@ -234,27 +230,24 @@ export class AlchemistAcademy extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, number, string, string, BigNumber, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber] & {
         decimals: number;
-        ratioOfSteady: number;
         fees: number;
         DAOApproved: number;
         oracleAddress: string;
-        infoUri: string;
-        reward: BigNumber;
+        steadyImplForChyme: string;
+        symbol: string;
         timeToMaturity: BigNumber;
       }
     >;
 
     createNewChyme(
       _decimals: BigNumberish,
-      _ratioOfSteady: BigNumberish,
       _fees: BigNumberish,
       _approvalStatus: BigNumberish,
       _chyme: string,
       _oracleAddress: string,
       _timeToMaturity: BigNumberish,
-      _rewardAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -264,18 +257,19 @@ export class AlchemistAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, number, BigNumber] & {
+      [string, number, number, BigNumber, string, string] & {
         oracleAddress: string;
         fees: number;
-        ratio: number;
         decimals: number;
         timeToMaturity: BigNumber;
+        symbol: string;
+        steadyImplForChyme: string;
       }
     >;
 
     initialize(
-      _steadyImpl: string,
       _elixirImpl: string,
+      _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
@@ -306,11 +300,6 @@ export class AlchemistAcademy extends BaseContract {
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  alchemist(
-    _chyme: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
   alchemistImpl(overrides?: CallOverrides): Promise<string>;
@@ -319,27 +308,24 @@ export class AlchemistAcademy extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [number, number, number, number, string, string, BigNumber, BigNumber] & {
+    [number, number, number, string, string, string, BigNumber] & {
       decimals: number;
-      ratioOfSteady: number;
       fees: number;
       DAOApproved: number;
       oracleAddress: string;
-      infoUri: string;
-      reward: BigNumber;
+      steadyImplForChyme: string;
+      symbol: string;
       timeToMaturity: BigNumber;
     }
   >;
 
   createNewChyme(
     _decimals: BigNumberish,
-    _ratioOfSteady: BigNumberish,
     _fees: BigNumberish,
     _approvalStatus: BigNumberish,
     _chyme: string,
     _oracleAddress: string,
     _timeToMaturity: BigNumberish,
-    _rewardAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -349,18 +335,19 @@ export class AlchemistAcademy extends BaseContract {
     _chyme: string,
     overrides?: CallOverrides
   ): Promise<
-    [string, number, number, number, BigNumber] & {
+    [string, number, number, BigNumber, string, string] & {
       oracleAddress: string;
       fees: number;
-      ratio: number;
       decimals: number;
       timeToMaturity: BigNumber;
+      symbol: string;
+      steadyImplForChyme: string;
     }
   >;
 
   initialize(
-    _steadyImpl: string,
     _elixirImpl: string,
+    _steadyImpl: string,
     _treasury: string,
     _alchemistImpl: string,
     _DAOAddress: string,
@@ -391,8 +378,6 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    alchemist(_chyme: string, overrides?: CallOverrides): Promise<string>;
-
     alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     alchemistImpl(overrides?: CallOverrides): Promise<string>;
@@ -401,27 +386,24 @@ export class AlchemistAcademy extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, number, string, string, BigNumber, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber] & {
         decimals: number;
-        ratioOfSteady: number;
         fees: number;
         DAOApproved: number;
         oracleAddress: string;
-        infoUri: string;
-        reward: BigNumber;
+        steadyImplForChyme: string;
+        symbol: string;
         timeToMaturity: BigNumber;
       }
     >;
 
     createNewChyme(
       _decimals: BigNumberish,
-      _ratioOfSteady: BigNumberish,
       _fees: BigNumberish,
       _approvalStatus: BigNumberish,
       _chyme: string,
       _oracleAddress: string,
       _timeToMaturity: BigNumberish,
-      _rewardAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -431,18 +413,19 @@ export class AlchemistAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, number, BigNumber] & {
+      [string, number, number, BigNumber, string, string] & {
         oracleAddress: string;
         fees: number;
-        ratio: number;
         decimals: number;
         timeToMaturity: BigNumber;
+        symbol: string;
+        steadyImplForChyme: string;
       }
     >;
 
     initialize(
-      _steadyImpl: string,
       _elixirImpl: string,
+      _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
@@ -470,52 +453,79 @@ export class AlchemistAcademy extends BaseContract {
   };
 
   filters: {
-    "AlchemistForged(address,address,int256)"(
+    "AlchemistForged(address,address,uint8,address)"(
       alchemist?: string | null,
       priceOracle?: null,
-      forgePrice?: null
+      fees?: null,
+      steadyImplForChyme?: null
     ): TypedEventFilter<
-      [string, string, BigNumber],
-      { alchemist: string; priceOracle: string; forgePrice: BigNumber }
+      [string, string, number, string],
+      {
+        alchemist: string;
+        priceOracle: string;
+        fees: number;
+        steadyImplForChyme: string;
+      }
     >;
 
     AlchemistForged(
       alchemist?: string | null,
       priceOracle?: null,
-      forgePrice?: null
+      fees?: null,
+      steadyImplForChyme?: null
     ): TypedEventFilter<
-      [string, string, BigNumber],
-      { alchemist: string; priceOracle: string; forgePrice: BigNumber }
+      [string, string, number, string],
+      {
+        alchemist: string;
+        priceOracle: string;
+        fees: number;
+        steadyImplForChyme: string;
+      }
     >;
 
-    "Chymed(address,uint256,uint256)"(
+    "Chymed(address,uint256,uint256,string)"(
       chyme?: null,
       fees?: null,
-      approvalStatus?: null
+      approvalStatus?: null,
+      symbol?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { chyme: string; fees: BigNumber; approvalStatus: BigNumber }
+      [string, BigNumber, BigNumber, string],
+      {
+        chyme: string;
+        fees: BigNumber;
+        approvalStatus: BigNumber;
+        symbol: string;
+      }
     >;
 
     Chymed(
       chyme?: null,
       fees?: null,
-      approvalStatus?: null
+      approvalStatus?: null,
+      symbol?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { chyme: string; fees: BigNumber; approvalStatus: BigNumber }
+      [string, BigNumber, BigNumber, string],
+      {
+        chyme: string;
+        fees: BigNumber;
+        approvalStatus: BigNumber;
+        symbol: string;
+      }
     >;
+
+    "Initialized(uint8)"(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
+
+    Initialized(
+      version?: null
+    ): TypedEventFilter<[number], { version: number }>;
   };
 
   estimateGas: {
     DAOAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    alchemist(
-      _chyme: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -525,13 +535,11 @@ export class AlchemistAcademy extends BaseContract {
 
     createNewChyme(
       _decimals: BigNumberish,
-      _ratioOfSteady: BigNumberish,
       _fees: BigNumberish,
       _approvalStatus: BigNumberish,
       _chyme: string,
       _oracleAddress: string,
       _timeToMaturity: BigNumberish,
-      _rewardAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -540,8 +548,8 @@ export class AlchemistAcademy extends BaseContract {
     getChymeInfo(_chyme: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
-      _steadyImpl: string,
       _elixirImpl: string,
+      _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
@@ -573,11 +581,6 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    alchemist(
-      _chyme: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     alchemistCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     alchemistImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -589,13 +592,11 @@ export class AlchemistAcademy extends BaseContract {
 
     createNewChyme(
       _decimals: BigNumberish,
-      _ratioOfSteady: BigNumberish,
       _fees: BigNumberish,
       _approvalStatus: BigNumberish,
       _chyme: string,
       _oracleAddress: string,
       _timeToMaturity: BigNumberish,
-      _rewardAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -607,8 +608,8 @@ export class AlchemistAcademy extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      _steadyImpl: string,
       _elixirImpl: string,
+      _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,

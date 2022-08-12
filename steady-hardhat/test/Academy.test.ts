@@ -11,7 +11,7 @@ import {
   DummyPriceOracleForTesting,
   Steady,
   SteadyDAOReward,
-  Elixir } from '../src/types/index';
+  Elixir } from '../typechain';
 import * as hre from "hardhat";
 
 // let mrAlchemist:Alchemist;
@@ -24,10 +24,8 @@ let alchemistImpl: Alchemist;
 const testAddresses = ['0xb4E459c2d7C9C4A13C4870ED35653d71536F5a4B', '0xE61A17362BEcE0764C641cd449B4c56150c99c80'];
 const feeAddress = '0x3E924146306957bD453502e33B9a7B6AbA6e4D3a';
 
-// SAND token
-// Tests are based on Block: 13670552
-const chymeAddress = '0x3845badAde8e6dFF049820680d1F14bD3903a5d0';
-const oracleAddress = '0x0C466540B2ee1a31b441671eac0ca886e051E410';// we use SAND token but we use Gold oracle
+const chymeAddress = '0xa77451Ce512c970173fD3Faff316F6EDED1867f6';
+const oracleAddress = '0x81570059A0cb83888f1459Ec66Aad1Ac16730243';
 
 const DAY = 86400;
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
@@ -44,78 +42,80 @@ describe('Alchemists Ideal cases', async () => {
  
     before('create fixture loader', async () => {
         [wallet, Wallet2, Wallet3, treasury, DAOAddress] = await (ethers as any).getSigners()
-        console.log("Wallet addresses - %s, %s", wallet.address, Wallet2.address);
+        console.log("Wallet addresses - %s, %s", wallet.address, Wallet2.address, Wallet3.address,treasury.address);
 
         const Steady = await ethers.getContractFactory("Steady");
-        steadyImpl = await Steady.deploy() as Steady;
+        steadyImpl = await Steady.connect(DAOAddress).deploy() as Steady;
+        await steadyImpl.deployed();
         
         const TreasureChest = await ethers.getContractFactory("Treasure");
         const treasureChest = await TreasureChest.deploy();
 
         const ElixirFactory = await ethers.getContractFactory("Elixir");
         elixirImpl = await ElixirFactory.deploy("NFT","Elixir", treasureChest.address) as Elixir;
-
-        const AlchemistAcademy = await ethers.getContractFactory("AlchemistAcademy");
-        alchemistAcademy = await AlchemistAcademy.deploy() as AlchemistAcademy;
-
-        elixirImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
-        steadyImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
-
+      
         const Alchemist = await ethers.getContractFactory("Alchemist");
         alchemistImpl = await Alchemist.deploy() as Alchemist;
-
-        loadFixture = createFixtureLoader([wallet, Wallet2]);
-        const _dummyPriceOracleForTesting = await ethers.getContractFactory("DummyPriceOracleForTesting");
-        dummyPriceOracleForTesting = await _dummyPriceOracleForTesting.deploy() as DummyPriceOracleForTesting;
-
-        await dummyPriceOracleForTesting.setLatestAnswer(5778003570);
+        await alchemistImpl.deployed();
+        console.log("Alchemist Impl deployed")
 
         const SteadyDAOReward = await ethers.getContractFactory("SteadyDAOReward");
-        steadyDAOReward = await SteadyDAOReward.connect(Wallet2).deploy() as SteadyDAOReward;
+        steadyDAOReward = await SteadyDAOReward.deploy() as SteadyDAOReward;
         await steadyDAOReward.deployed();
+        console.log("steadyDAOReward  deployed")
 
     })
     
     describe('Set up an Alchemist', async () => {
+        it('can deploy factory', async () => {
+            const AlchemistAcademy = await ethers.getContractFactory("AlchemistAcademy");
+            alchemistAcademy = await AlchemistAcademy.deploy() as AlchemistAcademy;
+            await alchemistAcademy.deployed();
+            
+            elixirImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address); 
+        }).timeout(100000);
+
         it('initialize factory', async () => {
+           
             await alchemistAcademy.initialize(
-                steadyImpl.address, 
                 elixirImpl.address,
-                alchemistImpl.address,
+                steadyImpl.address,
                 treasury.address,
+                alchemistImpl.address,
                 DAOAddress.address,
                 steadyDAOReward.address
               );
-            expect(await alchemistAcademy.elixirImpl()).equals(elixirImpl.address);
-            expect(await alchemistAcademy.steadyImpl()).equals(steadyImpl.address);
-        });
+
+
+        expect(await alchemistAcademy.elixirImpl()).equals(elixirImpl.address);
+        }).timeout(100000);
+        
         it('DAO can create new chyme', async () => {
+            // await steadyImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address);
+            
+            console.log("DAOAddress.address --- ",DAOAddress.address)
             await alchemistAcademy.connect(DAOAddress).createNewChyme(
                 18,
-                75,
                 0,
                 1,
                 chymeAddress,           
                 oracleAddress,
-                157680000,
-                0
+                157680000
                 );
             expect((await alchemistAcademy.chymeList(chymeAddress)).fees).equal(0);
-        });
+        }).timeout(100000);
 
         it('Non DAO cannot create a new chyme', async () => {
             await expect( alchemistAcademy.createNewChyme(
                 18,
-                75,
                 0,
                 1,
                 chymeAddress,           
                 oracleAddress,
-                157680000,
-                0
+                157680000
                 ))
             .to.be.revertedWith("Requires Governance!");
         });
     });
 
-});
+})

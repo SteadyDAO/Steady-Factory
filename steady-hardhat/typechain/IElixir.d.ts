@@ -25,10 +25,11 @@ interface IElixirInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getCurrentTokenId()": FunctionFragment;
     "getSteadyRequired(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "safeMint(address,address,uint256,uint256,uint256)": FunctionFragment;
+    "safeMint(address,address,uint8,uint256,uint256,uint256,address)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -46,6 +47,10 @@ interface IElixirInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCurrentTokenId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getSteadyRequired",
     values: [BigNumberish]
   ): string;
@@ -59,7 +64,15 @@ interface IElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "safeMint",
-    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -83,6 +96,10 @@ interface IElixirInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentTokenId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -208,10 +225,14 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { operator: string }>;
 
+    getCurrentTokenId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     getSteadyRequired(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber, BigNumber]>;
+    ): Promise<[BigNumber, BigNumber, BigNumber, string]>;
 
     isApprovedForAll(
       owner: string,
@@ -227,9 +248,11 @@ export class IElixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      ratio: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -285,10 +308,14 @@ export class IElixir extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCurrentTokenId(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getSteadyRequired(
     tokenId: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber, BigNumber]>;
+  ): Promise<[BigNumber, BigNumber, BigNumber, string]>;
 
   isApprovedForAll(
     owner: string,
@@ -301,9 +328,11 @@ export class IElixir extends BaseContract {
   safeMint(
     _to: string,
     _chyme: string,
+    ratio: BigNumberish,
     _forgePrice: BigNumberish,
     _amount: BigNumberish,
     _timeToMaturity: BigNumberish,
+    chymeVault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -356,10 +385,12 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getSteadyRequired(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber, BigNumber]>;
+    ): Promise<[BigNumber, BigNumber, BigNumber, string]>;
 
     isApprovedForAll(
       owner: string,
@@ -372,11 +403,13 @@ export class IElixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      ratio: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -487,6 +520,10 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCurrentTokenId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getSteadyRequired(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -506,9 +543,11 @@ export class IElixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      ratio: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -568,6 +607,10 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCurrentTokenId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     getSteadyRequired(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -587,9 +630,11 @@ export class IElixir extends BaseContract {
     safeMint(
       _to: string,
       _chyme: string,
+      ratio: BigNumberish,
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
+      chymeVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
