@@ -96,6 +96,7 @@ export class AlchemistAcademy__chymeListResult {
   value4: Address;
   value5: string;
   value6: BigInt;
+  value7: Address;
 
   constructor(
     value0: i32,
@@ -104,7 +105,8 @@ export class AlchemistAcademy__chymeListResult {
     value3: Address,
     value4: Address,
     value5: string,
-    value6: BigInt
+    value6: BigInt,
+    value7: Address
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -113,6 +115,7 @@ export class AlchemistAcademy__chymeListResult {
     this.value4 = value4;
     this.value5 = value5;
     this.value6 = value6;
+    this.value7 = value7;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -133,6 +136,7 @@ export class AlchemistAcademy__chymeListResult {
     map.set("value4", ethereum.Value.fromAddress(this.value4));
     map.set("value5", ethereum.Value.fromString(this.value5));
     map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
+    map.set("value7", ethereum.Value.fromAddress(this.value7));
     return map;
   }
 }
@@ -144,6 +148,7 @@ export class AlchemistAcademy__getChymeInfoResult {
   value3: BigInt;
   value4: string;
   value5: Address;
+  value6: Address;
 
   constructor(
     value0: Address,
@@ -151,7 +156,8 @@ export class AlchemistAcademy__getChymeInfoResult {
     value2: i32,
     value3: BigInt,
     value4: string,
-    value5: Address
+    value5: Address,
+    value6: Address
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -159,6 +165,7 @@ export class AlchemistAcademy__getChymeInfoResult {
     this.value3 = value3;
     this.value4 = value4;
     this.value5 = value5;
+    this.value6 = value6;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -175,7 +182,42 @@ export class AlchemistAcademy__getChymeInfoResult {
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     map.set("value4", ethereum.Value.fromString(this.value4));
     map.set("value5", ethereum.Value.fromAddress(this.value5));
+    map.set("value6", ethereum.Value.fromAddress(this.value6));
     return map;
+  }
+}
+
+export class AlchemistAcademy__setChymeInfoInput_iChymeStruct extends ethereum.Tuple {
+  get decimals(): i32 {
+    return this[0].toI32();
+  }
+
+  get fees(): i32 {
+    return this[1].toI32();
+  }
+
+  get DAOApproved(): i32 {
+    return this[2].toI32();
+  }
+
+  get oracleAddress(): Address {
+    return this[3].toAddress();
+  }
+
+  get steadyImplForChyme(): Address {
+    return this[4].toAddress();
+  }
+
+  get symbol(): string {
+    return this[5].toString();
+  }
+
+  get timeToMaturity(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get steadyDAOReward(): Address {
+    return this[7].toAddress();
   }
 }
 
@@ -214,29 +256,6 @@ export class AlchemistAcademy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
-  alchemistCounter(): BigInt {
-    let result = super.call(
-      "alchemistCounter",
-      "alchemistCounter():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_alchemistCounter(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "alchemistCounter",
-      "alchemistCounter():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   alchemistImpl(): Address {
     let result = super.call("alchemistImpl", "alchemistImpl():(address)", []);
 
@@ -259,7 +278,7 @@ export class AlchemistAcademy extends ethereum.SmartContract {
   chymeList(param0: Address): AlchemistAcademy__chymeListResult {
     let result = super.call(
       "chymeList",
-      "chymeList(address):(uint8,uint8,uint8,address,address,string,uint256)",
+      "chymeList(address):(uint8,uint8,uint8,address,address,string,uint256,address)",
       [ethereum.Value.fromAddress(param0)]
     );
 
@@ -270,7 +289,8 @@ export class AlchemistAcademy extends ethereum.SmartContract {
       result[3].toAddress(),
       result[4].toAddress(),
       result[5].toString(),
-      result[6].toBigInt()
+      result[6].toBigInt(),
+      result[7].toAddress()
     );
   }
 
@@ -279,7 +299,7 @@ export class AlchemistAcademy extends ethereum.SmartContract {
   ): ethereum.CallResult<AlchemistAcademy__chymeListResult> {
     let result = super.tryCall(
       "chymeList",
-      "chymeList(address):(uint8,uint8,uint8,address,address,string,uint256)",
+      "chymeList(address):(uint8,uint8,uint8,address,address,string,uint256,address)",
       [ethereum.Value.fromAddress(param0)]
     );
     if (result.reverted) {
@@ -294,30 +314,16 @@ export class AlchemistAcademy extends ethereum.SmartContract {
         value[3].toAddress(),
         value[4].toAddress(),
         value[5].toString(),
-        value[6].toBigInt()
+        value[6].toBigInt(),
+        value[7].toAddress()
       )
     );
-  }
-
-  elixirImpl(): Address {
-    let result = super.call("elixirImpl", "elixirImpl():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_elixirImpl(): ethereum.CallResult<Address> {
-    let result = super.tryCall("elixirImpl", "elixirImpl():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   getChymeInfo(_chyme: Address): AlchemistAcademy__getChymeInfoResult {
     let result = super.call(
       "getChymeInfo",
-      "getChymeInfo(address):(address,uint8,uint8,uint256,string,address)",
+      "getChymeInfo(address):(address,uint8,uint8,uint256,string,address,address)",
       [ethereum.Value.fromAddress(_chyme)]
     );
 
@@ -327,7 +333,8 @@ export class AlchemistAcademy extends ethereum.SmartContract {
       result[2].toI32(),
       result[3].toBigInt(),
       result[4].toString(),
-      result[5].toAddress()
+      result[5].toAddress(),
+      result[6].toAddress()
     );
   }
 
@@ -336,7 +343,7 @@ export class AlchemistAcademy extends ethereum.SmartContract {
   ): ethereum.CallResult<AlchemistAcademy__getChymeInfoResult> {
     let result = super.tryCall(
       "getChymeInfo",
-      "getChymeInfo(address):(address,uint8,uint8,uint256,string,address)",
+      "getChymeInfo(address):(address,uint8,uint8,uint256,string,address,address)",
       [ethereum.Value.fromAddress(_chyme)]
     );
     if (result.reverted) {
@@ -350,7 +357,8 @@ export class AlchemistAcademy extends ethereum.SmartContract {
         value[2].toI32(),
         value[3].toBigInt(),
         value[4].toString(),
-        value[5].toAddress()
+        value[5].toAddress(),
+        value[6].toAddress()
       )
     );
   }
@@ -378,46 +386,33 @@ export class AlchemistAcademy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  steadyDAOReward(): Address {
+  setChymeInfo(
+    _chyme: Address,
+    _iChyme: AlchemistAcademy__setChymeInfoInput_iChymeStruct
+  ): boolean {
     let result = super.call(
-      "steadyDAOReward",
-      "steadyDAOReward():(address)",
-      []
+      "setChymeInfo",
+      "setChymeInfo(address,(uint8,uint8,uint8,address,address,string,uint256,address)):(bool)",
+      [ethereum.Value.fromAddress(_chyme), ethereum.Value.fromTuple(_iChyme)]
     );
 
-    return result[0].toAddress();
+    return result[0].toBoolean();
   }
 
-  try_steadyDAOReward(): ethereum.CallResult<Address> {
+  try_setChymeInfo(
+    _chyme: Address,
+    _iChyme: AlchemistAcademy__setChymeInfoInput_iChymeStruct
+  ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "steadyDAOReward",
-      "steadyDAOReward():(address)",
-      []
+      "setChymeInfo",
+      "setChymeInfo(address,(uint8,uint8,uint8,address,address,string,uint256,address)):(bool)",
+      [ethereum.Value.fromAddress(_chyme), ethereum.Value.fromTuple(_iChyme)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  steadyDAOToken(): Address {
-    let result = super.call("steadyDAOToken", "steadyDAOToken():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_steadyDAOToken(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "steadyDAOToken",
-      "steadyDAOToken():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   steadyImpl(): Address {
@@ -468,28 +463,14 @@ export class CreateNewChymeCall__Inputs {
     this._call = call;
   }
 
-  get _decimals(): i32 {
-    return this._call.inputValues[0].value.toI32();
-  }
-
-  get _fees(): i32 {
-    return this._call.inputValues[1].value.toI32();
-  }
-
-  get _approvalStatus(): i32 {
-    return this._call.inputValues[2].value.toI32();
+  get _iChyme(): CreateNewChymeCall_iChymeStruct {
+    return changetype<CreateNewChymeCall_iChymeStruct>(
+      this._call.inputValues[0].value.toTuple()
+    );
   }
 
   get _chyme(): Address {
-    return this._call.inputValues[3].value.toAddress();
-  }
-
-  get _oracleAddress(): Address {
-    return this._call.inputValues[4].value.toAddress();
-  }
-
-  get _timeToMaturity(): BigInt {
-    return this._call.inputValues[5].value.toBigInt();
+    return this._call.inputValues[1].value.toAddress();
   }
 }
 
@@ -498,6 +479,40 @@ export class CreateNewChymeCall__Outputs {
 
   constructor(call: CreateNewChymeCall) {
     this._call = call;
+  }
+}
+
+export class CreateNewChymeCall_iChymeStruct extends ethereum.Tuple {
+  get decimals(): i32 {
+    return this[0].toI32();
+  }
+
+  get fees(): i32 {
+    return this[1].toI32();
+  }
+
+  get DAOApproved(): i32 {
+    return this[2].toI32();
+  }
+
+  get oracleAddress(): Address {
+    return this[3].toAddress();
+  }
+
+  get steadyImplForChyme(): Address {
+    return this[4].toAddress();
+  }
+
+  get symbol(): string {
+    return this[5].toString();
+  }
+
+  get timeToMaturity(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get steadyDAOReward(): Address {
+    return this[7].toAddress();
   }
 }
 
@@ -518,28 +533,20 @@ export class InitializeCall__Inputs {
     this._call = call;
   }
 
-  get _elixirImpl(): Address {
+  get _steadyImpl(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _steadyImpl(): Address {
+  get _treasury(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get _treasury(): Address {
+  get _alchemistImpl(): Address {
     return this._call.inputValues[2].value.toAddress();
   }
 
-  get _alchemistImpl(): Address {
-    return this._call.inputValues[3].value.toAddress();
-  }
-
   get _DAOAddress(): Address {
-    return this._call.inputValues[4].value.toAddress();
-  }
-
-  get _steadyDAOReward(): Address {
-    return this._call.inputValues[5].value.toAddress();
+    return this._call.inputValues[3].value.toAddress();
   }
 }
 
@@ -551,32 +558,76 @@ export class InitializeCall__Outputs {
   }
 }
 
-export class SetDAORewardContractCall extends ethereum.Call {
-  get inputs(): SetDAORewardContractCall__Inputs {
-    return new SetDAORewardContractCall__Inputs(this);
+export class SetChymeInfoCall extends ethereum.Call {
+  get inputs(): SetChymeInfoCall__Inputs {
+    return new SetChymeInfoCall__Inputs(this);
   }
 
-  get outputs(): SetDAORewardContractCall__Outputs {
-    return new SetDAORewardContractCall__Outputs(this);
+  get outputs(): SetChymeInfoCall__Outputs {
+    return new SetChymeInfoCall__Outputs(this);
   }
 }
 
-export class SetDAORewardContractCall__Inputs {
-  _call: SetDAORewardContractCall;
+export class SetChymeInfoCall__Inputs {
+  _call: SetChymeInfoCall;
 
-  constructor(call: SetDAORewardContractCall) {
+  constructor(call: SetChymeInfoCall) {
     this._call = call;
   }
 
-  get _steadyDAOReward(): Address {
+  get _chyme(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
+
+  get _iChyme(): SetChymeInfoCall_iChymeStruct {
+    return changetype<SetChymeInfoCall_iChymeStruct>(
+      this._call.inputValues[1].value.toTuple()
+    );
+  }
 }
 
-export class SetDAORewardContractCall__Outputs {
-  _call: SetDAORewardContractCall;
+export class SetChymeInfoCall__Outputs {
+  _call: SetChymeInfoCall;
 
-  constructor(call: SetDAORewardContractCall) {
+  constructor(call: SetChymeInfoCall) {
     this._call = call;
+  }
+
+  get success(): boolean {
+    return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class SetChymeInfoCall_iChymeStruct extends ethereum.Tuple {
+  get decimals(): i32 {
+    return this[0].toI32();
+  }
+
+  get fees(): i32 {
+    return this[1].toI32();
+  }
+
+  get DAOApproved(): i32 {
+    return this[2].toI32();
+  }
+
+  get oracleAddress(): Address {
+    return this[3].toAddress();
+  }
+
+  get steadyImplForChyme(): Address {
+    return this[4].toAddress();
+  }
+
+  get symbol(): string {
+    return this[5].toString();
+  }
+
+  get timeToMaturity(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get steadyDAOReward(): Address {
+    return this[7].toAddress();
   }
 }

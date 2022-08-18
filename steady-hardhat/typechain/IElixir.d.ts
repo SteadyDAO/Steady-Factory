@@ -225,9 +225,7 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { operator: string }>;
 
-    getCurrentTokenId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    getCurrentTokenId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getSteadyRequired(
       tokenId: BigNumberish,
@@ -308,9 +306,7 @@ export class IElixir extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getCurrentTokenId(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
   getSteadyRequired(
     tokenId: BigNumberish,
@@ -520,9 +516,7 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCurrentTokenId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
     getSteadyRequired(
       tokenId: BigNumberish,
@@ -607,9 +601,7 @@ export class IElixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCurrentTokenId(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    getCurrentTokenId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getSteadyRequired(
       tokenId: BigNumberish,

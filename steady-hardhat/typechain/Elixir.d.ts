@@ -29,10 +29,11 @@ interface ElixirInterface extends ethers.utils.Interface {
     "burn(uint256)": FunctionFragment;
     "calculateParams(uint256)": FunctionFragment;
     "elements(uint256)": FunctionFragment;
-    "generateAttributes(uint256,string,uint256,uint256)": FunctionFragment;
+    "generateAttributes(uint256,uint256,uint256)": FunctionFragment;
     "generateBase64Image(uint256,uint256,string)": FunctionFragment;
     "generateImage(uint256,uint256,string)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getCurrentTokenId()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getSteadyRequired(uint256)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
@@ -81,7 +82,7 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "generateAttributes",
-    values: [BigNumberish, string, BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "generateBase64Image",
@@ -94,6 +95,10 @@ interface ElixirInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCurrentTokenId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -201,6 +206,10 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentTokenId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -400,7 +409,6 @@ export class Elixir extends BaseContract {
 
     generateAttributes(
       tokenId: BigNumberish,
-      elixirCurrentSteadyValue: string,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
       overrides?: CallOverrides
@@ -424,6 +432,8 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getCurrentTokenId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
@@ -594,7 +604,6 @@ export class Elixir extends BaseContract {
 
   generateAttributes(
     tokenId: BigNumberish,
-    elixirCurrentSteadyValue: string,
     currentPrice: BigNumberish,
     forgeConstant: BigNumberish,
     overrides?: CallOverrides
@@ -618,6 +627,8 @@ export class Elixir extends BaseContract {
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -777,7 +788,6 @@ export class Elixir extends BaseContract {
 
     generateAttributes(
       tokenId: BigNumberish,
-      elixirCurrentSteadyValue: string,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
       overrides?: CallOverrides
@@ -801,6 +811,8 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -1048,7 +1060,6 @@ export class Elixir extends BaseContract {
 
     generateAttributes(
       tokenId: BigNumberish,
-      elixirCurrentSteadyValue: string,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
       overrides?: CallOverrides
@@ -1072,6 +1083,8 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getCurrentTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(
       role: BytesLike,
@@ -1225,7 +1238,6 @@ export class Elixir extends BaseContract {
 
     generateAttributes(
       tokenId: BigNumberish,
-      elixirCurrentSteadyValue: string,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
       overrides?: CallOverrides
@@ -1249,6 +1261,8 @@ export class Elixir extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getCurrentTokenId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
       role: BytesLike,

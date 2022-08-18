@@ -1,0 +1,16 @@
+output: mythx.json
+format: json
+viaIR: true
+analyze:
+    mode: deep
+    create-group: true
+    group-name: steady
+    solc: 0.8.16
+    async: true
+    remappings:
+        - "@openzeppelin/=/home/wizgot/projects/Steady-Factory/steady-hardhat/node_modules/@openzeppelin/"
+        - "base64-sol=/home/wizgot/projects/Steady-Factory/steady-hardhat/node_modules/base64-sol/"
+    targets:
+        - contracts/Alchemist.sol
+        - contracts/AlchemistAcademy.sol
+        - contracts/SteadyDAOReward.sol

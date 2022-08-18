@@ -109,7 +109,7 @@ export function handleSplit(event: Split): void {
     elixirEntity = new Elixir(event.params.tokenId.toHexString())
   }
   elixirEntity.chyme = event.params.chyme.toHexString()
-  elixirEntity.status = Status.Split.toString()
+  elixirEntity.status = "Split"
 
   elixirEntity.save()
 }
@@ -119,7 +119,7 @@ export function handleMerge(event: Merge): void {
   if(!elixirEntity){
     elixirEntity = new Elixir(event.params.tokenid.toHexString())
   }
-  elixirEntity.status = Status.Merged.toString()
+  elixirEntity.status = "Merged"
   elixirEntity.save()
 }
 // export function handleChymeCreated(call: CreateNewChymeCall): void {

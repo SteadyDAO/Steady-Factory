@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "base64-sol/base64.sol";
 import "./interfaces/IAcademy.sol";
 import "./interfaces/ITreasure.sol";
-
 contract Elixir is ERC721, ERC721Burnable, AccessControl {
     using Counters for Counters.Counter;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -81,7 +80,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         )
     {
         Spagyria memory myElixir = elements[tokenId];
-        (, , uint8 decimals, , ,) = IAcademy(address(academy)).getChymeInfo(
+        (,, uint8 decimals,,,,) = IAcademy(address(academy)).getChymeInfo(
             address(elements[tokenId].chyme)
         );
         uint256 divisor = 10**decimals;
@@ -189,7 +188,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
             uint256 timeLeft
         )
     {
-        (address oracleAddress, , uint8 decimals,,,) = IAcademy(
+        (address oracleAddress, , uint8 decimals,,,,) = IAcademy(
             address(academy)
         ).getChymeInfo(elements[tokenId].chyme);
         currentPrice = uint256(
@@ -279,6 +278,10 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
 
     function burn(uint256 tokenId) public override(ERC721Burnable) {
         super.burn(tokenId);
+    }
+
+    function getCurrentTokenId() public view returns (uint256) {
+        return tokenIdCounter.current();
     }
     
     /**

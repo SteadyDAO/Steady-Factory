@@ -150,13 +150,14 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, BigNumber, string, string] & {
+      [string, number, number, BigNumber, string, string, string] & {
         oracleAddress: string;
         fees: number;
         decimals: number;
         timeToMaturity: BigNumber;
         symbol: string;
         steadyImplForChyme: string;
+        steadyDAOReward: string;
       }
     >;
 
@@ -195,13 +196,14 @@ export class IAcademy extends BaseContract {
     _chyme: string,
     overrides?: CallOverrides
   ): Promise<
-    [string, number, number, BigNumber, string, string] & {
+    [string, number, number, BigNumber, string, string, string] & {
       oracleAddress: string;
       fees: number;
       decimals: number;
       timeToMaturity: BigNumber;
       symbol: string;
       steadyImplForChyme: string;
+      steadyDAOReward: string;
     }
   >;
 
@@ -227,7 +229,7 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, string, string, string, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber, string] & {
         decimals: number;
         fees: number;
         DAOApproved: number;
@@ -235,6 +237,7 @@ export class IAcademy extends BaseContract {
         steadyImplForChyme: string;
         symbol: string;
         timeToMaturity: BigNumber;
+        steadyDAOReward: string;
       }
     >;
 
@@ -244,13 +247,14 @@ export class IAcademy extends BaseContract {
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, BigNumber, string, string] & {
+      [string, number, number, BigNumber, string, string, string] & {
         oracleAddress: string;
         fees: number;
         decimals: number;
         timeToMaturity: BigNumber;
         symbol: string;
         steadyImplForChyme: string;
+        steadyDAOReward: string;
       }
     >;
 

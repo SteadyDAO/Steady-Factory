@@ -23,17 +23,13 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
   functions: {
     "DAOAddress()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
-    "alchemistCounter()": FunctionFragment;
     "alchemistImpl()": FunctionFragment;
     "chymeList(address)": FunctionFragment;
-    "createNewChyme(uint8,uint8,uint8,address,address,uint256)": FunctionFragment;
-    "elixirImpl()": FunctionFragment;
+    "createNewChyme((uint8,uint8,uint8,address,address,string,uint256,address),address)": FunctionFragment;
     "getChymeInfo(address)": FunctionFragment;
-    "initialize(address,address,address,address,address,address)": FunctionFragment;
+    "initialize(address,address,address,address)": FunctionFragment;
     "priceFromOracle(address)": FunctionFragment;
-    "setDAORewardContract(address)": FunctionFragment;
-    "steadyDAOReward()": FunctionFragment;
-    "steadyDAOToken()": FunctionFragment;
+    "setChymeInfo(address,(uint8,uint8,uint8,address,address,string,uint256,address))": FunctionFragment;
     "steadyImpl()": FunctionFragment;
     "treasury()": FunctionFragment;
   };
@@ -47,10 +43,6 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "alchemistCounter",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "alchemistImpl",
     values?: undefined
   ): string;
@@ -58,17 +50,18 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createNewChyme",
     values: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      string,
-      BigNumberish
+      {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
+      string
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "elixirImpl",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getChymeInfo",
@@ -76,23 +69,27 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string, string, string]
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "priceFromOracle",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setDAORewardContract",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "steadyDAOReward",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "steadyDAOToken",
-    values?: undefined
+    functionFragment: "setChymeInfo",
+    values: [
+      string,
+      {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "steadyImpl",
@@ -106,10 +103,6 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "alchemistCounter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "alchemistImpl",
     data: BytesLike
   ): Result;
@@ -118,7 +111,6 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     functionFragment: "createNewChyme",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "elixirImpl", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getChymeInfo",
     data: BytesLike
@@ -129,15 +121,7 @@ interface AlchemistAcademyInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setDAORewardContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "steadyDAOReward",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "steadyDAOToken",
+    functionFragment: "setChymeInfo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "steadyImpl", data: BytesLike): Result;
@@ -222,15 +206,13 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    alchemistCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     alchemistImpl(overrides?: CallOverrides): Promise<[string]>;
 
     chymeList(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, string, string, string, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber, string] & {
         decimals: number;
         fees: number;
         DAOApproved: number;
@@ -238,42 +220,45 @@ export class AlchemistAcademy extends BaseContract {
         steadyImplForChyme: string;
         symbol: string;
         timeToMaturity: BigNumber;
+        steadyDAOReward: string;
       }
     >;
 
     createNewChyme(
-      _decimals: BigNumberish,
-      _fees: BigNumberish,
-      _approvalStatus: BigNumberish,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       _chyme: string,
-      _oracleAddress: string,
-      _timeToMaturity: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    elixirImpl(overrides?: CallOverrides): Promise<[string]>;
 
     getChymeInfo(
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, BigNumber, string, string] & {
+      [string, number, number, BigNumber, string, string, string] & {
         oracleAddress: string;
         fees: number;
         decimals: number;
         timeToMaturity: BigNumber;
         symbol: string;
         steadyImplForChyme: string;
+        steadyDAOReward: string;
       }
     >;
 
     initialize(
-      _elixirImpl: string,
       _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
-      _steadyDAOReward: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -282,14 +267,20 @@ export class AlchemistAcademy extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { price: BigNumber }>;
 
-    setDAORewardContract(
-      _steadyDAOReward: string,
+    setChymeInfo(
+      _chyme: string,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    steadyDAOReward(overrides?: CallOverrides): Promise<[string]>;
-
-    steadyDAOToken(overrides?: CallOverrides): Promise<[string]>;
 
     steadyImpl(overrides?: CallOverrides): Promise<[string]>;
 
@@ -300,15 +291,13 @@ export class AlchemistAcademy extends BaseContract {
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
   alchemistImpl(overrides?: CallOverrides): Promise<string>;
 
   chymeList(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [number, number, number, string, string, string, BigNumber] & {
+    [number, number, number, string, string, string, BigNumber, string] & {
       decimals: number;
       fees: number;
       DAOApproved: number;
@@ -316,42 +305,45 @@ export class AlchemistAcademy extends BaseContract {
       steadyImplForChyme: string;
       symbol: string;
       timeToMaturity: BigNumber;
+      steadyDAOReward: string;
     }
   >;
 
   createNewChyme(
-    _decimals: BigNumberish,
-    _fees: BigNumberish,
-    _approvalStatus: BigNumberish,
+    _iChyme: {
+      decimals: BigNumberish;
+      fees: BigNumberish;
+      DAOApproved: BigNumberish;
+      oracleAddress: string;
+      steadyImplForChyme: string;
+      symbol: string;
+      timeToMaturity: BigNumberish;
+      steadyDAOReward: string;
+    },
     _chyme: string,
-    _oracleAddress: string,
-    _timeToMaturity: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  elixirImpl(overrides?: CallOverrides): Promise<string>;
 
   getChymeInfo(
     _chyme: string,
     overrides?: CallOverrides
   ): Promise<
-    [string, number, number, BigNumber, string, string] & {
+    [string, number, number, BigNumber, string, string, string] & {
       oracleAddress: string;
       fees: number;
       decimals: number;
       timeToMaturity: BigNumber;
       symbol: string;
       steadyImplForChyme: string;
+      steadyDAOReward: string;
     }
   >;
 
   initialize(
-    _elixirImpl: string,
     _steadyImpl: string,
     _treasury: string,
     _alchemistImpl: string,
     _DAOAddress: string,
-    _steadyDAOReward: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -360,14 +352,20 @@ export class AlchemistAcademy extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  setDAORewardContract(
-    _steadyDAOReward: string,
+  setChymeInfo(
+    _chyme: string,
+    _iChyme: {
+      decimals: BigNumberish;
+      fees: BigNumberish;
+      DAOApproved: BigNumberish;
+      oracleAddress: string;
+      steadyImplForChyme: string;
+      symbol: string;
+      timeToMaturity: BigNumberish;
+      steadyDAOReward: string;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  steadyDAOReward(overrides?: CallOverrides): Promise<string>;
-
-  steadyDAOToken(overrides?: CallOverrides): Promise<string>;
 
   steadyImpl(overrides?: CallOverrides): Promise<string>;
 
@@ -378,15 +376,13 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
     alchemistImpl(overrides?: CallOverrides): Promise<string>;
 
     chymeList(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [number, number, number, string, string, string, BigNumber] & {
+      [number, number, number, string, string, string, BigNumber, string] & {
         decimals: number;
         fees: number;
         DAOApproved: number;
@@ -394,42 +390,45 @@ export class AlchemistAcademy extends BaseContract {
         steadyImplForChyme: string;
         symbol: string;
         timeToMaturity: BigNumber;
+        steadyDAOReward: string;
       }
     >;
 
     createNewChyme(
-      _decimals: BigNumberish,
-      _fees: BigNumberish,
-      _approvalStatus: BigNumberish,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       _chyme: string,
-      _oracleAddress: string,
-      _timeToMaturity: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    elixirImpl(overrides?: CallOverrides): Promise<string>;
 
     getChymeInfo(
       _chyme: string,
       overrides?: CallOverrides
     ): Promise<
-      [string, number, number, BigNumber, string, string] & {
+      [string, number, number, BigNumber, string, string, string] & {
         oracleAddress: string;
         fees: number;
         decimals: number;
         timeToMaturity: BigNumber;
         symbol: string;
         steadyImplForChyme: string;
+        steadyDAOReward: string;
       }
     >;
 
     initialize(
-      _elixirImpl: string,
       _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
-      _steadyDAOReward: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -438,14 +437,20 @@ export class AlchemistAcademy extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    setDAORewardContract(
-      _steadyDAOReward: string,
+    setChymeInfo(
+      _chyme: string,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       overrides?: CallOverrides
-    ): Promise<void>;
-
-    steadyDAOReward(overrides?: CallOverrides): Promise<string>;
-
-    steadyDAOToken(overrides?: CallOverrides): Promise<string>;
+    ): Promise<boolean>;
 
     steadyImpl(overrides?: CallOverrides): Promise<string>;
 
@@ -527,33 +532,32 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    alchemistCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
     alchemistImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
     chymeList(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     createNewChyme(
-      _decimals: BigNumberish,
-      _fees: BigNumberish,
-      _approvalStatus: BigNumberish,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       _chyme: string,
-      _oracleAddress: string,
-      _timeToMaturity: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    elixirImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
     getChymeInfo(_chyme: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
-      _elixirImpl: string,
       _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
-      _steadyDAOReward: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -562,14 +566,20 @@ export class AlchemistAcademy extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    setDAORewardContract(
-      _steadyDAOReward: string,
+    setChymeInfo(
+      _chyme: string,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    steadyDAOReward(overrides?: CallOverrides): Promise<BigNumber>;
-
-    steadyDAOToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     steadyImpl(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -581,8 +591,6 @@ export class AlchemistAcademy extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    alchemistCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     alchemistImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     chymeList(
@@ -591,16 +599,19 @@ export class AlchemistAcademy extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createNewChyme(
-      _decimals: BigNumberish,
-      _fees: BigNumberish,
-      _approvalStatus: BigNumberish,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       _chyme: string,
-      _oracleAddress: string,
-      _timeToMaturity: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    elixirImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getChymeInfo(
       _chyme: string,
@@ -608,12 +619,10 @@ export class AlchemistAcademy extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      _elixirImpl: string,
       _steadyImpl: string,
       _treasury: string,
       _alchemistImpl: string,
       _DAOAddress: string,
-      _steadyDAOReward: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -622,14 +631,20 @@ export class AlchemistAcademy extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setDAORewardContract(
-      _steadyDAOReward: string,
+    setChymeInfo(
+      _chyme: string,
+      _iChyme: {
+        decimals: BigNumberish;
+        fees: BigNumberish;
+        DAOApproved: BigNumberish;
+        oracleAddress: string;
+        steadyImplForChyme: string;
+        symbol: string;
+        timeToMaturity: BigNumberish;
+        steadyDAOReward: string;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    steadyDAOReward(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    steadyDAOToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     steadyImpl(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -6,7 +6,7 @@ dataSources:
     name: AlchemistAcademy
     network: rinkeby
     source:
-      address: "0x0b3F91A7bf157a40e9F809765289b963728D3C20"
+      address: "0xC87C9Aa171240129ad5579B5f3A381CFC4CB37d0"
       abi: AlchemistAcademy
     mapping:
       kind: ethereum/events

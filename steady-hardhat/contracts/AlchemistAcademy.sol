@@ -2,28 +2,22 @@
 pragma solidity 0.8.16;
 
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol";
 
 import "./interfaces/IChyme.sol";
 import "./Alchemist.sol";
-
 contract AlchemistAcademy is Initializable {
     mapping(address => IChyme.Chyme) public chymeList;
-
-    address public elixirImpl;
-    address public steadyImpl;
-    address public alchemistImpl;
-    address public steadyDAOToken;
+    
     address public treasury;
+    address public steadyImpl;
     address public DAOAddress;
-    address public steadyDAOReward;
+    address public alchemistImpl;
 
     string steady = "Steady_";
     string steadySymbol = "s";
 
-    uint256 public alchemistCounter;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     event Chymed(
@@ -40,51 +34,28 @@ contract AlchemistAcademy is Initializable {
     );
 
     function initialize(
-        address _elixirImpl,
         address _steadyImpl,
         address _treasury,
         address _alchemistImpl,
-        address _DAOAddress,
-        address _steadyDAOReward
+        address _DAOAddress
     ) public initializer {
-        elixirImpl = _elixirImpl;
         steadyImpl = _steadyImpl;
         treasury = _treasury;
         alchemistImpl = _alchemistImpl;
         DAOAddress = _DAOAddress;
-        steadyDAOReward = _steadyDAOReward;
     }
 
-    function setDAORewardContract(address _steadyDAOReward) external {
-        _onlyDAO();
-        steadyDAOReward = _steadyDAOReward;
-    }
-
-    function createNewChyme(
-        uint8 _decimals,
-        uint8 _fees,
-        uint8 _approvalStatus,
-        address _chyme,
-        address _oracleAddress,
-        uint256 _timeToMaturity
-    ) external {
+    function createNewChyme(IChyme.Chyme memory _iChyme, address _chyme) external {
         _onlyDAO();
         string memory symbol = IERC20Burnable(_chyme).symbol();
         address _steadyImplForChyme = createSteady(
             string(abi.encodePacked(steady, symbol)),
             string(abi.encodePacked(steadySymbol, symbol))
         );
-        IChyme.Chyme memory chyme = IChyme.Chyme(
-            _decimals,
-            _fees,
-            _approvalStatus,
-            _oracleAddress,
-            _steadyImplForChyme,
-            symbol,
-            _timeToMaturity
-        );
+        _iChyme.steadyImplForChyme = _steadyImplForChyme;
+        IChyme.Chyme memory chyme = _iChyme;
         chymeList[_chyme] = chyme;
-        emit Chymed(_chyme, _fees, _approvalStatus, symbol);
+        emit Chymed(_chyme, _iChyme.fees, _iChyme.DAOApproved, symbol);
         // here we create the alchemist because it is just based on the chyme type
         _alchemist(_chyme); //generate a new alchemist that can issue accounts and create elixirs for this type of chyme
     }
@@ -94,13 +65,7 @@ contract AlchemistAcademy is Initializable {
         IChyme.Chyme memory chyme = chymeList[_chyme]; //the type of erc20 that will be split
         require(chyme.DAOApproved == 1, "Ye Chyme is Impure!");
         address alchemistDeployed = ClonesUpgradeable.clone(alchemistImpl);
-        Alchemist(alchemistDeployed).initialize(
-            _chyme,
-            elixirImpl,
-            treasury,
-            alchemistCounter++,
-            steadyDAOReward
-        );
+        Alchemist(alchemistDeployed).initialize(_chyme);
         (bool success, ) = chyme.steadyImplForChyme.call(
             abi.encodeWithSignature(
                 "grantRole(bytes32,address)",
@@ -109,10 +74,6 @@ contract AlchemistAcademy is Initializable {
             )
         );
         require(success);
-        IAccessControlEnumerableUpgradeable(elixirImpl).grantRole(
-            MINTER_ROLE,
-            alchemistDeployed
-        );
 
         emit AlchemistForged(
             alchemistDeployed,
@@ -168,7 +129,8 @@ contract AlchemistAcademy is Initializable {
             uint8 decimals,
             uint256 timeToMaturity,
             string memory symbol,
-            address steadyImplForChyme
+            address steadyImplForChyme,
+            address steadyDAOReward
         )
     {
         return (
@@ -177,8 +139,17 @@ contract AlchemistAcademy is Initializable {
             chymeList[_chyme].decimals,
             chymeList[_chyme].timeToMaturity,
             chymeList[_chyme].symbol,
-            chymeList[_chyme].steadyImplForChyme
+            chymeList[_chyme].steadyImplForChyme,
+            chymeList[_chyme].steadyDAOReward
         );
     }
+    function setChymeInfo(address _chyme, IChyme.Chyme calldata _iChyme)
+        external
+        returns (bool success)
+    {
+        _onlyDAO();
+        chymeList[_chyme] = _iChyme;
+        return true;
+        //TODO: Add event
+    }
 }
-//TODO: set approval status via another call

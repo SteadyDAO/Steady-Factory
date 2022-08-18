@@ -10,5 +10,6 @@ interface IChyme{
         address steadyImplForChyme;
         string symbol;
         uint256 timeToMaturity;
+        address steadyDAOReward;// A reward system per chyme
     }
 }

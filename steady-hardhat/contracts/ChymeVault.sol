@@ -4,8 +4,6 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "hardhat/console.sol";
-
 //title - This contract is a chyme vault created by the user when a split position is created
 contract ChymeVault is Ownable{
   // the alchemist is the one who can transfer here and also transfer out and destroy this contract

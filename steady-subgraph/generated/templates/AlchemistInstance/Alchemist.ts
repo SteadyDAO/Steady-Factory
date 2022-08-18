@@ -112,21 +112,6 @@ export class Alchemist extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  alchemistId(): BigInt {
-    let result = super.call("alchemistId", "alchemistId():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_alchemistId(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("alchemistId", "alchemistId():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   chyme(): Address {
     let result = super.call("chyme", "chyme():(address)", []);
 
@@ -135,25 +120,6 @@ export class Alchemist extends ethereum.SmartContract {
 
   try_chyme(): ethereum.CallResult<Address> {
     let result = super.tryCall("chyme", "chyme():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  chymeVaultImpl(): Address {
-    let result = super.call("chymeVaultImpl", "chymeVaultImpl():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_chymeVaultImpl(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "chymeVaultImpl",
-      "chymeVaultImpl():(address)",
-      []
-    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -230,63 +196,6 @@ export class Alchemist extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
-
-  steadyDAORewards(): Address {
-    let result = super.call(
-      "steadyDAORewards",
-      "steadyDAORewards():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_steadyDAORewards(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "steadyDAORewards",
-      "steadyDAORewards():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  steadyDAOToken(): Address {
-    let result = super.call("steadyDAOToken", "steadyDAOToken():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_steadyDAOToken(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "steadyDAOToken",
-      "steadyDAOToken():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  treasury(): Address {
-    let result = super.call("treasury", "treasury():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_treasury(): ethereum.CallResult<Address> {
-    let result = super.tryCall("treasury", "treasury():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
 }
 
 export class InitializeCall extends ethereum.Call {
@@ -308,22 +217,6 @@ export class InitializeCall__Inputs {
 
   get _chyme(): Address {
     return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _elixirImpl(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get _treasury(): Address {
-    return this._call.inputValues[2].value.toAddress();
-  }
-
-  get _alchemistId(): BigInt {
-    return this._call.inputValues[3].value.toBigInt();
-  }
-
-  get _steadyDAORewards(): Address {
-    return this._call.inputValues[4].value.toAddress();
   }
 }
 

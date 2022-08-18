@@ -102,19 +102,6 @@
   },
   {
     "inputs": [],
-    "name": "alchemistCounter",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "alchemistImpl",
     "outputs": [
       {
@@ -170,6 +157,11 @@
         "internalType": "uint256",
         "name": "timeToMaturity",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "steadyDAOReward",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -178,52 +170,61 @@
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "_decimals",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_fees",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_approvalStatus",
-        "type": "uint8"
+        "components": [
+          {
+            "internalType": "uint8",
+            "name": "decimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "fees",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "DAOApproved",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "oracleAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "steadyImplForChyme",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timeToMaturity",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "steadyDAOReward",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IChyme.Chyme",
+        "name": "_iChyme",
+        "type": "tuple"
       },
       {
         "internalType": "address",
         "name": "_chyme",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_oracleAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_timeToMaturity",
-        "type": "uint256"
       }
     ],
     "name": "createNewChyme",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "elixirImpl",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -265,6 +266,11 @@
         "internalType": "address",
         "name": "steadyImplForChyme",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "steadyDAOReward",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -272,11 +278,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_elixirImpl",
-        "type": "address"
-      },
       {
         "internalType": "address",
         "name": "_steadyImpl",
@@ -295,11 +296,6 @@
       {
         "internalType": "address",
         "name": "_DAOAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_steadyDAOReward",
         "type": "address"
       }
     ],
@@ -331,39 +327,66 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_steadyDAOReward",
+        "name": "_chyme",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint8",
+            "name": "decimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "fees",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "DAOApproved",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "oracleAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "steadyImplForChyme",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timeToMaturity",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "steadyDAOReward",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IChyme.Chyme",
+        "name": "_iChyme",
+        "type": "tuple"
       }
     ],
-    "name": "setDAORewardContract",
-    "outputs": [],
+    "name": "setChymeInfo",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "success",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "steadyDAOReward",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "steadyDAOToken",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

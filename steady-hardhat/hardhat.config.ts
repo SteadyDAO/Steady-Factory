@@ -39,7 +39,12 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
   solidity: {compilers: [
     {
       version: "0.8.16",
-      settings: {},
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 1000,
+        },
+      }
     },
   ]},
   paths: {
@@ -55,8 +60,10 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
       forking: {
         enabled: true,
         url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`,
-        blockNumber: 10702595
-      }},
+        blockNumber: 10702595,
+        
+      },
+      accounts},
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_RINKEBY_API_KEY}`, 
       accounts,
