@@ -1,0 +1,14 @@
+{
+  "NETWORK": {
+    "CHAIN_ID": 4,
+    "NAME": "Rinkeby",
+    "RPC_URL": "https://eth-rinkeby.alchemyapi.io/v2/RKJPeye-oRYfsDVIlHTANDE_O4j2fTOV",
+    "BLOCK_EXPLORER": "https://rinkeby.etherscan.io/"
+  },
+  "STEADY_SUBGRAPH_URL": "https://api.thegraph.com/subgraphs/name/vitamind3inj/steady-rin",
+  "OPENSEA_API_URL": "https://testnets-api.opensea.io/api/v1",
+  "CONTRACTS_ADDRESS": {
+    "Academy": "0x0b3F91A7bf157a40e9F809765289b963728D3C20",
+    "ElixirNft": "0x1a057164C8D44e1877F50034b6dDeBBC471eFD5E"
+  }
+}
