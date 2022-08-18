@@ -70,8 +70,8 @@ const Merge = () => {
                 }
               }}
             >
-              <ToggleButton className="MergeToggleButton" value="nfts">NFTS</ToggleButton>
-              <ToggleButton className="MergeToggleButton" value="tokens">TOKENS</ToggleButton>
+              <ToggleButton className="MergeToggleButton" value="nfts">Elixirs</ToggleButton>
+              <ToggleButton className="MergeToggleButton" value="tokens">Tokens</ToggleButton>
             </ToggleButtonGroup>
           </div>
           {toggle === 'nfts' ?

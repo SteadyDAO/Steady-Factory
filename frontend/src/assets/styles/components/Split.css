@@ -1,7 +1,6 @@
 .SplitContainer {
   align-items: flex-start;
   background: #675B5B;
-  box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.35);
   border-radius: 1.5rem;
   display: flex;
   flex-direction: column;

@@ -9,7 +9,7 @@
 .AppContainer {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 90px);
+  min-height: calc(100vh - 70px);
   overflow-y: auto;
 }
 

@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { getWeb3Provider } from './helpers/Wallet';
 import SplitPage from './pages/SplitPage';
-import MergePage from './pages/MergePage';
 import BottomNavigate from './components/BottomNavigate';
 
 const theme = createTheme({
@@ -49,15 +48,6 @@ function App() {
                   <Header />
                   <div className="AppContainer">
                     <SplitPage />
-                  </div>
-                  <BottomNavigate />
-                </>
-              } />
-              <Route path="/merge" element={
-                <>
-                  <Header />
-                  <div className="AppContainer">
-                    <MergePage />
                   </div>
                   <BottomNavigate />
                 </>

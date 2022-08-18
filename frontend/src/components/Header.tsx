@@ -3,7 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import { EtherSWRConfig } from "ether-swr";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getABIs } from "../helpers/Contract";
 import { connectWallet } from "../helpers/Wallet";
 import Account from "./Account";
@@ -49,14 +49,6 @@ const Header = () => {
         }
         {isWallet ?
           <>
-            <ul className="NavbarContainer">
-              <li>
-                <NavLink className={(navData) => navData.isActive ? "NavbarItem NavbarItemActive" : "NavbarItem"} to="/split">Split</NavLink>
-              </li>
-              <li>
-                <NavLink className={(navData) => navData.isActive ? "NavbarItem NavbarItemActive" : "NavbarItem"} to="/merge">Merge</NavLink>
-              </li>
-            </ul>
             {active && chainId ?
               <EtherSWRConfig
                 value={{
