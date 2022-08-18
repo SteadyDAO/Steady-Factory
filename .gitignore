@@ -2,3 +2,4 @@ node_modules
 frontend/artifacts/
 steady-hardhat/src/types/
 steady-hardhat/typechain/
+.env
