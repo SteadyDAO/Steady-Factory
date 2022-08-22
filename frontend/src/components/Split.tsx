@@ -49,7 +49,6 @@ const Split = () => {
   const [balance, setBalance] = useState<string>('-');
   const [symbol, setSymbol] = useState<string>('-');
   const { data: getAlchemists } = useQuery(GET_ALCHEMISTS, {
-    pollInterval: 30000
   });
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
     isOpen: false

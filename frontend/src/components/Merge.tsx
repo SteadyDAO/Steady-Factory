@@ -23,7 +23,6 @@ const Merge = () => {
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [toggle, setToggle] = useState<string>('nfts');
   const { data: getAlchemists, loading } = useQuery(GET_ALCHEMISTS, {
-    pollInterval: 30000
   });
 
   useEffect(() => {
@@ -43,6 +42,21 @@ const Merge = () => {
     setIsLoadingElixirNfts(true);
     return fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' })
       .then((response) => response.json())
+      .then((data: OpenseaResponse) => {
+        const nfts = data.assets.filter(
+          (asset: IOpenseaAsset) => asset.asset_contract.address.toLocaleLowerCase() === elixirContractAddress.toLocaleLowerCase()
+        );
+        const requests: Array<any> = [];
+        let delay = 1000;
+        nfts.forEach(nft => {
+          requests.push(new Promise(resolve => setTimeout(resolve, delay)).then(() => fetch(`${config.OPENSEA_API_URL}/asset/${elixirContractAddress.toLocaleLowerCase()}/${nft.token_id}/?force_update=true`)));
+          delay += 1500;
+        });
+        return Promise.all(requests);
+      }).then(res => {
+        return new Promise(resolve => setTimeout(resolve, 1500)).then(() => fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' }));
+        
+      }).then((response) => response.json())
       .then((data: OpenseaResponse) => {
         const nfts = data.assets.filter(
           (asset: IOpenseaAsset) => asset.asset_contract.address.toLocaleLowerCase() === elixirContractAddress.toLocaleLowerCase()

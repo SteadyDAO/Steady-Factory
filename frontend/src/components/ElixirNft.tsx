@@ -36,8 +36,7 @@ const ElixirNft = (props: {
   const { data: getElixirs } = useQuery(GET_ELIXIR_BY_TOKEN_ID, {
     variables: {
       tokenId: `0x${(+props.elixirNft.token_id).toString(16)}`
-    },
-    pollInterval: 3000
+    }
   });
 
   useEffect(() => {
