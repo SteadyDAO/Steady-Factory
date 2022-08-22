@@ -29,6 +29,10 @@ code {
   color: #FFFFFF !important;
 }
 
+.MuiPopover-paper {
+  background: none !important;
+}
+
 .CompletedColor {
   color: #12da33 !important;
 }

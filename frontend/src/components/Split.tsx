@@ -369,12 +369,14 @@ const Split = () => {
           {isNotEnoughBalance ?
             <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
           }
-          <div className="GetTokenContainer">
-            <Button variant="contained" disabled={!isAddress(chymeControl.value) || !chymeDecimal} onClick={getTestToken}>Get token</Button>
-            <Tooltip title="This use for test only. On production this button will be removed.">
-              <InfoIcon />
-            </Tooltip>
-          </div>
+          {process.env.REACT_APP_MODE !== 'production' ?
+            <div className="GetTokenContainer">
+              <Button variant="contained" disabled={!isAddress(chymeControl.value) || !chymeDecimal} onClick={getTestToken}>Get token</Button>
+              <Tooltip title="This use for test only. On production this button will be removed.">
+                <InfoIcon />
+              </Tooltip>
+            </div> : <></>
+          }
         </div>
         <div className="SplitActions">
           {active && chainId === config.NETWORK.CHAIN_ID ?

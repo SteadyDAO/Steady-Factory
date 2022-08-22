@@ -9,6 +9,6 @@
   "OPENSEA_API_URL": "https://testnets-api.opensea.io/api/v1",
   "CONTRACTS_ADDRESS": {
     "Academy": "0x0b3F91A7bf157a40e9F809765289b963728D3C20",
-    "ElixirNft": "0x1a057164C8D44e1877F50034b6dDeBBC471eFD5E"
+    "ElixirNft": "0x70b0FbacB4a6b1C0bf09cddef4cE2B908f87DF18"
   }
 }
