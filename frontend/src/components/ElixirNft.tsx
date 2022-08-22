@@ -178,20 +178,20 @@ const ElixirNft = (props: {
   const mergeCompleted = (status: number) => {
     if (status === 1) {
       setIsMergeCompleted(true);
-      setConfirmationMessage('Successfully merged.');
+      setConfirmationMessage('Merged Success!');
       setConfirmationStep(3);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
         type: 'success',
-        message: 'Successfully merged'
+        message: 'Merged Success!'
       });
     } else if (status === 0) {
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
         type: 'error',
-        message: 'merge failed'
+        message: 'Merge failed'
       });
     }
   }

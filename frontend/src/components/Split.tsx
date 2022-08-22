@@ -190,13 +190,13 @@ const Split = () => {
     if (status === 1) {
       setDisableForm(false);
       setIsSplitCompleted(true);
-      setConfirmationMessage('Successfully splitted.');
+      setConfirmationMessage('Split Success!');
       setConfirmationStep(2);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
         type: 'success',
-        message: 'Successfully splitted'
+        message: 'Split Success!'
       });
       const getBalance = async () => {
         const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
