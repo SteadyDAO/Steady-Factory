@@ -25,7 +25,7 @@ query GetElixirByTokenId($tokenId: String!) {
   ) {
     id
     tokenId
-    ratio
+    status
     chyme {
       symbol
       steadyToken

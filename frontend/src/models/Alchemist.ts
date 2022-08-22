@@ -17,19 +17,13 @@ export interface IChyme {
 export interface IElixir {
   id: string;
   tokenId: string;
-  ratio: IRatio;
+  status: IStatus;
   chyme: IChyme;
 }
+
+export type IStatus = 'Split' | 'Merged';
 
 export interface IRatio {
   label: string;
   value: number;
 };
-
-export interface IStrike {
-  strikePrice: number;
-  forgePrice: number;
-  ratio: number;
-  alchemist: string;
-  priceOracle: string;
-}

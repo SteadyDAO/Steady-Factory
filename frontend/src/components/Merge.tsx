@@ -10,7 +10,6 @@ import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist } from "../models/Alchemist";
 import { EtherSWRConfig } from "ether-swr";
 import TokenItem from "./TokenItem";
-import ConnectWallet from "./ConnectWallet";
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
 
@@ -140,10 +139,7 @@ const Merge = () => {
             </>
           }
           <></>
-        </div> :
-        <div className="MergeActions">
-          <ConnectWallet />
-        </div>
+        </div> : <></>
       }
     </>
   );

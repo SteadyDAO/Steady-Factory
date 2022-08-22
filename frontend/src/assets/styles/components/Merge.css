@@ -1,8 +1,9 @@
 .MergeContainer {
+  align-items: center;
   display: flex;
   flex-direction: column;
   gap: .75rem;
-  justify-content: flex-start;
+  max-width: 1200px;
   width: 100%;
 }
 
@@ -35,8 +36,10 @@
 
 .ElixirNftsContainer {
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .NoElixirNftMessage {
