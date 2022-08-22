@@ -49,20 +49,22 @@ const Merge = () => {
         const requests: Array<any> = [];
         let delay = 1000;
         nfts.forEach(nft => {
-          requests.push(new Promise(resolve => setTimeout(resolve, delay)).then(() => fetch(`${config.OPENSEA_API_URL}/asset/${elixirContractAddress.toLocaleLowerCase()}/${nft.token_id}/?force_update=true`)));
+          requests.push(new Promise(resolve => setTimeout(resolve, delay)).then(() => fetch(`${config.OPENSEA_API_URL}/asset/${elixirContractAddress.toLocaleLowerCase()}/${nft.token_id}/?force_update=true`, { cache: 'no-cache' })));
           delay += 1500;
         });
         return Promise.all(requests);
-      }).then(res => {
+      })
+      .then(() => {
         return new Promise(resolve => setTimeout(resolve, 1500)).then(() => fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' }));
-        
-      }).then((response) => response.json())
+      })
+      .then((response) => response.json())
       .then((data: OpenseaResponse) => {
         const nfts = data.assets.filter(
           (asset: IOpenseaAsset) => asset.asset_contract.address.toLocaleLowerCase() === elixirContractAddress.toLocaleLowerCase()
         );
         setElixirNfts(nfts);
-      }).finally(() => {
+      })
+      .finally(() => {
         setIsLoadingElixirNfts(false);
       });
   }
