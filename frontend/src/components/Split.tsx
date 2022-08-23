@@ -379,7 +379,7 @@ const Split = () => {
           </div>
           <div className="SplitMessageContainer">
             {isFormValid && oraclePrice ?
-              <span className="SplitElixirMessage">Receive 1 Elixir and {(+amountControl.value * 75 * oraclePrice) / 100 } sSTT</span> : <></>
+              <span className="SplitElixirMessage">Receive 1 Elixir and {Math.floor((+amountControl.value * 75 * oraclePrice) / 100) } sSTT</span> : <></>
             }
             {isNotEnoughBalance ?
               <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
