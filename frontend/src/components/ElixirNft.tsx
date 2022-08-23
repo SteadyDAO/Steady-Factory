@@ -177,13 +177,13 @@ const ElixirNft = (props: {
   const mergeCompleted = (status: number) => {
     if (status === 1) {
       setIsMergeCompleted(true);
-      setConfirmationMessage('Merged Success!');
+      setConfirmationMessage('Merge Success!');
       setConfirmationStep(3);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
         type: 'success',
-        message: 'Merged Success!'
+        message: 'Merge Success!'
       });
     } else if (status === 0) {
       setSnackbar({
@@ -242,7 +242,7 @@ const ElixirNft = (props: {
             <span className="TransactionsConfirmationMessage">{confirmationMessage}</span>
             <Stepper className="TransactionsConfirmationStepper" activeStep={confirmationStep} alternativeLabel>
               <Step>
-                <StepLabel>Approve NFT</StepLabel>
+                <StepLabel>Approve Elixir NFT</StepLabel>
               </Step>
               <Step>
                 <StepLabel>Approve Steady Token</StepLabel>
