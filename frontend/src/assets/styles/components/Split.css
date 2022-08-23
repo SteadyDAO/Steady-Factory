@@ -15,12 +15,17 @@
   font-weight: 600;
 }
 
+.SplitBalanceContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: .5rem;
+  width: 100%;
+}
+
 .SplitBalance {
   font-size: .8rem;
   font-weight: 600;
-  padding: .5rem 0;
-  text-align: end;
-  width: 100%;
 }
 
 .SplitFormContainer {
@@ -38,7 +43,7 @@
 }
 
 .SplitChymeControl {
-  width: 40%;
+  width: 100%;
 }
 
 .SplitStrikeControl {
@@ -51,6 +56,21 @@
 
 .SplitMaxAmountButton {
   height: 2rem !important;
+}
+
+.SplitMessageContainer {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 .5rem;
+  width: 100%;
+}
+
+.SplitElixirMessage {
+  color: #ffffff;
+  font-size: .75rem;
+  font-style: italic;
+  font-weight: 600;
 }
 
 .SplitFormControlErrorMessage {

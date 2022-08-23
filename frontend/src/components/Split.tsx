@@ -3,7 +3,7 @@ import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornme
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist, IRatio } from "../models/Alchemist";
-import { getContractByAddressName } from "../helpers/Contract";
+import { getContractByAddressName, getContractByName } from "../helpers/Contract";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
 import { IFormControl } from "../models/Form";
@@ -26,6 +26,7 @@ const Split = () => {
   const { account, active, chainId, library } = useWeb3React();
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [chymeDecimal, setChymeDecimal] = useState<number>();
+  const [oraclePrice, setOraclePrice] = useState<number>();
   const [isNotEnoughBalance, setIsNotEnoughBalance] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isTryAgain, setIsTryAgain] = useState<boolean>(false);
@@ -70,6 +71,14 @@ const Split = () => {
         setBalance(formatUnits(bl, dcm));
         setSymbol(sb);
         setChymeDecimal(dcm);
+        // Get oracle price
+        const academyContract = getContractByName('Academy', library.getSigner());
+        const chymeInfo = await academyContract.getChymeInfo(chymeControl.value);
+        const oracleAddress = chymeInfo.oracleAddress;
+        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', library.getSigner());
+        const oracleLatestAnswer = await oracleContract.latestAnswer();
+        const oracleDecimals= await oracleContract.decimals();
+        setOraclePrice(+formatUnits(oracleLatestAnswer, oracleDecimals));
       }
       getBalance();
       setRatioControl({
@@ -89,12 +98,12 @@ const Split = () => {
   }, [amountControl, balance]);
 
   useEffect(() => {
-    if (!isNotEnoughBalance && !chymeControl.invalid && !ratioControl.invalid && !amountControl.invalid +amountControl.value && +amountControl.value > 0) {
+    if (!isNotEnoughBalance && !chymeControl.invalid && !amountControl.invalid +amountControl.value && +amountControl.value > 0) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
     }
-  }, [chymeControl, ratioControl, amountControl, isNotEnoughBalance]);
+  }, [chymeControl, amountControl, isNotEnoughBalance]);
 
   useEffect(() => {
     if (alchemists.length > 0) {
@@ -168,7 +177,7 @@ const Split = () => {
     setConfirmationMessage('Waiting for transaction confirmation...');
     const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
     const alchemistContract = getContractByAddressName(alchemistAdd, 'Alchemist', library.getSigner());
-    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), ratioControl.value)
+    alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), 0)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
           isOpen: true,
@@ -304,7 +313,7 @@ const Split = () => {
               </Select>
             </FormControl>
           </div>
-          <div className="SplitStrikeControl SplitFormControl">
+          {/* <div className="SplitStrikeControl SplitFormControl">
             <FormControl required fullWidth>
               <Select value={ratioControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
                 if (typeof event.target.value === 'number') {
@@ -327,8 +336,13 @@ const Split = () => {
                 )}
               </Select>
             </FormControl>
+          </div> */}
+          <div className="SplitBalanceContainer">
+            {symbol && oraclePrice ?
+              <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <span></span>
+            }
+            <span className="SplitBalance">Balance: {balance} {symbol}</span>
           </div>
-          <span className="SplitBalance">Balance: {balance} {symbol}</span>
           <div className="SplitAmountControl SplitFormControl">
             <FormControl required fullWidth>
               <TextField
@@ -363,17 +377,22 @@ const Split = () => {
               />
             </FormControl>
           </div>
-          {isNotEnoughBalance ?
-            <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
-          }
-          {process.env.REACT_APP_MODE !== 'production' ?
+          <div className="SplitMessageContainer">
+            {isFormValid && oraclePrice ?
+              <span className="SplitElixirMessage">Receive 1 Elixir and {(+amountControl.value * 75 * oraclePrice) / 100 } sSTT</span> : <></>
+            }
+            {isNotEnoughBalance ?
+              <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
+            }
+          </div>
+          {/* {process.env.REACT_APP_MODE !== 'production' ?
             <div className="GetTokenContainer">
               <Button variant="contained" disabled={!isAddress(chymeControl.value) || !chymeDecimal} onClick={getTestToken}>Get token</Button>
               <Tooltip title="This use for test only. On production this button will be removed.">
                 <InfoIcon />
               </Tooltip>
             </div> : <></>
-          }
+          } */}
         </div>
         <div className="SplitActions">
           {active && chainId === config.NETWORK.CHAIN_ID ?
