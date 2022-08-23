@@ -89,7 +89,7 @@ const Split = () => {
   }, [amountControl, balance]);
 
   useEffect(() => {
-    if (!isNotEnoughBalance && !chymeControl.invalid && !ratioControl.invalid && !amountControl.invalid) {
+    if (!isNotEnoughBalance && !chymeControl.invalid && !ratioControl.invalid && !amountControl.invalid +amountControl.value && +amountControl.value > 0) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -351,17 +351,10 @@ const Split = () => {
                     </InputAdornment>,
                 }}
                 onChange={(e) => {
-                  if (+e.target.value && +e.target.value > 0) {
-                    setAmountControl({
-                      value: +e.target.value,
-                      invalid: false
-                    });
-                  } else {
-                    setAmountControl({
-                      value: '',
-                      invalid: true
-                    });
-                  }
+                  setAmountControl({
+                    value: e.target.value,
+                    invalid: false
+                  });
                 }}
               />
             </FormControl>
