@@ -191,6 +191,10 @@ const Split = () => {
       setIsSplitCompleted(true);
       setConfirmationMessage('Split Success!');
       setConfirmationStep(2);
+      setAmountControl({
+        value: '',
+        invalid: true
+      });
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
