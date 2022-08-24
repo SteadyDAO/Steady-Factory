@@ -342,11 +342,15 @@ const Split = () => {
             </FormControl>
           </div> */}
           <div className="SplitBalanceContainer">
-            {symbol && oraclePrice ?
-              <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <Skeleton width={80} height={30} variant="text" />
-            }
-            {balance && symbol ?
-              <span className="SplitBalance">Balance: {balance} {symbol}</span> : <Skeleton width={80} height={30} variant="text" />
+            {active ?
+              <>
+                {symbol && oraclePrice ?
+                  <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <Skeleton width={80} height={30} variant="text" />
+                }
+                {balance && symbol ?
+                  <span className="SplitBalance">Balance: {balance} {symbol}</span> : <Skeleton width={80} height={30} variant="text" />
+                }
+              </> : <></>
             }
           </div>
           <div className="SplitAmountControl SplitFormControl">
