@@ -63,6 +63,7 @@ const ElixirNft = (props: {
   }, [getElixirs]);
 
   const approveNft = async () => {
+    setDisableMerge(true);
     if (isApprovedNft) {
       approveSteadyToken();
     } else {
@@ -83,6 +84,7 @@ const ElixirNft = (props: {
         }, (err: any) => {
           setConfirmationMessage('Something went wrong. Please try again.');
           setIsTryAgain(true);
+          setDisableMerge(false);
           errorHandler(err, setSnackbar);
         });
     }
@@ -97,6 +99,7 @@ const ElixirNft = (props: {
         message: ''
       } as any);
     } else if (status === 0) {
+      setDisableMerge(false);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
@@ -128,6 +131,7 @@ const ElixirNft = (props: {
         }, (err: any) => {
           setConfirmationMessage('Something went wrong. Please try again.');
           setIsTryAgain(true);
+          setDisableMerge(false);
           errorHandler(err, setSnackbar);
         });
     }
@@ -142,6 +146,7 @@ const ElixirNft = (props: {
         message: ''
       } as any);
     } else if (status === 0) {
+      setDisableMerge(false);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
@@ -170,6 +175,7 @@ const ElixirNft = (props: {
       }, (err: any) => {
         setConfirmationMessage('Something went wrong. Please try again.');
         setIsTryAgain(true);
+        setDisableMerge(false);
         errorHandler(err, setSnackbar);
       });
   }
@@ -186,6 +192,7 @@ const ElixirNft = (props: {
         message: 'Merge Success!'
       });
     } else if (status === 0) {
+      setDisableMerge(false);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
