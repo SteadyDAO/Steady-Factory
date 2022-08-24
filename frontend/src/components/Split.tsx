@@ -71,7 +71,11 @@ const Split = () => {
         setBalance(formatUnits(bl, dcm));
         setSymbol(sb);
         setChymeDecimal(dcm);
-        // Get oracle price
+      }
+      setInterval(() => {
+        getBalance();
+      }, 3000);
+      const getOraclePrice = async () => {
         const academyContract = getContractByName('Academy', library.getSigner());
         const chymeInfo = await academyContract.getChymeInfo(chymeControl.value);
         const oracleAddress = chymeInfo.oracleAddress;
@@ -80,7 +84,7 @@ const Split = () => {
         const oracleDecimals= await oracleContract.decimals();
         setOraclePrice(+formatUnits(oracleLatestAnswer, oracleDecimals));
       }
-      getBalance();
+      getOraclePrice();
       setRatioControl({
         value: 0,
         invalid: false
@@ -378,8 +382,8 @@ const Split = () => {
             </FormControl>
           </div>
           <div className="SplitMessageContainer">
-            {isFormValid && oraclePrice ?
-              <span className="SplitElixirMessage">Receive 1 Elixir and {Math.floor((+amountControl.value * 75 * oraclePrice) / 100) } sSTT</span> : <></>
+            {isFormValid && oraclePrice && symbol ?
+              <span className="SplitElixirMessage">Receive 1 Elixir and {(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString() } s{symbol}</span> : <></>
             }
             {isNotEnoughBalance ?
               <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
