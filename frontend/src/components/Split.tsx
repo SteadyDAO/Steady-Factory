@@ -1,8 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
-import { IAlchemist, IRatio } from "../models/Alchemist";
+import { IAlchemist } from "../models/Alchemist";
 import { getContractByAddressName, getContractByName } from "../helpers/Contract";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
 import { useWeb3React } from "@web3-react/core";
@@ -16,8 +16,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import ConnectWallet from "./ConnectWallet";
-import InfoIcon from '@mui/icons-material/Info';
-import { ratios } from "../consts/Alchemist";
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
 
@@ -243,51 +241,6 @@ const Split = () => {
     }
   }
 
-  const getTestToken = () => {
-    const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-    chymeContract.mint(account, parseUnits(10000 + '', chymeDecimal))
-      .then((transactionResponse: TransactionResponse) => {
-        setSnackbar({
-          isOpen: true,
-          timeOut: 500000,
-          type: 'warning',
-          message: 'Transaction is processing'
-        });
-        pollingTransaction(transactionResponse.hash, getTestTokenCompleted);
-      }, (err: any) => {
-        setConfirmationMessage('Something went wrong. Please try again.');
-        errorHandler(err, setSnackbar);
-      });
-  }
-
-  const getTestTokenCompleted = (status: number) => {
-    if (status === 1) {
-      setSnackbar({
-        isOpen: true,
-        timeOut: 5000,
-        type: 'success',
-        message: 'Successfully'
-      });
-      const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-        const bl = await chymeContract.balanceOf(account);
-        const sb = await chymeContract.symbol();
-        const dcm = await chymeContract.decimal();
-        setBalance(formatUnits(bl, dcm));
-        setSymbol(sb);
-        setChymeDecimal(dcm);
-      }
-      getBalance();
-    } else if (status === 0) {
-      setSnackbar({
-        isOpen: true,
-        timeOut: 5000,
-        type: 'error',
-        message: 'Split failed'
-      });
-    }
-  }
-
   return (
     <>
       <div className="SplitContainer">
@@ -395,14 +348,6 @@ const Split = () => {
               <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
             }
           </div>
-          {/* {process.env.REACT_APP_MODE !== 'production' ?
-            <div className="GetTokenContainer">
-              <Button variant="contained" disabled={!isAddress(chymeControl.value) || !chymeDecimal} onClick={getTestToken}>Get token</Button>
-              <Tooltip title="This use for test only. On production this button will be removed.">
-                <InfoIcon />
-              </Tooltip>
-            </div> : <></>
-          } */}
         </div>
         <div className="SplitActions">
           {active && chainId === config.NETWORK.CHAIN_ID ?

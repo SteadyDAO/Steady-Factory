@@ -124,12 +124,3 @@
 
 @media only screen and (max-width: 320px) {
 }
-
-.GetTokenContainer {
-  align-items: center;
-  display: flex;
-  gap: .5rem;
-  justify-content: center;
-  margin-top: 10px;
-  width: 100%;
-}
