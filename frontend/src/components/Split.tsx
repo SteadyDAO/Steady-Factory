@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist, IRatio } from "../models/Alchemist";
@@ -47,8 +47,8 @@ const Split = () => {
     value: '',
     invalid: true
   });
-  const [balance, setBalance] = useState<string>('-');
-  const [symbol, setSymbol] = useState<string>('-');
+  const [balance, setBalance] = useState<string>('');
+  const [symbol, setSymbol] = useState<string>('');
   const { data: getAlchemists } = useQuery(GET_ALCHEMISTS, {
   });
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
@@ -343,9 +343,11 @@ const Split = () => {
           </div> */}
           <div className="SplitBalanceContainer">
             {symbol && oraclePrice ?
-              <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <span></span>
+              <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <Skeleton width={80} height={30} variant="text" />
             }
-            <span className="SplitBalance">Balance: {balance} {symbol}</span>
+            {balance && symbol ?
+              <span className="SplitBalance">Balance: {balance} {symbol}</span> : <Skeleton width={80} height={30} variant="text" />
+            }
           </div>
           <div className="SplitAmountControl SplitFormControl">
             <FormControl required fullWidth>
