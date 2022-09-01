@@ -311,7 +311,7 @@ const ElixirNft = (props: {
             <span>You will spend:</span>
             <div className="MergeConfirmationContentRow">
               <KeyboardArrowRightIcon fontSize="small" color="primary" />
-              <span>1 Elixir NFT</span>
+              <span>1 Elixir NFT (#{props.elixirNft.tokenId})</span>
             </div>
             <div className="MergeConfirmationContentRow">
               <KeyboardArrowRightIcon fontSize="small" color="primary" />
