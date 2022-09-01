@@ -8,7 +8,7 @@ export interface IAlchemist {
 
 export interface IChyme {
   id: string;
-  alchemists: Array<IAlchemist>;
+  alchemist: IAlchemist;
   symbol: string;
   priceOracle: string;
   steadyToken: string;
@@ -19,6 +19,13 @@ export interface IElixir {
   tokenId: string;
   status: IStatus;
   chyme: IChyme;
+  ratioOfSteady: number;
+  forgeConstant: string;
+  amount: string;
+  dateSplit: string;
+  dateMerged: string;
+  vault: string;
+  owner: string;
 }
 
 export type IStatus = 'Split' | 'Merged';

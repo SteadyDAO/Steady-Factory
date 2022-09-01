@@ -24,7 +24,7 @@ const Account = () => {
   }, [chainId]);
 
   const getTestToken = () => {
-    const chymeContract = getContractByAddressName('0xd7ee3B42896F95D768936D5059246541Ba37Af8C', 'Chyme', library.getSigner());
+    const chymeContract = getContractByAddressName('0xA96Ab10d8D334ad7F7E11B2f33426fDeb47f18B6', 'Chyme', library.getSigner());
     chymeContract.mint(account, parseUnits(10000 + '', 8))
       .then((transactionResponse: TransactionResponse) => {
       }, (err: any) => {

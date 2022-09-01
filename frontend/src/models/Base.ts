@@ -6,7 +6,6 @@ export interface IAppConfig {
     BLOCK_EXPLORER: string;
   },
   STEADY_SUBGRAPH_URL: string;
-  OPENSEA_API_URL: string;
   CONTRACTS_ADDRESS: {
     Academy: string;
     ElixirNft: string;

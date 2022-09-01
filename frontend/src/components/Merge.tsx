@@ -1,13 +1,12 @@
 import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
 import ElixirNft from "./ElixirNft";
-import { IOpenseaAsset, OpenseaResponse } from "../models/Ethereum";
 import { getABIs, getContractAddressByName } from "../helpers/Contract";
 import { Button, CircularProgress, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
-import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
-import { IAlchemist } from "../models/Alchemist";
+import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
+import { IAlchemist, IElixir } from "../models/Alchemist";
 import { EtherSWRConfig } from "ether-swr";
 import TokenItem from "./TokenItem";
 import { IAppConfig } from "../models/Base";
@@ -18,19 +17,17 @@ const Merge = () => {
   const { account, active, chainId, library } = useWeb3React();
   const elixirContractAddress = getContractAddressByName('ElixirNft');
   const academyContractAddress = getContractAddressByName('Academy');
-  const [elixirNfts, setElixirNfts] = useState<Array<IOpenseaAsset>>([]);
-  const [isLoadingElixirNfts, setIsLoadingElixirNfts] = useState<boolean>(false);
+  const [elixirNfts, setElixirNfts] = useState<Array<any>>([]);
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [toggle, setToggle] = useState<string>('nfts');
-  const { data: getAlchemists, loading } = useQuery(GET_ALCHEMISTS, {
+  const { data: getAlchemists, loading: getAlchemistsLoading } = useQuery(GET_ALCHEMISTS, {
   });
-
-  useEffect(() => {
-    if (account) {
-      fetchData();
-    }
-    // eslint-disable-next-line
-  }, [account]);
+  const { data: getElixirsByAccount, loading: getElixirsByAccountLoading, refetch: refetchElixirsByAccount } = useQuery(GET_ELIXIR_BY_ACCOUNT, {
+    variables: {
+      account
+    },
+    notifyOnNetworkStatusChange: true
+  });
 
   useEffect(() => {
     if (getAlchemists && getAlchemists.alchemists) {
@@ -38,36 +35,11 @@ const Merge = () => {
     }
   }, [getAlchemists]);
 
-  const fetchData = () => {
-    setIsLoadingElixirNfts(true);
-    return fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' })
-      .then((response) => response.json())
-      .then((data: OpenseaResponse) => {
-        const nfts = data.assets.filter(
-          (asset: IOpenseaAsset) => asset.asset_contract.address.toLocaleLowerCase() === elixirContractAddress.toLocaleLowerCase()
-        );
-        const requests: Array<any> = [];
-        let delay = 1000;
-        nfts.forEach(nft => {
-          requests.push(new Promise(resolve => setTimeout(resolve, delay)).then(() => fetch(`${config.OPENSEA_API_URL}/asset/${elixirContractAddress.toLocaleLowerCase()}/${nft.token_id}/?force_update=true`, { cache: 'no-cache' })));
-          delay += 1500;
-        });
-        return Promise.all(requests);
-      })
-      .then(() => {
-        return new Promise(resolve => setTimeout(resolve, 1500)).then(() => fetch(`${config.OPENSEA_API_URL}/assets?owner=${account}`, { cache: 'no-cache' }));
-      })
-      .then((response) => response.json())
-      .then((data: OpenseaResponse) => {
-        const nfts = data.assets.filter(
-          (asset: IOpenseaAsset) => asset.asset_contract.address.toLocaleLowerCase() === elixirContractAddress.toLocaleLowerCase()
-        );
-        setElixirNfts(nfts);
-      })
-      .finally(() => {
-        setIsLoadingElixirNfts(false);
-      });
-  }
+  useEffect(() => {
+    if (getElixirsByAccount && getElixirsByAccount.elixirs) {
+      setElixirNfts(getElixirsByAccount.elixirs);
+    }
+  }, [getElixirsByAccount]);
 
   return (
     <>
@@ -92,12 +64,14 @@ const Merge = () => {
           {toggle === 'nfts' ?
             <>
               <div className="MergeActions">
-                <Button color="secondary" variant="contained" onClick={fetchData}>
+                <Button color="secondary" variant="contained" onClick={() => {
+                  refetchElixirsByAccount()
+                  }}>
                   <RefreshIcon />
                   Refresh
                 </Button>
               </div>
-              {isLoadingElixirNfts ?
+              {getElixirsByAccountLoading ?
                 <div className="ElixirNftsSpinnerContainer">
                   <CircularProgress color="secondary" size={80} />
                 </div> :
@@ -113,7 +87,7 @@ const Merge = () => {
                           ])),
                           refreshInterval: 1000
                         }}>
-                        {elixirNfts.map((elixirNft: IOpenseaAsset) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
+                        {elixirNfts.map((elixirNft: IElixir) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
                       </EtherSWRConfig>
                     </div> :
                     <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
@@ -125,10 +99,10 @@ const Merge = () => {
               <div className="TokensContainer">
                 <div className="TokensHeaderContainer">
                   <span className="TokensHeaderToken">Token</span>
-                  <span className="TokensHeaderBalance">Balance</span>
+                  <span className="TokensHeaderBalance">Agg. Balance</span>
                   <span className="TokensHeaderTotalSupply">Total Supply</span>
                 </div>
-                {loading ?
+                {getAlchemistsLoading ?
                   <div className="ElixirNftsSpinnerContainer">
                     <CircularProgress color="secondary" size={80} />
                   </div> :

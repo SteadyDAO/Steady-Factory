@@ -1,5 +1,4 @@
 import { Button, CircularProgress, Dialog, IconButton, Step, StepLabel, Stepper } from "@mui/material";
-import { IOpenseaAsset } from "../models/Ethereum";
 import { TransactionResponse } from "@ethersproject/providers";
 import SnackbarMessage from "./Snackbar";
 import { ISnackbarConfig } from "../models/Material";
@@ -11,11 +10,12 @@ import { useEffect, useState } from "react";
 import { getContractAddressByName, getContractByAddressName } from "../helpers/Contract";
 import { useWeb3React } from "@web3-react/core";
 import { errorHandler, pollingTransaction } from "../helpers/Wallet";
-import { GET_ELIXIR_BY_TOKEN_ID } from "../graphql/alchemist.queries";
-import { useQuery } from "@apollo/client";
+import ElixirNftImage from "./ElixirNftImage";
+import { IElixir } from "../models/Alchemist";
+import { formatUnits } from "ethers/lib/utils";
 
 const ElixirNft = (props: {
-  elixirNft: IOpenseaAsset
+  elixirNft: IElixir
 }) => {
   const { account, library } = useWeb3React();
   const [disableMerge, setDisableMerge] = useState<boolean>(true);
@@ -25,6 +25,8 @@ const ElixirNft = (props: {
   const [isApprovedNft, setIsApprovedNft] = useState<boolean>(false);
   const [isApprovedSteadyToken, setIsApprovedSteadyToken] = useState<boolean>(false);
   const [confirmationStep, setConfirmationStep] = useState<number>(0);
+  const [maturesDays, setMaturesDays] = useState<number>(0);
+  const [value, setValue] = useState<number>(0);
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
   const [steadyRequiredAmount, setSteadyRequiredAmount] = useState();
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
@@ -33,34 +35,41 @@ const ElixirNft = (props: {
   const elixirContractAddress = getContractAddressByName('ElixirNft');
   const elixirNftContract = getContractByAddressName(elixirContractAddress, 'ElixirNft', library.getSigner());
 
-  const { data: getElixirs } = useQuery(GET_ELIXIR_BY_TOKEN_ID, {
-    variables: {
-      tokenId: `0x${(+props.elixirNft.token_id).toString(16)}`
-    }
-  });
-
   useEffect(() => {
     const getApproved = async () => {
-        try {
-          const steadyTokenContract = getContractByAddressName(getElixirs.elixirs[0].chyme?.steadyToken, 'SteadyToken', library.getSigner());
-          const approvedAddress = await elixirNftContract.getApproved(+props.elixirNft.token_id);
-          setIsApprovedNft(approvedAddress?.toLowerCase() === (getElixirs.elixirs[0].chyme?.alchemist?.id)?.toLowerCase());
-          const steadyRequired = await elixirNftContract.getSteadyRequired(+props.elixirNft.token_id);
-          const allowance = await steadyTokenContract.allowance(account, getElixirs.elixirs[0].chyme?.alchemist?.id);
-          const steadyDecimals = await steadyTokenContract.decimals();
-          setSteadyRequiredAmount(steadyRequired.steadyRequired);
-          setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
-          setDisableMerge(false);
-        } catch (err) {
-          console.log(err)
-          setDisableMerge(true);
+      try {
+        const maturesTime = (+props.elixirNft.dateSplit) - (new Date().getTime() / 1000) + 157680000;
+        const mDays = Math.floor(maturesTime / 3600 / 24);
+        if (mDays < 0) {
+          setMaturesDays(0);
+        } else {
+          setMaturesDays(mDays);
         }
+        const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', library.getSigner());
+        const approvedAddress = await elixirNftContract.getApproved(props.elixirNft.tokenId);
+        setIsApprovedNft(approvedAddress?.toLowerCase() === (props.elixirNft.chyme?.alchemist?.id)?.toLowerCase());
+        const steadyRequired = await elixirNftContract.getSteadyRequired(props.elixirNft.tokenId);
+        const allowance = await steadyTokenContract.allowance(account, props.elixirNft.chyme?.alchemist?.id);
+        const steadyDecimals = await steadyTokenContract.decimals();
+        setSteadyRequiredAmount(steadyRequired.steadyRequired);
+        setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
+        
+        const oracleContract = getContractByAddressName(props.elixirNft.chyme.priceOracle, 'Oracle', library.getSigner());
+        const oracleLatestAnswer = await oracleContract.latestAnswer();
+        const oracleDecimals= await oracleContract.decimals();
+        const oraclePrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
+        const forgeConstant = +formatUnits(+props.elixirNft.forgeConstant, oracleDecimals);
+        const vl = (oraclePrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
+        setValue(vl);
+        setDisableMerge(false);
+      } catch (err) {
+        console.log(err)
+        setDisableMerge(true);
+      }
     };
-    if (getElixirs && getElixirs.elixirs && getElixirs.elixirs.length > 0) {
       getApproved();
-    }
     // eslint-disable-next-line
-  }, [getElixirs]);
+  }, []);
 
   const approveNft = async () => {
     setDisableMerge(true);
@@ -72,7 +81,7 @@ const ElixirNft = (props: {
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      elixirNftContract.approve(getElixirs.elixirs[0].chyme?.alchemist?.id, +props.elixirNft.token_id)
+      elixirNftContract.approve(props.elixirNft.chyme?.alchemist?.id, props.elixirNft.tokenId)
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
             isOpen: true,
@@ -118,8 +127,8 @@ const ElixirNft = (props: {
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      const steadyTokenContract = getContractByAddressName(getElixirs.elixirs[0].chyme?.steadyToken, 'SteadyToken', library.getSigner());
-      steadyTokenContract.approve(getElixirs.elixirs[0].chyme?.alchemist?.id, steadyRequiredAmount)
+      const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', library.getSigner());
+      steadyTokenContract.approve(props.elixirNft.chyme?.alchemist?.id, steadyRequiredAmount)
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
             isOpen: true,
@@ -162,8 +171,8 @@ const ElixirNft = (props: {
     setIsTryAgain(false);
     setIsMergeCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
-    const alchemistContract = getContractByAddressName(getElixirs.elixirs[0].chyme?.alchemist?.id, 'Alchemist', library.getSigner());
-    alchemistContract.merge(+props.elixirNft.token_id)
+    const alchemistContract = getContractByAddressName(props.elixirNft.chyme?.alchemist?.id, 'Alchemist', library.getSigner());
+    alchemistContract.merge(props.elixirNft.tokenId)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
           isOpen: true,
@@ -215,9 +224,7 @@ const ElixirNft = (props: {
   return (
     <>
       <div className="ElixirNftContainer">
-        <img className="ElixirNftImage" src={props.elixirNft.image_preview_url} alt="" onClick={() => {
-          window.open(props.elixirNft.permalink, '_blank')
-        }} />
+        <ElixirNftImage maturesDays={maturesDays} chyme={props.elixirNft.chyme.id} value={value} />
         <div className="ElixirNftActions">
           <Button color="secondary" variant="contained" onClick={approveNft} disabled={disableMerge}>Merge</Button>
         </div>

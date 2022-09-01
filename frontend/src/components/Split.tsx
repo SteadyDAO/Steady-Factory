@@ -37,10 +37,6 @@ const Split = () => {
     value: 'default',
     invalid: true
   });
-  const [ratioControl, setRatioControl] = useState<IFormControl>({
-    value: 'default',
-    invalid: true
-  });
   const [amountControl, setAmountControl] = useState<IFormControl>({
     value: '',
     invalid: true
@@ -83,10 +79,6 @@ const Split = () => {
         setOraclePrice(+formatUnits(oracleLatestAnswer, oracleDecimals));
       }
       getOraclePrice();
-      setRatioControl({
-        value: 0,
-        invalid: false
-      });
     }
     // eslint-disable-next-line
   }, [chymeControl, account, chainId]);
@@ -270,30 +262,6 @@ const Split = () => {
               </Select>
             </FormControl>
           </div>
-          {/* <div className="SplitStrikeControl SplitFormControl">
-            <FormControl required fullWidth>
-              <Select value={ratioControl.value} disabled={!chymeControl.value || chymeControl.value === 'default' || disableForm} onChange={(event) => {
-                if (typeof event.target.value === 'number') {
-                  setRatioControl({
-                    value: event.target.value,
-                    invalid: false
-                  });
-                } else {
-                  setRatioControl({
-                    value: 'default',
-                    invalid: true
-                  });
-                }
-              }}>
-                <MenuItem selected disabled value="default">Ratio</MenuItem>
-                {ratios.map((ratio: IRatio) =>
-                  <MenuItem key={ratio.value} value={ratio.value}>
-                    {ratio.label}
-                  </MenuItem>
-                )}
-              </Select>
-            </FormControl>
-          </div> */}
           <div className="SplitBalanceContainer">
             {active ?
               <>

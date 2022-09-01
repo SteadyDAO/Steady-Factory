@@ -2,7 +2,7 @@ import { Skeleton } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import useEtherSWR from 'ether-swr';
 import { formatUnits } from 'ethers/lib/utils';
-import cgtImage from '../assets/images/cache-gold-icon.png';
+import ethImage from '../assets/images/ethereum_icon.svg';
 
 const TokenItem = (props: {
   steadyToken: string;
@@ -39,7 +39,7 @@ const TokenItem = (props: {
     <>
     <div className="TokensItemContainer">
       <div className="TokensItemTokenContainer">
-        <img className="TokensItemTokenImg" src={cgtImage} alt="" />
+        <img className="TokensItemTokenImg" src={ethImage} alt="" />
         <span>{name ? name : <Skeleton width={80} height={35} variant="text" />}</span>
       </div>
       <div className="TokensItemBalanceContainer">
@@ -50,7 +50,7 @@ const TokenItem = (props: {
       </div>
     </div>
     <div className="TokensItemMobileContainer">
-        <img className="TokensItemMobileTokenImg" src={cgtImage} alt="" />
+        <img className="TokensItemMobileTokenImg" src={ethImage} alt="" />
         <div className="TokensItemInfoMobileContainer">
         <span>{symbol ? symbol : <Skeleton width={80} height={35} variant="text" />}</span>
         <span>{balance && decimals ? `${(+formatUnits(balance, decimals)).toLocaleString()} ${symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>

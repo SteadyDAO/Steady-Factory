@@ -16,23 +16,35 @@ export const GET_ALCHEMISTS = gql`
   }
 `;
 
-export const GET_ELIXIR_BY_TOKEN_ID = gql`
-query GetElixirByTokenId($tokenId: String!) {
-  elixirs (
-    where: {
-      id: $tokenId
-    }
-  ) {
-    id
-    tokenId
-    status
-    chyme {
-      symbol
-      steadyToken
-      alchemist {
+export const GET_ELIXIR_BY_ACCOUNT = gql`
+  query GetElixirByAccount($account: String!) {
+    elixirs (
+      where: {
+        owner: $account,
+        status: Split
+      },
+      orderBy: dateSplit,
+      orderDirection: desc,
+    ) {
+      id
+      tokenId
+      status
+      ratioOfSteady
+      forgeConstant
+      amount
+      dateSplit
+      dateMerged
+      chyme {
         id
+        symbol
+        priceOracle
+        steadyToken
+        alchemist {
+          id
+        }
       }
+      vault
+      owner
     }
   }
-}
 `;
