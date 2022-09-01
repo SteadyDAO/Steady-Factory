@@ -32,6 +32,7 @@
 .TransactionsConfirmationActionsContainer {
   align-items: center;
   display: flex;
+  gap: 1rem;
   justify-content: center;
   padding-bottom: 1rem;
 }

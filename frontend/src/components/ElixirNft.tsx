@@ -13,6 +13,7 @@ import { errorHandler, pollingTransaction } from "../helpers/Wallet";
 import ElixirNftImage from "./ElixirNftImage";
 import { IElixir } from "../models/Alchemist";
 import { formatUnits } from "ethers/lib/utils";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const ElixirNft = (props: {
   elixirNft: IElixir
@@ -22,13 +23,19 @@ const ElixirNft = (props: {
   const [isTryAgain, setIsTryAgain] = useState<boolean>(false);
   const [isMergeCompleted, setIsMergeCompleted] = useState<boolean>(false);
   const [isConfirmation, setIsConfirmation] = useState<boolean>(false);
+  const [isTxConfirmation, setIsTxConfirmation] = useState<boolean>(false);
   const [isApprovedNft, setIsApprovedNft] = useState<boolean>(false);
   const [isApprovedSteadyToken, setIsApprovedSteadyToken] = useState<boolean>(false);
   const [confirmationStep, setConfirmationStep] = useState<number>(0);
   const [maturesDays, setMaturesDays] = useState<number>(0);
   const [value, setValue] = useState<number>(0);
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
-  const [steadyRequiredAmount, setSteadyRequiredAmount] = useState();
+  const [steadyRequiredAmount, setSteadyRequiredAmount] = useState(0);
+  const [steadyDecimals, setSteadyDecimals] = useState();
+  const [steadySymbol, setSteadySymbol] = useState();
+  const [receiveAmount, setReceiveAmount] = useState(0);
+  const [chymeDecimals, setChymeDecimalsl] = useState();
+  const [chymeSymbol, setChymeSymbol] = useState();
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
     isOpen: false
   } as any);
@@ -50,13 +57,22 @@ const ElixirNft = (props: {
         setIsApprovedNft(approvedAddress?.toLowerCase() === (props.elixirNft.chyme?.alchemist?.id)?.toLowerCase());
         const steadyRequired = await elixirNftContract.getSteadyRequired(props.elixirNft.tokenId);
         const allowance = await steadyTokenContract.allowance(account, props.elixirNft.chyme?.alchemist?.id);
-        const steadyDecimals = await steadyTokenContract.decimals();
+        const steadyDcms = await steadyTokenContract.decimals();
+        const steadySymbol = await steadyTokenContract.symbol();
+        setSteadyDecimals(steadyDcms);
+        setSteadySymbol(steadySymbol);
         setSteadyRequiredAmount(steadyRequired.steadyRequired);
-        setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDecimals));
-        
+        setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDcms));
+        const chymeContract = getContractByAddressName(props.elixirNft.chyme?.id, 'Chyme', library.getSigner());
+        const chymeDcms = await chymeContract.decimals();
+        const receiveAmt = await chymeContract.balanceOf(props.elixirNft.vault);
+        const chymeSymbol = await chymeContract.symbol();
+        setChymeDecimalsl(chymeDcms);
+        setReceiveAmount(receiveAmt);
+        setChymeSymbol(chymeSymbol);
         const oracleContract = getContractByAddressName(props.elixirNft.chyme.priceOracle, 'Oracle', library.getSigner());
         const oracleLatestAnswer = await oracleContract.latestAnswer();
-        const oracleDecimals= await oracleContract.decimals();
+        const oracleDecimals = await oracleContract.decimals();
         const oraclePrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
         const forgeConstant = +formatUnits(+props.elixirNft.forgeConstant, oracleDecimals);
         const vl = (oraclePrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
@@ -67,7 +83,7 @@ const ElixirNft = (props: {
         setDisableMerge(true);
       }
     };
-      getApproved();
+    getApproved();
     // eslint-disable-next-line
   }, []);
 
@@ -77,7 +93,7 @@ const ElixirNft = (props: {
       approveSteadyToken();
     } else {
       setConfirmationStep(0);
-      setIsConfirmation(true);
+      setIsTxConfirmation(true);
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
@@ -123,7 +139,7 @@ const ElixirNft = (props: {
       merge();
     } else {
       setConfirmationStep(1);
-      setIsConfirmation(true);
+      setIsTxConfirmation(true);
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
@@ -167,7 +183,7 @@ const ElixirNft = (props: {
 
   const merge = () => {
     setConfirmationStep(2);
-    setIsConfirmation(true);
+    setIsTxConfirmation(true);
     setIsTryAgain(false);
     setIsMergeCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
@@ -226,19 +242,21 @@ const ElixirNft = (props: {
       <div className="ElixirNftContainer">
         <ElixirNftImage maturesDays={maturesDays} chyme={props.elixirNft.chyme.id} value={value} />
         <div className="ElixirNftActions">
-          <Button color="secondary" variant="contained" onClick={approveNft} disabled={disableMerge}>Merge</Button>
+          <Button color="secondary" variant="contained" onClick={() => {
+            setIsConfirmation(true);
+          }} disabled={disableMerge}>Merge</Button>
         </div>
       </div>
       <Dialog
         className="TransactionsConfirmationDialog"
-        open={isConfirmation}
+        open={isTxConfirmation}
         TransitionComponent={Transition}
         keepMounted
       >
         <div className="TransactionsConfirmationContainer">
           <div className="TransactionsConfirmationHeaderContainer">
             <IconButton onClick={() => {
-              setIsConfirmation(false);
+              setIsTxConfirmation(false);
             }}>
               <CloseIcon color="primary" />
             </IconButton>
@@ -273,6 +291,51 @@ const ElixirNft = (props: {
               </Button>
             </div> : <></>
           }
+        </div>
+      </Dialog>
+      <Dialog
+        className="TransactionsConfirmationDialog"
+        open={isConfirmation}
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <div className="TransactionsConfirmationContainer">
+          <div className="TransactionsConfirmationHeaderContainer">
+            <IconButton onClick={() => {
+              setIsConfirmation(false);
+            }}>
+              <CloseIcon color="primary" />
+            </IconButton>
+          </div>
+          <div className="MergeConfirmationContent">
+            <span>You will spend:</span>
+            <div className="MergeConfirmationContentRow">
+              <KeyboardArrowRightIcon fontSize="small" color="primary" />
+              <span>1 Elixir NFT</span>
+            </div>
+            <div className="MergeConfirmationContentRow">
+              <KeyboardArrowRightIcon fontSize="small" color="primary" />
+              <span>{`${formatUnits(steadyRequiredAmount, steadyDecimals)} ${steadySymbol}`}</span>
+            </div>
+            <span>You will receive:</span>
+            <div className="MergeConfirmationContentRow">
+              <KeyboardArrowRightIcon fontSize="small" color="primary" />
+              <span>{`${formatUnits(receiveAmount, chymeDecimals)} ${chymeSymbol}`}</span>
+            </div>
+          </div>
+          <div className="TransactionsConfirmationActionsContainer">
+            <Button variant="contained" color="secondary" onClick={() => {
+              setIsConfirmation(false);
+              approveNft();
+            }}>
+              OK
+            </Button>
+            <Button variant="contained" onClick={() => {
+              setIsConfirmation(false);
+            }}>
+              Cancel
+            </Button>
+          </div>
         </div>
       </Dialog>
       <SnackbarMessage snackbar={snackbar} setSnackbar={setSnackbar} />
