@@ -60,7 +60,7 @@ const ElixirNft = (props: {
         const oraclePrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
         const forgeConstant = +formatUnits(+props.elixirNft.forgeConstant, oracleDecimals);
         const vl = (oraclePrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
-        setValue(vl);
+        setValue(+(vl.toFixed(2)));
         setDisableMerge(false);
       } catch (err) {
         console.log(err)
