@@ -28,7 +28,7 @@ const ElixirNft = (props: {
   const [isApprovedSteadyToken, setIsApprovedSteadyToken] = useState<boolean>(false);
   const [confirmationStep, setConfirmationStep] = useState<number>(0);
   const [maturesDays, setMaturesDays] = useState<number>(0);
-  const [value, setValue] = useState<number>(0);
+  const [value, setValue] = useState<any>('-');
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
   const [steadyRequiredAmount, setSteadyRequiredAmount] = useState(0);
   const [steadyDecimals, setSteadyDecimals] = useState();
@@ -240,7 +240,7 @@ const ElixirNft = (props: {
   return (
     <>
       <div className="ElixirNftContainer">
-        <ElixirNftImage maturesDays={maturesDays} chyme={props.elixirNft.chyme.id} value={value} />
+        <ElixirNftImage maturesDays={maturesDays} chyme={props.elixirNft.chyme.alchemist.id} value={value} />
         <div className="ElixirNftActions">
           <Button color="secondary" variant="contained" onClick={() => {
             setIsConfirmation(true);
