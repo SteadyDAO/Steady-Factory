@@ -3,12 +3,10 @@
 
 - [Steady DAO](#steady-dao)
 	- [Introduction](#introduction)
-	- [Roadmap](#roadmap)
 	- [Steady DAO Mint Economic Model](#steady-dao-mint-economic-model)
 		- [Scenario](#scenario)
 	- [Benefits to the Steady DAO holder](#benefits-to-the-steady-dao-holder)
 	- [Dynamic Fees](#dynamic-fees)
-		- [Simulations](#simulations)
 	- [How to list your chyme](#how-to-list-your-chyme)
 	- [Alchemist Rules](#alchemist-rules)
 	- [How we used Steady DAO Dynasty tokens](#how-we-used-steady-dao-dynasty-tokens)
@@ -16,7 +14,7 @@
 	- [Steps](#steps)
 		- [STEP 1 - CREATE CHYME	CreatNewChyme](#step-1---create-chymecreatnewchyme)
 
-  
+  [![MythXBadge](https://badgen.net/https/api.mythx.io/v1/projects/024757ac-c03f-4fd3-a81a-0fa46abad8cf/badge/data?cache=300&icon=https://raw.githubusercontent.com/ConsenSys/mythx-github-badge/main/logo_white.svg)](https://docs.mythx.io/dashboard/github-badges)
 ## Introduction
 The inspiration for Steady DAO is from the fact that in today's crypto landscape there are multiple
 stable coin implementations that are not backed by real physical assets. This lends to increased risk, for eg
@@ -27,19 +25,6 @@ See [DAI collateral types](https://daistats.com/#/) . DAI added USDC in March 20
 Steady DAO creates Steady assets that are backed by real physical assets with great transparency. 
 The model gives you the user an opportunity to split your tokens into the current USD value and another NFT, which
 represents the volatility of the underlying collateral. We believe that decentralization requires a strong foundation.
-
-## Roadmap
-
-| Quarter  	|  Event 	| Goals  	| Gamefication  	|  Land Used 	|  
-|---	|---	|---	|---	|---	|
-|22-Q1	| Steady DAO Alchemist | The Alchemist allows the Steady DAO to create a foundational value with an underlying redeemable asset backed token. |1. Basic Animation 1. Gamification of closing mature options and earning rewards. 2. Make fees lower based on correct timing.|The Mint
-|22-Q2|Steady DAO Stabilizer|This allows the economy to maintain a stable value for the steady token. A model similar to the maker dao model of auctioning collaterals that the treasury buys based on thresholds is created|1. Spotter - A spotter is someone who sirens that there is a deviation from price 1. First Responders - Responders who decide immediate action. Both spotters and Responders for actions(game elements) leading to stability earn rewards|The Reserve
-|22-Q3|Steady DAO Land Sales and Adventurers|Proximity based land allocation giving rewards to different areas based on growth. Adventurers who can be upgraded over time with PvP battles and equipments. Adventurers earn higher rewards for staking throughout the lands, based on their reputation|1. Land System 2. PvP and Player shops|Stage 1 - Lands
-|22-Q4|Steady DAO Dynasty Bank |The banking system within the DAO where yields are generated from bonds and also with merger of other dApp's  and protocols|1. Basic Animation 2. Become the Governor competitions|The Central 
-|23-Q1|Steady DAO Dynasty Souq|Integrate other dApp's into the system, new DeFi projects, forks of existing protocols etc|1. Basic Shopfront 2. Custom Animations 3. Staking rewards based on mini games|The Souq
-|23-Q2|Steady DAO Dynasty Adventure Guilds|Allows mini DAO formation||The Barracks
-|23-Q3|Steady DAO Dynasty Quests|Create gamified quests where players earn rewards for completing quests|Adventure quests developed by Indie developers with various difficulties|The Leaky Tavern
-|23-Q4|Steady DAO Guild Wars|Yearly full blown quest between mini DAO's to get a shot at winning the rigths to be the governor|Guild Vs Guild Battles|The Arena
 
 ## Steady DAO Mint Economic Model
 | Invest  	|  Time 	|  Gold Price 	|  Steady ERC20 	|  Elixir 	|  Elixir NFT 	| Ratio	|   Forge Price  	|
@@ -58,8 +43,6 @@ represents the volatility of the underlying collateral. We believe that decentra
  the user will require 1 Elixir NFT with a value of 12.5 and 37.5 Steady tokens to get a Full GOLD GRAM token back, where price of GOLD GRAM Token = $60. 
 The user has thus redeemed this for $50 and sold it for $60 and netted a payout of $10.
 3. If the user does a merge later at time T5 when price is gone down to 30 then the user requires 37.5 steady tokens and his 1 Leveraged token to get back 1 GOLD worth $30. 
-However, since his leveraged token value is below 0 we simply do not allow redemptions below 0. Now, the 37.5 $ value which the Steady had, is said to be unbacked. Neverthless,
-the total volume of steady minted might still be backed.
 
 The DAO periodically invests and buys into the treasury the approved chymes/commodity assets. 
 
@@ -72,9 +55,6 @@ That is if the underlying is less transparent about its backing the chyme will b
 2. Fees are charged for splitting and merging
 3. Upon merging fees are charged based on the current value of the underlying
 4. Rewards are only issued for closing mature chymes
-
-### Simulations
-TODO
 
 ## How to list your chyme
 In order to list your chyme, please create a pull request with ChymeList.json and mention the details required.

@@ -25,7 +25,7 @@ let chyme:SimpleToken;
 let steadyDAOReward: SteadyDAOReward;
 
 const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
-
+const MINTER_ROLE = "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6";
 const chymeAddress = '0xa77451Ce512c970173fD3Faff316F6EDED1867f6';
 const oracleAddress = '0x81570059A0cb83888f1459Ec66Aad1Ac16730243';
 const oracleAddressWith18DecimalPlaces = "0x0855428B493637726090003eD12Dd224715CA217";
@@ -67,7 +67,7 @@ describe('Check the Alchemy', () => {
 
     const ElixirFactory = await ethers.getContractFactory("Elixir");
     elixirImpl = await ElixirFactory.deploy("NFT","Elixir", treasureChest.address) as Elixir;
-  
+    console.log("Elixir Impl address - ", elixirImpl.address)
     const Alchemist = await ethers.getContractFactory("Alchemist");
     alchemistImpl = await Alchemist.deploy() as Alchemist;
     await alchemistImpl.deployed();
@@ -83,15 +83,11 @@ describe('Check the Alchemy', () => {
     alchemistAcademy = await AlchemistAcademy.deploy() as AlchemistAcademy;
     await alchemistAcademy.deployed();
     
-    elixirImpl.grantRole(DEFAULT_ADMIN_ROLE, alchemistAcademy.address); 
-
     await alchemistAcademy.initialize(
-      elixirImpl.address,
       steadyImpl.address,
       treasury.address,
       alchemistImpl.address,
-      DAOAddress.address,
-      steadyDAOReward.address
+      DAOAddress.address
     );
 
   })
@@ -102,14 +98,18 @@ describe('Check the Alchemy', () => {
       const Alchemist = await ethers.getContractFactory("Alchemist");
       const SteadyFactory = await ethers.getContractFactory("Steady");
       
-      let tx = await alchemistAcademy.connect(DAOAddress).createNewChyme(
-        8,
-        0,
-        1,
-        chymeAddress,           
-        oracleAddress,
-        157680000
+      let tx = await alchemistAcademy.connect(DAOAddress).createNewChyme( 
+        { 
+        "decimals":8,
+        "fees":0,
+        "DAOApproved":1,
+        "oracleAddress":oracleAddress,
+        "steadyImplForChyme":oracleAddress,
+        "symbol":"PGT",
+        "timeToMaturity":157680000,
+        "steadyDAOReward":steadyDAOReward.address}, chymeAddress
         );
+        
       
       elixirImpl.setAcademy(alchemistAcademy.address);
 
@@ -123,15 +123,20 @@ describe('Check the Alchemy', () => {
       const Chyme = await ethers.getContractFactory("SimpleToken");
       chyme = await Chyme.attach(chymeAddress) as SimpleToken;
       mrAlchemist = await Alchemist.attach(event.alchemist) as Alchemist;
+      elixirImpl.grantRole(MINTER_ROLE, mrAlchemist.address); 
+      
       mySteady = await SteadyFactory.attach(event.steadyImplForChyme) as Steady;
     })
 
-    xit('can split Chyme belonging to it', async () => {
+    it('can split Chyme belonging to it', async () => {
       await chyme.connect(chymeHolder).transfer(wallet.address, ethers.utils.parseUnits("100", 8) )
 
       expect(await mrAlchemist.chyme()).to.equal(chymeAddress)
       let chymeAddressContract = await mrAlchemist.chyme();
       let balanceBefore = await chyme.balanceOf(wallet.address);
+      let elixirTokenID = await elixirImpl.getCurrentTokenId();
+      console.log("Elixir Impl token Id - ", elixirTokenID);
+
 
       await chyme.approve(mrAlchemist.address,ethers.utils.parseUnits("100", 8));
 
@@ -148,7 +153,7 @@ describe('Check the Alchemy', () => {
     });
 
 
-    xit('can merge Chyme belonging to it', async () => {
+    it('can merge Chyme belonging to it', async () => {
       let balanceBeforeMerge = await chyme.balanceOf(wallet.address);
       let balSteady = await steadyImpl.balanceOf(wallet.address);
       let balElixir = await elixirImpl.balanceOf(wallet.address);
@@ -180,12 +185,15 @@ describe('Check the Alchemy', () => {
       const SimpleToken = await ethers.getContractFactory("SimpleToken");
       chyme = await SimpleToken.deploy(18) as SimpleToken;
       let tx = await alchemistAcademy.connect(DAOAddress).createNewChyme( 
-        18,
-        0,
-        1,
-        chymeAddress,           
-        oracleAddress,
-        157680000
+        { 
+        "decimals":8,
+        "fees":0,
+        "DAOApproved":1,
+        "oracleAddress":oracleAddress,
+        "steadyImplForChyme":oracleAddress,
+        "symbol":"PGT",
+        "timeToMaturity":157680000,
+        "steadyDAOReward":steadyDAOReward.address}, chymeAddress
         );
       await chyme.mint(chymeHolder.address,ethers.utils.parseEther("10000"));
  

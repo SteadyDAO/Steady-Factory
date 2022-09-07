@@ -68,6 +68,11 @@ const _abi = [
             name: "timeToMaturity",
             type: "uint256",
           },
+          {
+            internalType: "address",
+            name: "steadyDAOReward",
+            type: "address",
+          },
         ],
         internalType: "struct IChyme.Chyme",
         name: "",
@@ -122,6 +127,11 @@ const _abi = [
       {
         internalType: "address",
         name: "steadyImplForChyme",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "steadyDAOReward",
         type: "address",
       },
     ],

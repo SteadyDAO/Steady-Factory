@@ -64,7 +64,7 @@ describe('Elixir NFT works as expected', async () => {
     
         const ElixirFactory = await ethers.getContractFactory("Elixir");
         elixirImpl = await ElixirFactory.deploy("NFT","Elixir", treasureChest.address) as Elixir;
-      
+        console.log("elixirImpl.address -- ",elixirImpl.address)
         const Alchemist = await ethers.getContractFactory("Alchemist");
         alchemistImpl = await Alchemist.deploy() as Alchemist;
         await alchemistImpl.deployed();
@@ -84,27 +84,28 @@ describe('Elixir NFT works as expected', async () => {
         elixirImpl.grantRole(DEFAULT_ADMIN_ROLE, wallet.address); 
     
         await alchemistAcademy.initialize(
-          elixirImpl.address,
           steadyImpl.address,
           treasury.address,
           alchemistImpl.address,
-          DAOAddress.address,
-          steadyDAOReward.address
+          DAOAddress.address
         );
+        console.log("initialized")
      
         let tx = await alchemistAcademy.connect(DAOAddress).createNewChyme( 
-          8,
-          0,
-          1,
-          chymeAddress,           
-          oracleAddress,
-          157680000
+          { 
+          "decimals":8,
+          "fees":0,
+          "DAOApproved":1,
+          "oracleAddress":oracleAddress,
+          "steadyImplForChyme":oracleAddress,
+          "symbol":"PGT",
+          "timeToMaturity":157680000,
+          "steadyDAOReward":steadyDAOReward.address}, chymeAddress
           );
+      console.log("createNewChyme.address -- ",chymeAddress)
 
-        elixirImpl.setAcademy(alchemistAcademy.address);
-
-        // let tx = await alchemistAcademy.alchemist(chymeAddress);   
-        const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+      elixirImpl.setAcademy(alchemistAcademy.address);
+      const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
       const interfaceAlch = new ethers.utils.Interface(["event AlchemistForged(address indexed alchemist,address priceOracle,uint8 fees,address steadyImplForChyme)"]);
       const data = receipt.logs[receipt.logs.length-1].data;
       const topics = receipt.logs[receipt.logs.length-1].topics;
@@ -122,8 +123,7 @@ describe('Elixir NFT works as expected', async () => {
     })
 
   it('can fetch a token URI string', async () => {
-    let forgePrice =  5778003570;//await mrAlchemist.forgePrice();
-    // console.log("forge Price --- ", forgePrice.toString());
+    let forgePrice =  5778003570;
     await elixirImpl.safeMint(
       wallet2.address,
       chymeAddress,
