@@ -82,7 +82,7 @@ const ElixirNft = (props: {
         const orcPrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
         setOraclePrice(Math.floor(orcPrice));
         const forgeConstant = +formatUnits(+props.elixirNft.forgeConstant, oracleDecimals);
-        const strPrice = forgeConstant * (100 - (+props.elixirNft.ratioOfSteady)) / 100;
+        const strPrice = forgeConstant;
         setStrikePrice(Math.floor(strPrice));
         const vl = (orcPrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
         setValue(Math.floor(vl).toLocaleString());

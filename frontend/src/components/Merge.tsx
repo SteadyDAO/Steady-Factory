@@ -6,7 +6,7 @@ import { Button, Checkbox, CircularProgress, FormControl, ListItemText, MenuItem
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
-import { IAlchemist, IElixir } from "../models/Alchemist";
+import { IAlchemist, IChyme, IElixir } from "../models/Alchemist";
 import { EtherSWRConfig } from "ether-swr";
 import TokenItem from "./TokenItem";
 import { IAppConfig } from "../models/Base";
@@ -26,10 +26,11 @@ const Merge = () => {
   });
   const { data: getElixirsByAccount, loading: getElixirsByAccountLoading, refetch: refetchElixirsByAccount } = useQuery(GET_ELIXIR_BY_ACCOUNT, {
     variables: {
-      account
+      account,
+      chymeIds: []
     },
-    // notifyOnNetworkStatusChange: true,
-    pollInterval: 3000
+    notifyOnNetworkStatusChange: true,
+    // pollInterval: 3000
   });
 
   useEffect(() => {
@@ -41,6 +42,11 @@ const Merge = () => {
       setNftsFiltersValue([
         ...getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.symbol)
       ]);
+      const chymeIds = getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.id);
+      refetchElixirsByAccount({
+        account,
+        chymeIds
+      });
     }
   }, [getAlchemists]);
 
@@ -57,6 +63,12 @@ const Merge = () => {
     setNftsFiltersValue(
       typeof value === 'string' ? value.split(',') : value,
     );
+    const alcmists = alchemists.filter(alchemist => value.find((vl: string) => alchemist.chyme.symbol === vl));
+    const chymeIds: Array<string> = alcmists.map((alc: IAlchemist) => alc.chyme.id);
+    refetchElixirsByAccount({
+      account,
+      chymeIds: chymeIds as any
+    });
   }
 
   return (
@@ -81,7 +93,7 @@ const Merge = () => {
           </div>
           {toggle === 'nfts' ?
             <>
-              {/* <div className="MergeActions">
+              <div className="MergeActions">
                 <Button className="MergeActionsButton" color="secondary" variant="contained" onClick={() => {
                   refetchElixirsByAccount()
                 }}>
@@ -105,7 +117,7 @@ const Merge = () => {
                     </Select>
                   </FormControl>
                 </div>
-              </div> */}
+              </div>
               {getElixirsByAccountLoading ?
                 <div className="ElixirNftsSpinnerContainer">
                   <CircularProgress color="secondary" size={80} />

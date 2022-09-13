@@ -17,11 +17,12 @@ export const GET_ALCHEMISTS = gql`
 `;
 
 export const GET_ELIXIR_BY_ACCOUNT = gql`
-  query GetElixirByAccount($account: String!) {
+  query GetElixirByAccount($account: String!, $chymeIds: [String]!) {
     elixirs (
       where: {
         owner: $account,
-        status: Split
+        status: Split,
+        chyme_in: $chymeIds
       },
       orderBy: dateSplit,
       orderDirection: desc,

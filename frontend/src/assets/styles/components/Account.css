@@ -45,6 +45,12 @@
   padding: 0 10px;
 }
 
+.GetTokenContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+}
+
 @media only screen and (max-width: 1366px) {
 }
 
@@ -65,16 +71,13 @@
 }
 
 @media only screen and (max-width: 640px) {
+  .GetTokenContainer {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 480px) {
 }
 
 @media only screen and (max-width: 320px) {
-}
-
-.GetTokenContainer {
-  align-items: center;
-  display: flex;
-  gap: .5rem;
 }
