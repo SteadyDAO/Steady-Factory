@@ -361,7 +361,7 @@ const Split = () => {
                 <StepLabel>Approve Amount</StepLabel>
               </Step>
               <Step>
-                <StepLabel>Split Chyme</StepLabel>
+                <StepLabel>Split Token</StepLabel>
               </Step>
             </Stepper>
           </div>
