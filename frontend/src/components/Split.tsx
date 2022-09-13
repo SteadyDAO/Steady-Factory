@@ -190,30 +190,32 @@ const Split = () => {
 
   const splitCompleted = (status: number) => {
     if (status === 1) {
-      setDisableForm(false);
-      setIsSplitCompleted(true);
-      setConfirmationMessage('Split Success!');
-      setConfirmationStep(2);
-      setAmountControl({
-        value: '',
-        invalid: true
-      });
-      setSnackbar({
-        isOpen: true,
-        timeOut: 5000,
-        type: 'success',
-        message: 'Split Success!'
-      });
-      const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-        const bl = await chymeContract.balanceOf(account);
-        const sb = await chymeContract.symbol();
-        const dcm = await chymeContract.decimal();
-        setBalance(formatUnits(bl, dcm));
-        setSymbol(sb);
-        setChymeDecimal(dcm);
-      }
-      getBalance();
+      setTimeout(() => {
+        setDisableForm(false);
+        setIsSplitCompleted(true);
+        setConfirmationMessage('Split Success!');
+        setConfirmationStep(2);
+        setAmountControl({
+          value: '',
+          invalid: true
+        });
+        setSnackbar({
+          isOpen: true,
+          timeOut: 5000,
+          type: 'success',
+          message: 'Split Success!'
+        });
+        const getBalance = async () => {
+          const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
+          const bl = await chymeContract.balanceOf(account);
+          const sb = await chymeContract.symbol();
+          const dcm = await chymeContract.decimal();
+          setBalance(formatUnits(bl, dcm));
+          setSymbol(sb);
+          setChymeDecimal(dcm);
+        }
+        getBalance();
+      }, 6000)
     } else if (status === 0) {
       setDisableForm(false);
       setSnackbar({
@@ -236,7 +238,7 @@ const Split = () => {
   return (
     <>
       <div className="SplitContainer">
-        <span className="SplitLabel">Split Chyme</span>
+        <span className="SplitLabel">Split Token</span>
         <div className="SplitFormContainer">
           <div className="SplitChymeControl SplitFormControl">
             <FormControl required fullWidth>
@@ -253,7 +255,7 @@ const Split = () => {
                   });
                 }
               }}>
-                <MenuItem selected disabled value="default">Chyme</MenuItem>
+                <MenuItem selected disabled value="default">Token</MenuItem>
                 {alchemists.length > 0 && alchemists.map((alchemist: IAlchemist) =>
                   <MenuItem key={alchemist.id} value={alchemist.chyme.id}>
                     {alchemist.chyme?.symbol}
@@ -310,7 +312,7 @@ const Split = () => {
           </div>
           <div className="SplitMessageContainer">
             {isFormValid && oraclePrice && symbol ?
-              <span className="SplitElixirMessage">Receive 1 Elixir and {(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString() } s{symbol}</span> : <></>
+              <span className="SplitElixirMessage">Receive 1 Leveraged NFT representing {(Math.floor((+amountControl.value * 25 * oraclePrice) / 100)).toLocaleString() } s{symbol} (25%) and {(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString() } s{symbol} (75%)</span> : <></>
             }
             {isNotEnoughBalance ?
               <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>

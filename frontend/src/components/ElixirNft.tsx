@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Dialog, IconButton, Step, StepLabel, Stepper } from "@mui/material";
+import { Button, CircularProgress, Dialog, IconButton, Skeleton, Step, StepLabel, Stepper, Tooltip } from "@mui/material";
 import { TransactionResponse } from "@ethersproject/providers";
 import SnackbarMessage from "./Snackbar";
 import { ISnackbarConfig } from "../models/Material";
@@ -14,10 +14,14 @@ import ElixirNftImage from "./ElixirNftImage";
 import { IElixir } from "../models/Alchemist";
 import { formatUnits } from "ethers/lib/utils";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { IAppConfig } from "../models/Base";
+import { getAppConfig } from "../helpers/Utilities";
 
 const ElixirNft = (props: {
   elixirNft: IElixir
 }) => {
+  const config: IAppConfig = getAppConfig();
   const { account, library } = useWeb3React();
   const [disableMerge, setDisableMerge] = useState<boolean>(true);
   const [isTryAgain, setIsTryAgain] = useState<boolean>(false);
@@ -34,6 +38,8 @@ const ElixirNft = (props: {
   const [steadyDecimals, setSteadyDecimals] = useState();
   const [steadySymbol, setSteadySymbol] = useState();
   const [receiveAmount, setReceiveAmount] = useState(0);
+  const [oraclePrice, setOraclePrice] = useState(0);
+  const [strikePrice, setStrikePrice] = useState(0);
   const [chymeDecimals, setChymeDecimalsl] = useState();
   const [chymeSymbol, setChymeSymbol] = useState();
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
@@ -45,7 +51,7 @@ const ElixirNft = (props: {
   useEffect(() => {
     const getApproved = async () => {
       try {
-        const maturesTime = (+props.elixirNft.dateSplit) - (new Date().getTime() / 1000) + 157680000;
+        const maturesTime = (+props.elixirNft.dateSplit + 94608000) - (new Date().getTime() / 1000);
         const mDays = Math.floor(maturesTime / 3600 / 24);
         if (mDays < 0) {
           setMaturesDays(0);
@@ -73,10 +79,13 @@ const ElixirNft = (props: {
         const oracleContract = getContractByAddressName(props.elixirNft.chyme.priceOracle, 'Oracle', library.getSigner());
         const oracleLatestAnswer = await oracleContract.latestAnswer();
         const oracleDecimals = await oracleContract.decimals();
-        const oraclePrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
+        const orcPrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
+        setOraclePrice(Math.floor(orcPrice));
         const forgeConstant = +formatUnits(+props.elixirNft.forgeConstant, oracleDecimals);
-        const vl = (oraclePrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
-        setValue(+(vl.toFixed(2)));
+        const strPrice = forgeConstant * (100 - (+props.elixirNft.ratioOfSteady)) / 100;
+        setStrikePrice(Math.floor(strPrice));
+        const vl = (orcPrice - forgeConstant) * +formatUnits(+props.elixirNft.amount, oracleDecimals);
+        setValue(Math.floor(vl).toLocaleString());
         setDisableMerge(false);
       } catch (err) {
         console.log(err)
@@ -217,12 +226,14 @@ const ElixirNft = (props: {
         message: 'Merge Success!'
       });
     } else if (status === 0) {
-      setDisableMerge(false);
+      setIsMergeCompleted(true);
+      setConfirmationMessage('Merge Success!');
+      setConfirmationStep(3);
       setSnackbar({
         isOpen: true,
         timeOut: 5000,
-        type: 'error',
-        message: 'Merge failed'
+        type: 'success',
+        message: 'Merge Success!'
       });
     }
   }
@@ -240,7 +251,30 @@ const ElixirNft = (props: {
   return (
     <>
       <div className="ElixirNftContainer">
-        <ElixirNftImage maturesDays={maturesDays} chyme={props.elixirNft.chyme.alchemist.id} value={value} />
+        <ElixirNftImage maturesdays={maturesDays} chyme={props.elixirNft.chyme.id} value={value} />
+        <div className="ElixirPricesContainer">
+          <div className="ElixirPricesLeftSide">
+            <div className="ElixirPriceLabelContainer">
+              <span className="ElixirPriceLabel">Strike Price:</span>
+              <span className="ElixirPriceLabel">Underlying Price:</span>
+            </div>
+            <div className="ElixirPriceLabelContainer">
+              {strikePrice ?
+                <span className="ElixirPriceText">${strikePrice}</span> :
+                <Skeleton width={60} variant="text" />
+              }
+              {oraclePrice ?
+                <span className="ElixirPriceText">${oraclePrice}</span> :
+                <Skeleton width={60} variant="text" />
+              }
+            </div>
+          </div>
+          <Tooltip title="View Elixir on Opensea">
+            <OpenInNewIcon className="ElixirPricesIcon" onClick={() => {
+              window.open(`${config.OPENSEA_ASSETS_URL}/${config.CONTRACTS_ADDRESS.ElixirNft}/${props.elixirNft.tokenId}`, '_blank')
+            }} />
+          </Tooltip>
+        </div>
         <div className="ElixirNftActions">
           <Button color="secondary" variant="contained" onClick={() => {
             setIsConfirmation(true);

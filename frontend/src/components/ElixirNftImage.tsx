@@ -1,5 +1,5 @@
 const ElixirNftImage = (props: {
-  maturesDays: number;
+  maturesdays: number;
   value: number;
   chyme: string;
 }) => (
@@ -9,11 +9,12 @@ const ElixirNftImage = (props: {
     width={230}
     height={230}
     viewBox="0 0 300 300"
+    {...props}
   >
     <style />
     <style type="text/css">
       {
-        ".st0{fill:#FFFFFF;}.st1{display:none;fill:none;stroke:#FFFFFF;stroke-width:0.5;}.st2{fill:#B0EFEB;}.st3{fill:#EDFFA9;}.st4{display:none;}.st5{fill:#FFFFFF;}.st10{fill:#D3D3D3;}.st11{fill:#FFFFFF;stroke:#939393;}.st20{fill:#FFB031;} .st21{fill:#FFA300;} .st22{fill:#E58D00;} "
+        ".st0{fill:#FFFFFF;}.st1{display:none;fill:none;stroke:#FFFFFF;stroke-width:0.5;}.st2{fill:#B0EFEB;}.st3{fill:#EDFFA9;}.st4{display:none;}.st5{fill:#FFFFFF;}.st10{fill:#D3D3D3;}.st11{fill:#FFFFFF;stroke:#939393;}.st20{fill:#FFB031;}.st21{fill:#FFA300;}.st22{fill:#E58D00;}"
       }
     </style>
     <g id="Base_Layer">
@@ -27,13 +28,13 @@ const ElixirNftImage = (props: {
       <line className="st7" x1={255} y1={90} x2={255} y2={300} />
       <line className="st8" x1={275.2} y1={90} x2={275.2} y2={300} />
       <text x={14} y={220} fontSize="14px" fontFamily="Arial">
-        {"Value:"}
+        {"Elixir Value:"}
       </text>
-      <text x={60} y={220} fontSize="14px" fontFamily="Arial">
+      <text x={100} y={220} fontSize="14px" fontFamily="Arial">
         {`$${props.value}`}
       </text>
       <text x={14} y={265} fontFamily="Arial">
-        {"Alchemist"}
+        {"Token Address"}
       </text>
       <text x={14} y={280} fontSize="11px" fontFamily="Arial">
         {props.chyme}
@@ -90,7 +91,7 @@ const ElixirNftImage = (props: {
       />
     </rect>
     <text x={80} y={125} fontFamily="Arial" fontSize="14px">
-      {`Matures in ${props.maturesDays} days`}
+      {`Matures in ${props.maturesdays} days`}
     </text>
   </svg>
 );

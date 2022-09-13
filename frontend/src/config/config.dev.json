@@ -6,8 +6,9 @@
     "BLOCK_EXPLORER": "https://rinkeby.etherscan.io/"
   },
   "STEADY_SUBGRAPH_URL": "https://api.thegraph.com/subgraphs/name/vitamind3inj/steady-rin",
+  "OPENSEA_ASSETS_URL": "https://testnets.opensea.io/assets/rinkeby",
   "CONTRACTS_ADDRESS": {
-    "Academy": "0x8eE6b67ECD4d27C351a357b7a3cDA953cC03b501",
-    "ElixirNft": "0x39A176De89f6acFbC1E2fB43Ac10e51f340E8450"
+    "Academy": "0x6f72B2c5880C84bA2D6b84acC58A4767CA6f57A7",
+    "ElixirNft": "0xaf365bf847D2a5327001A387a494b31885D1052C"
   }
 }
