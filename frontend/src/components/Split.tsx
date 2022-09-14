@@ -43,6 +43,7 @@ const Split = () => {
   });
   const [balance, setBalance] = useState<string>('');
   const [symbol, setSymbol] = useState<string>('');
+  const [polling, setPolling] = useState<any>();
   const { data: getAlchemists } = useQuery(GET_ALCHEMISTS, {
   });
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
@@ -57,8 +58,13 @@ const Split = () => {
 
   useEffect(() => {
     if (isAddress(chymeControl.value) && account && chainId === config.NETWORK.CHAIN_ID) {
-      const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
+      if (polling) {
+        clearInterval(polling);
+        setBalance('');
+        setSymbol('');
+      }
       const getBalance = async () => {
+        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
         const bl = await chymeContract.balanceOf(account);
         const sb = await chymeContract.symbol();
         const dcm = await chymeContract.decimal();
@@ -66,9 +72,10 @@ const Split = () => {
         setSymbol(sb);
         setChymeDecimal(dcm);
       }
-      setInterval(() => {
+      const pl = setInterval(() => {
         getBalance();
       }, 3000);
+      setPolling(pl);
       const getOraclePrice = async () => {
         const academyContract = getContractByName('Academy', library.getSigner());
         const chymeInfo = await academyContract.getChymeInfo(chymeControl.value);
@@ -76,7 +83,7 @@ const Split = () => {
         const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', library.getSigner());
         const oracleLatestAnswer = await oracleContract.latestAnswer();
         const oracleDecimals= await oracleContract.decimals();
-        setOraclePrice(+formatUnits(oracleLatestAnswer, oracleDecimals));
+        setOraclePrice((+formatUnits(oracleLatestAnswer, oracleDecimals)).toFixed(2) as any);
       }
       getOraclePrice();
     }

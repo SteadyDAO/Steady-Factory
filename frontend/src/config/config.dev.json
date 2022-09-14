@@ -8,7 +8,7 @@
   "STEADY_SUBGRAPH_URL": "https://api.thegraph.com/subgraphs/name/vitamind3inj/steady-rin",
   "OPENSEA_ASSETS_URL": "https://testnets.opensea.io/assets/rinkeby",
   "CONTRACTS_ADDRESS": {
-    "Academy": "0x6f72B2c5880C84bA2D6b84acC58A4767CA6f57A7",
-    "ElixirNft": "0xaf365bf847D2a5327001A387a494b31885D1052C"
+    "Academy": "0xDCAfb3962c0031B3295490A10D36Aad4D64Da65f",
+    "ElixirNft": "0x324E04033baE94a9f8D2Dd8eE46AA3bE427A7Fe4"
   }
 }
