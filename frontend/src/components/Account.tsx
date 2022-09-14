@@ -23,7 +23,15 @@ const Account = () => {
     }
   }, [chainId]);
 
-  const getTestToken = () => {
+  const getSTTToken = () => {
+    const chymeContract = getContractByAddressName('0xd245630fa7f43879d7629475fcba9f086c4edca3', 'Chyme', library.getSigner());
+    chymeContract.mint(account, parseUnits(10000 + '', 8))
+      .then((transactionResponse: TransactionResponse) => {
+      }, (err: any) => {
+      });
+  }
+
+  const getCGTToken = () => {
     const chymeContract = getContractByAddressName('0x427e22f5ec932fee43887cff7e87f43e3b8d7e0c', 'Chyme', library.getSigner());
     chymeContract.mint(account, parseUnits(10000 + '', 8))
       .then((transactionResponse: TransactionResponse) => {
@@ -38,7 +46,8 @@ const Account = () => {
       </div> */}
       {process.env.REACT_APP_MODE !== 'production' ?
         <div className="GetTokenContainer">
-          <Button variant="contained" onClick={getTestToken}>Get CGT token</Button>
+          <Button variant="contained" onClick={getSTTToken}>Get STT token</Button>
+          <Button variant="contained" onClick={getCGTToken}>Get CGT token</Button>
           <Tooltip title="This use for test only. On production this button will be removed.">
             <InfoIcon />
           </Tooltip>
