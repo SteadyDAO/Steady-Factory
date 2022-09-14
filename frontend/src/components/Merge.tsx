@@ -2,7 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
 import ElixirNft from "./ElixirNft";
 import { getABIs, getContractAddressByName } from "../helpers/Contract";
-import { Button, Checkbox, CircularProgress, FormControl, ListItemText, MenuItem, Select, SelectChangeEvent, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
@@ -102,8 +102,10 @@ const Merge = () => {
                   Refresh
                 </Button>
                 <div className="MergeActionsFiltersContainer">
-                  <FormControl fullWidth>
+                  <FormControl fullWidth variant="standard"color="primary">
+        <InputLabel id="demo-simple-select-standard-label">Select Token</InputLabel>
                     <Select
+                      label="Select Token"
                       multiple
                       value={nftsFiltersValue}
                       onChange={onFiltersChange}
