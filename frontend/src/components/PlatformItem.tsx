@@ -26,6 +26,7 @@ const PlatformItem = (props: {
       setDecimals(dc);
     }
     getTokenInfo();
+    // eslint-disable-next-line
   }, []);
 
   return (

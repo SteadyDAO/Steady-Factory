@@ -11,7 +11,7 @@ const HomePage = () => {
     <div className="HomePageContainer">
       <div className="HomepageIntroContainer">
         <h2>Steady DAO</h2>
-        <h3>DAO for gold backed stablecoin forging and DeFi.</h3>
+        <h3>Steady DAO forges steady coins for any asset that has a chainlink price feed. You are free to add tokens to the system, but subject to governance approval.</h3>
         <Button className="HomepageLaunchAppButton" color="primary" variant="contained" onClick={() => {
           navigate('/split');
         }}>

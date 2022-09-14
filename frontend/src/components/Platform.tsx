@@ -19,7 +19,7 @@ const Platform = () => {
 
   return (
     <div className="PlatformContainer">
-      <h2>Platforms</h2>
+      <h2>Tokens</h2>
       {getPlatformsLoading ?
         <div className="ElixirNftsSpinnerContainer">
           <CircularProgress color="secondary" size={80} />
