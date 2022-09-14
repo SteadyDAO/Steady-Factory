@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getABIs } from "../helpers/Contract";
 import { connectWallet } from "../helpers/Wallet";
 import Account from "./Account";
+import steadyImage from '../assets/images/steadydao.png';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -38,9 +39,9 @@ const Header = () => {
 
   return (
     <div className="HeaderContainer">
-      <span className="Logo" onClick={() => {
+      <img src={steadyImage} alt="Steady DAO" className="Logo" onClick={() => {
         navigate('/');
-      }}>Steady DAO</span>
+      }} />
       <div className="RightSideContainer">
         {isLaunchApp ?
           <Button color="secondary" variant="contained" onClick={() => {

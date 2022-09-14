@@ -1,18 +1,14 @@
-.AppWrapper {
-  align-items: center;
-  background: #533535;
+.PlatformContainer {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  max-width: 1200px;
   width: 100%;
 }
 
-.AppContainer {
+.PlatformListContainer {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 70px);
-  overflow-y: auto;
-  width: 100%;
+  gap: 1rem;
 }
 
 @media only screen and (max-width: 1366px) {

@@ -6,7 +6,7 @@ import { Button, Checkbox, CircularProgress, FormControl, ListItemText, MenuItem
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
-import { IAlchemist, IChyme, IElixir } from "../models/Alchemist";
+import { IAlchemist, IElixir } from "../models/Alchemist";
 import { EtherSWRConfig } from "ether-swr";
 import TokenItem from "./TokenItem";
 import { IAppConfig } from "../models/Base";
@@ -42,12 +42,13 @@ const Merge = () => {
       setNftsFiltersValue([
         ...getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.symbol)
       ]);
-      const chymeIds = getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.id);
+      const chymeIds: Array<string> = getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.id);
       refetchElixirsByAccount({
         account,
-        chymeIds
+        chymeIds: chymeIds as any
       });
     }
+    // eslint-disable-next-line
   }, [getAlchemists]);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const Merge = () => {
     setNftsFiltersValue(
       typeof value === 'string' ? value.split(',') : value,
     );
-    const alcmists = alchemists.filter(alchemist => value.find((vl: string) => alchemist.chyme.symbol === vl));
+    const alcmists: Array<IAlchemist> = alchemists.filter(alchemist => value.find((vl: string) => alchemist.chyme.symbol === vl));
     const chymeIds: Array<string> = alcmists.map((alc: IAlchemist) => alc.chyme.id);
     refetchElixirsByAccount({
       account,

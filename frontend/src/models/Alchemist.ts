@@ -34,3 +34,10 @@ export interface IRatio {
   label: string;
   value: number;
 };
+
+export interface IPlatform {
+  id: string;
+  totalValueLocked: string;
+  totalSplit: string;
+  totalMerged: string;
+};

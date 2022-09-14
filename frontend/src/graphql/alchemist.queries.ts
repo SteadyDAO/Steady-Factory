@@ -1,5 +1,16 @@
 import { gql } from "@apollo/client";
 
+export const GET_PLATFORMS = gql`
+  query GetPlatforms {
+    platforms {
+      id
+      totalValueLocked
+      totalSplit
+      totalMerged
+    }
+  }
+`;
+
 export const GET_ALCHEMISTS = gql`
   query GetAlchemists {
     alchemists {
