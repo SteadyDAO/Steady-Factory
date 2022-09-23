@@ -127,20 +127,22 @@ const Merge = () => {
                 </div> :
                 <>
                   {elixirNfts.length > 0 ?
-                    <div className="ElixirNftsContainer">
-                      <EtherSWRConfig
-                        value={{
-                          web3Provider: library,
-                          ABIs: new Map(getABIs([
-                            { contractName: 'ElixirNft', contractAddress: elixirContractAddress },
-                            { contractName: 'Academy', contractAddress: academyContractAddress },
-                          ])),
-                          refreshInterval: 1000
-                        }}>
-                        {elixirNfts.map((elixirNft: IElixir) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
-                      </EtherSWRConfig>
-                    </div> :
-                    <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
+                  <>
+                  <span className="NoElixirNftMessage">Please note that it will take a while for these NFT's to appear here and on Opensea!</span>
+                  <div className="ElixirNftsContainer">
+                    <EtherSWRConfig
+                      value={{
+                        web3Provider: library,
+                        ABIs: new Map(getABIs([
+                          { contractName: 'ElixirNft', contractAddress: elixirContractAddress },
+                          { contractName: 'Academy', contractAddress: academyContractAddress },
+                        ])),
+                        refreshInterval: 1000
+                      }}>
+                      {elixirNfts.map((elixirNft: IElixir) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
+                    </EtherSWRConfig>
+                  </div>
+                  </> : <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
                   }
                 </>
               }
@@ -149,7 +151,7 @@ const Merge = () => {
               <div className="TokensContainer">
                 <div className="TokensHeaderContainer">
                   <span className="TokensHeaderToken">Token</span>
-                  <span className="TokensHeaderBalance">Agg. Balance</span>
+                  <span className="TokensHeaderBalance">My Agg. Balance</span>
                   <span className="TokensHeaderTotalSupply">Total Supply</span>
                 </div>
                 {getAlchemistsLoading ?

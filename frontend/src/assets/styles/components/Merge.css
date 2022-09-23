@@ -58,6 +58,7 @@
   color: #a99b9b;
   font-weight: 600;
   font-style: italic;
+  width: 100%;
 }
 
 .ElixirNftsSpinnerContainer {
@@ -88,13 +89,13 @@
 .TokensHeaderBalance {
   font-size: 1.15rem;
   font-weight: 600;
-  width: 30%;
+  width: 28%;
 }
 
 .TokensHeaderTotalSupply {
   font-size: 1.15rem;
   font-weight: 600;
-  width: 40%;
+  width: 30%;
 }
 
 .TokensItemContainer {
@@ -111,7 +112,7 @@
   align-items: center;
   display: flex;
   gap: .5rem;
-  width: 30%;
+  width: 28%;
 }
 
 .TokensItemTokenImg {
@@ -122,7 +123,24 @@
   align-items: center;
   display: flex;
   gap: .5rem;
-  width: 40%;
+  width: 30%;
+}
+
+.TokensAddTokenContainer {
+  align-items: center;
+  display: flex;
+  width: 14%;
+}
+
+.TokensAddTokenButton {
+  align-items: center !important;
+  display: flex !important;
+  gap: .35rem;
+  text-transform: none !important;
+}
+
+.TokensAddTokenImg {
+  width: 21px;
 }
 
 .TokensItemMobileContainer {
