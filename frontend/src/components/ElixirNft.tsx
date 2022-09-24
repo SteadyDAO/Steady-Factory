@@ -260,7 +260,7 @@ const ElixirNft = (props: {
               <span className="ElixirPriceLabel">Underlying Price:</span>
             </div>
             <div className="ElixirPriceLabelContainer">
-              <span className="ElixirPriceText">#{props.elixirNft.tokenId}</span>
+              <span className="ElixirPriceText">Elixir #{props.elixirNft.tokenId}</span>
               {strikePrice ?
                 <span className="ElixirPriceText">${strikePrice}</span> :
                 <Skeleton width={60} variant="text" />
