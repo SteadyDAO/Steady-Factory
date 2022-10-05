@@ -1,22 +1,17 @@
-import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
 import ElixirNft from "./ElixirNft";
-import { getABIs, getContractAddressByName } from "../helpers/Contract";
 import { Button, Checkbox, CircularProgress, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
 import { IAlchemist, IElixir } from "../models/Alchemist";
-import { EtherSWRConfig } from "ether-swr";
 import TokenItem from "./TokenItem";
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
+import { useAccount, useNetwork } from "wagmi";
 
 const Merge = () => {
   const config: IAppConfig = getAppConfig();
-  const { account, active, chainId, library } = useWeb3React();
-  const elixirContractAddress = getContractAddressByName('ElixirNft');
-  const academyContractAddress = getContractAddressByName('Academy');
   const [elixirNfts, setElixirNfts] = useState<Array<any>>([]);
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [toggle, setToggle] = useState<string>('nfts');
@@ -24,9 +19,12 @@ const Merge = () => {
   const [nftsFiltersValue, setNftsFiltersValue] = useState<Array<string>>([]);
   const { data: getAlchemists, loading: getAlchemistsLoading } = useQuery(GET_ALCHEMISTS, {
   });
+
+  const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
   const { data: getElixirsByAccount, loading: getElixirsByAccountLoading, refetch: refetchElixirsByAccount } = useQuery(GET_ELIXIR_BY_ACCOUNT, {
     variables: {
-      account,
+      account: address,
       chymeIds: []
     },
     notifyOnNetworkStatusChange: true,
@@ -44,7 +42,7 @@ const Merge = () => {
       ]);
       const chymeIds: Array<string> = getAlchemists.alchemists.map((alchemist: IAlchemist) => alchemist.chyme.id);
       refetchElixirsByAccount({
-        account,
+        account: address,
         chymeIds: chymeIds as any
       });
     }
@@ -67,14 +65,14 @@ const Merge = () => {
     const alcmists: Array<IAlchemist> = alchemists.filter(alchemist => value.find((vl: string) => alchemist.chyme.symbol === vl));
     const chymeIds: Array<string> = alcmists.map((alc: IAlchemist) => alc.chyme.id);
     refetchElixirsByAccount({
-      account,
+      account: address,
       chymeIds: chymeIds as any
     });
   }
 
   return (
     <>
-      {active && chainId === config.NETWORK.CHAIN_ID ?
+      {isConnected && chain?.id === config.NETWORK.CHAIN_ID ?
         <div className="MergeContainer">
           <div className="MergeTitleContainer">
             <ToggleButtonGroup
@@ -102,8 +100,8 @@ const Merge = () => {
                   Refresh
                 </Button>
                 <div className="MergeActionsFiltersContainer">
-                  <FormControl fullWidth variant="standard"color="primary">
-        <InputLabel id="demo-simple-select-standard-label">Select Token</InputLabel>
+                  <FormControl fullWidth variant="standard" color="primary">
+                    <InputLabel id="demo-simple-select-standard-label">Select Token</InputLabel>
                     <Select
                       label="Select Token"
                       multiple
@@ -127,22 +125,12 @@ const Merge = () => {
                 </div> :
                 <>
                   {elixirNfts.length > 0 ?
-                  <>
-                  <span className="NoElixirNftMessage">Please note that it will take a while for these NFT's to appear here and on Opensea!</span>
-                  <div className="ElixirNftsContainer">
-                    <EtherSWRConfig
-                      value={{
-                        web3Provider: library,
-                        ABIs: new Map(getABIs([
-                          { contractName: 'ElixirNft', contractAddress: elixirContractAddress },
-                          { contractName: 'Academy', contractAddress: academyContractAddress },
-                        ])),
-                        refreshInterval: 1000
-                      }}>
-                      {elixirNfts.map((elixirNft: IElixir) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
-                    </EtherSWRConfig>
-                  </div>
-                  </> : <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
+                    <>
+                      <span className="NoElixirNftMessage">Please note that it will take a while for these NFT's to appear here and on Opensea!</span>
+                      <div className="ElixirNftsContainer">
+                        {elixirNfts.map((elixirNft: IElixir) => <ElixirNft key={elixirNft.id} elixirNft={elixirNft} />)}
+                      </div>
+                    </> : <span className="NoElixirNftMessage">Please try refreshing in a few minutes to see your Elixir's.</span>
                   }
                 </>
               }
@@ -162,17 +150,8 @@ const Merge = () => {
                     {alchemists && alchemists.length > 0 ?
                       <>
                         {alchemists.map((alchemist: IAlchemist) =>
-                          <EtherSWRConfig
-                            key={alchemist.id}
-                            value={{
-                              web3Provider: library,
-                              ABIs: new Map(getABIs([
-                                { contractName: 'SteadyToken', contractAddress: alchemist.chyme.steadyToken }
-                              ])),
-                              refreshInterval: 1000
-                            }}>
-                            <TokenItem steadyToken={alchemist.chyme.steadyToken} />
-                          </EtherSWRConfig>)}
+                          <TokenItem key={alchemist.id} steadyToken={alchemist.chyme.steadyToken} />
+                        )}
                       </> : <></>
                     }
                   </>

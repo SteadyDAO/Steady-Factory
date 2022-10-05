@@ -4,15 +4,10 @@ import CallSplitIcon from '@mui/icons-material/CallSplit';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Popover } from '@mui/material';
-import { EtherSWRConfig } from 'ether-swr';
-import { getABIs } from '../helpers/Contract';
-import Account from './Account';
-import { connectWallet } from '../helpers/Wallet';
-import { useWeb3React } from '@web3-react/core';
+import { Popover } from '@mui/material';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const BottomNavigate = () => {
-  const { active, activate, chainId, library } = useWeb3React();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [value, setValue] = useState(0);
   const navigate = useNavigate();
@@ -67,24 +62,7 @@ const BottomNavigate = () => {
           horizontal: 'left',
         }}
       >
-      {active && chainId ?
-        <EtherSWRConfig
-          value={{
-            web3Provider: library,
-            refreshInterval: 1000,
-            ABIs: new Map(getABIs([
-            ])),
-          }}>
-          <Account />
-        </EtherSWRConfig> :
-        <Button color="secondary" variant="contained" onClick={() => {
-          if (typeof (window as any).ethereum === 'undefined' || typeof (window as any).web3 === 'undefined') {
-            window.open('https://metamask.io', '_blank');
-            return;
-          }
-          connectWallet(activate);
-        }}>Connect Wallet</Button>
-      }
+        <ConnectButton />
       </Popover>
     </div>
   );

@@ -20,6 +20,11 @@ export const getABIs = (contractList: Array<IContract>) => {
   return accumulator;
 }
 
+export const getABI = (contractName: string) => {
+  const abi = require(`../contracts/${contractName}.json`)
+  return abi;
+}
+
 export const getContractAddressByName = (name: string): string => {
   const contractAddresses = config.CONTRACTS_ADDRESS as any;
   return contractAddresses[name];

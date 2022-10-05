@@ -8,7 +8,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useEffect, useState } from "react";
 import { getContractAddressByName, getContractByAddressName } from "../helpers/Contract";
-import { useWeb3React } from "@web3-react/core";
 import { errorHandler, pollingTransaction } from "../helpers/Wallet";
 import ElixirNftImage from "./ElixirNftImage";
 import { IElixir } from "../models/Alchemist";
@@ -17,12 +16,12 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
+import { useAccount, useSigner } from "wagmi";
 
 const ElixirNft = (props: {
   elixirNft: IElixir
 }) => {
   const config: IAppConfig = getAppConfig();
-  const { account, library } = useWeb3React();
   const [disableMerge, setDisableMerge] = useState<boolean>(true);
   const [isTryAgain, setIsTryAgain] = useState<boolean>(false);
   const [isMergeCompleted, setIsMergeCompleted] = useState<boolean>(false);
@@ -45,8 +44,12 @@ const ElixirNft = (props: {
   const [snackbar, setSnackbar] = useState<ISnackbarConfig>({
     isOpen: false
   } as any);
+
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+
   const elixirContractAddress = getContractAddressByName('ElixirNft');
-  const elixirNftContract = getContractByAddressName(elixirContractAddress, 'ElixirNft', library.getSigner());
+  const elixirNftContract = getContractByAddressName(elixirContractAddress, 'ElixirNft', signer as any);
 
   useEffect(() => {
     const getApproved = async () => {
@@ -58,25 +61,25 @@ const ElixirNft = (props: {
         } else {
           setMaturesDays(mDays);
         }
-        const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', library.getSigner());
+        const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', signer as any);
         const approvedAddress = await elixirNftContract.getApproved(props.elixirNft.tokenId);
         setIsApprovedNft(approvedAddress?.toLowerCase() === (props.elixirNft.chyme?.alchemist?.id)?.toLowerCase());
         const steadyRequired = await elixirNftContract.getSteadyRequired(props.elixirNft.tokenId);
-        const allowance = await steadyTokenContract.allowance(account, props.elixirNft.chyme?.alchemist?.id);
+        const allowance = await steadyTokenContract.allowance(address, props.elixirNft.chyme?.alchemist?.id);
         const steadyDcms = await steadyTokenContract.decimals();
         const steadySymbol = await steadyTokenContract.symbol();
         setSteadyDecimals(steadyDcms);
         setSteadySymbol(steadySymbol);
         setSteadyRequiredAmount(steadyRequired.steadyRequired);
         setIsApprovedSteadyToken(allowance?.gte(steadyRequired.steadyRequired, steadyDcms));
-        const chymeContract = getContractByAddressName(props.elixirNft.chyme?.id, 'Chyme', library.getSigner());
+        const chymeContract = getContractByAddressName(props.elixirNft.chyme?.id, 'Chyme', signer as any);
         const chymeDcms = await chymeContract.decimals();
         const receiveAmt = await chymeContract.balanceOf(props.elixirNft.vault);
         const chymeSymbol = await chymeContract.symbol();
         setChymeDecimalsl(chymeDcms);
         setReceiveAmount(receiveAmt);
         setChymeSymbol(chymeSymbol);
-        const oracleContract = getContractByAddressName(props.elixirNft.chyme.priceOracle, 'Oracle', library.getSigner());
+        const oracleContract = getContractByAddressName(props.elixirNft.chyme.priceOracle, 'Oracle', signer as any);
         const oracleLatestAnswer = await oracleContract.latestAnswer();
         const oracleDecimals = await oracleContract.decimals();
         const orcPrice = +formatUnits(oracleLatestAnswer, oracleDecimals);
@@ -152,7 +155,7 @@ const ElixirNft = (props: {
       setIsTryAgain(false);
       setIsMergeCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', library.getSigner());
+      const steadyTokenContract = getContractByAddressName(props.elixirNft.chyme?.steadyToken, 'SteadyToken', signer as any);
       steadyTokenContract.approve(props.elixirNft.chyme?.alchemist?.id, steadyRequiredAmount)
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
@@ -196,7 +199,7 @@ const ElixirNft = (props: {
     setIsTryAgain(false);
     setIsMergeCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
-    const alchemistContract = getContractByAddressName(props.elixirNft.chyme?.alchemist?.id, 'Alchemist', library.getSigner());
+    const alchemistContract = getContractByAddressName(props.elixirNft.chyme?.alchemist?.id, 'Alchemist', signer as any);
     alchemistContract.merge(props.elixirNft.tokenId)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({

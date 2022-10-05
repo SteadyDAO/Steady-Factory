@@ -4,6 +4,7 @@ export interface IAppConfig {
     NAME: string;
     RPC_URL: string;
     BLOCK_EXPLORER: string;
+    ALCHEMY_API_KEY: string;
   },
   STEADY_SUBGRAPH_URL: string;
   OPENSEA_ASSETS_URL: string;

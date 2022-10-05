@@ -3,7 +3,8 @@
     "CHAIN_ID": 4,
     "NAME": "Rinkeby",
     "RPC_URL": "https://eth-rinkeby.alchemyapi.io/v2/RKJPeye-oRYfsDVIlHTANDE_O4j2fTOV",
-    "BLOCK_EXPLORER": "https://rinkeby.etherscan.io/"
+    "BLOCK_EXPLORER": "https://rinkeby.etherscan.io/",
+    "ALCHEMY_API_KEY": "RKJPeye-oRYfsDVIlHTANDE_O4j2fTOV"
   },
   "STEADY_SUBGRAPH_URL": "https://api.thegraph.com/subgraphs/name/vitamind3inj/steady-rin",
   "OPENSEA_ASSETS_URL": "https://testnets.opensea.io/assets/rinkeby",

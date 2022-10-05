@@ -5,7 +5,6 @@ import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist } from "../models/Alchemist";
 import { getContractByAddressName, getContractByName } from "../helpers/Contract";
 import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
-import { useWeb3React } from "@web3-react/core";
 import { IFormControl } from "../models/Form";
 import { errorHandler, pollingTransaction } from "../helpers/Wallet";
 import { TransactionResponse } from "@ethersproject/providers";
@@ -15,13 +14,13 @@ import { Transition } from "./Transition";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import ConnectWallet from "./ConnectWallet";
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount, useNetwork, useSigner } from "wagmi";
 
 const Split = () => {
   const config: IAppConfig = getAppConfig();
-  const { account, active, chainId, library } = useWeb3React();
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [chymeDecimal, setChymeDecimal] = useState<number>();
   const [oraclePrice, setOraclePrice] = useState<number>();
@@ -50,6 +49,10 @@ const Split = () => {
     isOpen: false
   } as any);
 
+  const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { data: signer } = useSigner();
+
   useEffect(() => {
     if (getAlchemists && getAlchemists.alchemists) {
       setAlchemists(getAlchemists.alchemists);
@@ -57,15 +60,15 @@ const Split = () => {
   }, [getAlchemists]);
 
   useEffect(() => {
-    if (isAddress(chymeControl.value) && account && chainId === config.NETWORK.CHAIN_ID) {
+    if (isAddress(chymeControl.value) && address && chain?.id === config.NETWORK.CHAIN_ID) {
       if (polling) {
         clearInterval(polling);
         setBalance('');
         setSymbol('');
       }
       const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-        const bl = await chymeContract.balanceOf(account);
+        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
+        const bl = await chymeContract.balanceOf(address);
         const sb = await chymeContract.symbol();
         const dcm = await chymeContract.decimal();
         setBalance(formatUnits(bl, dcm));
@@ -77,10 +80,10 @@ const Split = () => {
       }, 3000);
       setPolling(pl);
       const getOraclePrice = async () => {
-        const academyContract = getContractByName('Academy', library.getSigner());
+        const academyContract = getContractByName('Academy', signer as any);
         const chymeInfo = await academyContract.getChymeInfo(chymeControl.value);
         const oracleAddress = chymeInfo.oracleAddress;
-        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', library.getSigner());
+        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', signer as any);
         const oracleLatestAnswer = await oracleContract.latestAnswer();
         const oracleDecimals= await oracleContract.decimals();
         setOraclePrice((+formatUnits(oracleLatestAnswer, oracleDecimals)).toFixed(2) as any);
@@ -88,7 +91,7 @@ const Split = () => {
       getOraclePrice();
     }
     // eslint-disable-next-line
-  }, [chymeControl, account, chainId]);
+  }, [chymeControl, address, chain]);
 
   useEffect(() => {
     if (amountControl.value && balance && +amountControl.value > +balance) {
@@ -122,9 +125,9 @@ const Split = () => {
 
   const approve = async () => {
     setDisableForm(true);
-    const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
+    const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
     const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
-    const allowance = await chymeContract.allowance(account?.toString(), alchemistAdd);
+    const allowance = await chymeContract.allowance(address?.toString(), alchemistAdd);
     if (allowance?.gte(parseUnits(amountControl.value.toString(), chymeDecimal))) {
       splitChyme();
     } else {
@@ -177,7 +180,7 @@ const Split = () => {
     setIsSplitCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
     const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
-    const alchemistContract = getContractByAddressName(alchemistAdd, 'Alchemist', library.getSigner());
+    const alchemistContract = getContractByAddressName(alchemistAdd, 'Alchemist', signer as any);
     alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), 0)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
@@ -213,8 +216,8 @@ const Split = () => {
           message: 'Split Success!'
         });
         const getBalance = async () => {
-          const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', library.getSigner());
-          const bl = await chymeContract.balanceOf(account);
+          const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
+          const bl = await chymeContract.balanceOf(address);
           const sb = await chymeContract.symbol();
           const dcm = await chymeContract.decimal();
           setBalance(formatUnits(bl, dcm));
@@ -272,7 +275,7 @@ const Split = () => {
             </FormControl>
           </div>
           <div className="SplitBalanceContainer">
-            {active ?
+            {isConnected ?
               <>
                 {symbol && oraclePrice ?
                   <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <Skeleton width={80} height={30} variant="text" />
@@ -327,14 +330,14 @@ const Split = () => {
           </div>
         </div>
         <div className="SplitActions">
-          {active && chainId === config.NETWORK.CHAIN_ID ?
+          {isConnected && chain?.id === config.NETWORK.CHAIN_ID ?
             <Button className="SplitButton" color="secondary" variant="contained" disabled={!isFormValid || disableForm} onClick={approve}>
               {disableForm ?
                 <CircularProgress color="secondary" size={25} /> : <></>
               }
               Split
             </Button> :
-            <ConnectWallet />
+            <ConnectButton />
           }
         </div>
       </div>
