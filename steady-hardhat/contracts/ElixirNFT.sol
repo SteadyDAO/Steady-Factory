@@ -19,6 +19,8 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
     address public academy;
     address public treasure;
 
+    string public alchemistId;
+
     struct Spagyria {
         uint256 amount;
         uint8 ratioOfSteady;
@@ -27,6 +29,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         address alchemistId;
         uint256 timeToMaturity;
         address chymeVault;
+        uint decimals;
     }
 
     // tokenId => Spagyria
@@ -80,10 +83,10 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         )
     {
         Spagyria memory myElixir = elements[tokenId];
-        (,, uint8 decimals,,,,) = IAcademy(address(academy)).getChymeInfo(
-            address(elements[tokenId].chyme)
-        );
-        uint256 divisor = 10**decimals;
+        // (,, uint8 decimals,,,,) = IAcademy(address(academy)).getChymeInfo(
+        //     address(elements[tokenId].chyme)
+        // );
+        uint256 divisor = 10**myElixir.decimals;
         return (
             ((myElixir.amount *
                 myElixir.ratioOfSteady *
@@ -102,7 +105,8 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         uint256 _forgePrice,
         uint256 _amount,
         uint256 _timeToMaturity,
-        address chymeVault
+        address _chymeVault,
+        uint256 _decimals
     ) public onlyRole(MINTER_ROLE) returns(uint256 tokenId) {
         tokenId = tokenIdCounter.current();
         tokenIdCounter.increment();
@@ -114,8 +118,10 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
             _chyme,
             msg.sender,
             _timeToMaturity,
-            chymeVault
+            _chymeVault,
+            _decimals
         );
+        alchemistId = Strings.toHexString(uint160(elements[tokenId].alchemistId));
         return tokenId;
     }
 
@@ -144,12 +150,16 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
             uint256 forgeConstant,
             uint256 timeLeft
         ) = calculateParams(tokenId);
-        string memory attributes = generateAttributes(
+        Spagyria memory myElixir = elements[tokenId];
+        uint256 divisor = 10**myElixir.decimals;
+             
+        string memory attributes = generateAttributesPartA(
             tokenId,
-            elixirCurrentSteadyValue > 0 ? Strings.toString(uint256(elixirCurrentSteadyValue)) : int2str(elixirCurrentSteadyValue),
             currentPrice,
-            forgeConstant
+            forgeConstant,
+            divisor
         );
+        string memory attributesSet = generateAttributesPartB(elixirCurrentSteadyValue > 0 ? Strings.toString(uint256(elixirCurrentSteadyValue)) : int2str(elixirCurrentSteadyValue));
         string memory image = generateBase64Image(
             tokenId,
             timeLeft,
@@ -166,7 +176,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
                                 '", "description":"',
                                 description,
                                 '", "attributes":[',
-                                attributes,
+                                attributes,attributesSet,
                                 '], "image": "',
                                 'data:image/svg+xml;base64,',
                                 image,
@@ -188,7 +198,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
             uint256 timeLeft
         )
     {
-        (address oracleAddress, , uint8 decimals,,,,) = IAcademy(
+        (address oracleAddress,,,,,,) = IAcademy(
             address(academy)
         ).getChymeInfo(elements[tokenId].chyme);
         currentPrice = uint256(
@@ -198,7 +208,7 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
             (elements[tokenId].forgePrice * elements[tokenId].ratioOfSteady) /
             100;
         elixirCurrentSteadyValue = (int256(currentPrice) - int256(forgeConstant)) 
-                                    * int256(elements[tokenId].amount) / int256(2 * 10**decimals);
+                                    * int256(elements[tokenId].amount) / int256(10**elements[tokenId].decimals * 10**elements[tokenId].decimals);
         timeLeft = 0;
         if (elements[tokenId].timeToMaturity > block.timestamp) {
             timeLeft =
@@ -213,22 +223,32 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         );
     }
 
-    function generateAttributes(
+    function generateAttributesPartA(
         uint256 tokenId,
-        string memory elixirCurrentSteadyValue,
         uint256 currentPrice,
-        uint256 forgeConstant
+        uint256 forgeConstant,
+        uint256 divisor
     ) public view returns (string memory) {
         return
             string(
                 abi.encodePacked(
                     '{"display_type": "date", "trait_type": "Matures By", "value":',Strings.toString(elements[tokenId].timeToMaturity),'}',
-                    ',{"display_type": "number", "trait_type": "Forge Price", "value":',Strings.toString((elements[tokenId].forgePrice)),'}',
-                    ',{"display_type": "number", "trait_type": "Amount", "value":',Strings.toString((elements[tokenId].amount)),'}',
-                    ',{"display_type": "number", "trait_type": "Current Price", "value":',Strings.toString(currentPrice),'}',
-                    ',{"display_type": "number", "trait_type": "elixirCurrentSteadyValue Price", "value":',elixirCurrentSteadyValue,'}',
-                    ',{"trait_type": "Alchemist", "value":"',Strings.toHexString(uint160(elements[tokenId].alchemistId), 20),'"}',
-                    ',{"display_type": "number", "trait_type": "forgeConstant", "value":',Strings.toString(forgeConstant),'}'
+                    ',{"trait_type": "Forge Price", "value":',Strings.toString((elements[tokenId].forgePrice/divisor)),'}',
+                    ',{"trait_type": "Amount", "value":',Strings.toString((elements[tokenId].amount/divisor)),'}',
+                    ',{"trait_type": "Price", "value":',Strings.toString(currentPrice/divisor),'}',
+                    ',{"trait_type": "forgeConstant", "value":',Strings.toString(forgeConstant/divisor),'}'
+                )
+            );
+    }
+
+    function generateAttributesPartB(
+        string memory elixirCurrentSteadyValue
+    ) public view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    ',{"trait_type": "Total Value in ($)", "value":',elixirCurrentSteadyValue,'}',
+                    ',{"trait_type": "Alchemist", "value":"',alchemistId,'"}'
                 )
             );
     }
@@ -251,23 +271,23 @@ contract Elixir is ERC721, ERC721Burnable, AccessControl {
         uint256 timeLeft,
         string memory elixirCurrentSteadyValue
     ) public view returns (string memory) {
-        //display a treasure chest with remaining time in days and also a percentage to show progress 1825 = days in 5 years
+        //display a treasure chest with remaining time in days and also a percentage to show progress 1095 = days in 3 years
         string memory treasureChest = ITreasure(treasure).generateTreasureChest(
             Strings.toString(timeLeft),
-            Strings.toString((timeLeft * 100) / 1825)
+            Strings.toString((timeLeft * 100) / 1095)
         );
         return
             string(
                 abi.encodePacked(
                     ITreasure(treasure).generateHeader(),
-                    '<text x="14" y="215" font-size="10px" font-family="Arial">Value - $</text>',
-                    '<text x="79" y="215" font-size="14px"  font-family="Arial">',
+                    '<text x="14" y="220" font-size="10px" font-family="Arial">Elixir Value - $</text>',
+                    '<text x="90" y="220" font-size="21px"  font-family="Arial">',
                     elixirCurrentSteadyValue,
                     "</text>",
-                    '<text x="14" y="265" font-family="Arial">Alchemist</text>',
-                    '<text x="14" y="280"  font-size="7px"  font-family="Arial">',
-                    Strings.toHexString(uint160(elements[tokenId].alchemistId), 20),
-                    " </text>",
+                    '<text x="14" y="265" font-family="Arial">Token Address</text>',
+                    '<text x="14" y="280"  font-size="11px"  font-family="Arial">',
+                    Strings.toHexString(uint160(elements[tokenId].chyme), 20),
+                    "</text>",
                     '<line class="st9" x1="265.2" y1="90" x2="265.2" y2="300"/>',
                     "</g>",
                     treasureChest,

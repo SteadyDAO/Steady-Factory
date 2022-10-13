@@ -21,11 +21,16 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface TreasureInterface extends ethers.utils.Interface {
   functions: {
     "generateHeader()": FunctionFragment;
+    "generateStyles()": FunctionFragment;
     "generateTreasureChest(string,string)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "generateHeader",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "generateStyles",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -35,6 +40,10 @@ interface TreasureInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "generateHeader",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "generateStyles",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -91,6 +100,8 @@ export class Treasure extends BaseContract {
   functions: {
     generateHeader(overrides?: CallOverrides): Promise<[string]>;
 
+    generateStyles(overrides?: CallOverrides): Promise<[string]>;
+
     generateTreasureChest(
       timeLeft: string,
       to: string,
@@ -100,6 +111,8 @@ export class Treasure extends BaseContract {
 
   generateHeader(overrides?: CallOverrides): Promise<string>;
 
+  generateStyles(overrides?: CallOverrides): Promise<string>;
+
   generateTreasureChest(
     timeLeft: string,
     to: string,
@@ -108,6 +121,8 @@ export class Treasure extends BaseContract {
 
   callStatic: {
     generateHeader(overrides?: CallOverrides): Promise<string>;
+
+    generateStyles(overrides?: CallOverrides): Promise<string>;
 
     generateTreasureChest(
       timeLeft: string,
@@ -121,6 +136,8 @@ export class Treasure extends BaseContract {
   estimateGas: {
     generateHeader(overrides?: CallOverrides): Promise<BigNumber>;
 
+    generateStyles(overrides?: CallOverrides): Promise<BigNumber>;
+
     generateTreasureChest(
       timeLeft: string,
       to: string,
@@ -130,6 +147,8 @@ export class Treasure extends BaseContract {
 
   populateTransaction: {
     generateHeader(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    generateStyles(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     generateTreasureChest(
       timeLeft: string,

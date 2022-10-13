@@ -51,12 +51,12 @@ async function main() {
 
   const TreasureChest = await ethers.getContractFactory("Treasure");
   // const treasureChest = await TreasureChest.connect(wallet2).deploy();
-  const treasureChest = await TreasureChest.attach("0x075a1046D6C54F60E29cd3AdC14367CcD54fcD56");
+  const treasureChest = await TreasureChest.attach("0xF60CF01855dDE0C6b69a7Ec6Ca3B1F55cE22BE02");
   // await treasureChest.deployed();
 
   const ElixirFactory = await ethers.getContractFactory("Elixir");
   // elixirImpl = await ElixirFactory.connect(wallet2).deploy("NFT","Elixir", treasureChest.address) as Elixir;
-  elixirImpl = await ElixirFactory.connect(wallet2).attach("0x70b0FbacB4a6b1C0bf09cddef4cE2B908f87DF18") as Elixir;
+  elixirImpl = await ElixirFactory.connect(wallet2).attach("0x403aD48F8c8507dD193fbe4453EF2A410EB402cD") as Elixir;
   // await elixirImpl.deployed();
 
 
@@ -87,10 +87,10 @@ async function main() {
       "decimals":8,
       "fees":0,
       "DAOApproved":1,
-      "oracleAddress":"0x81570059A0cb83888f1459Ec66Aad1Ac16730243",
+      "oracleAddress":"0x7A65Cf6C2ACE993f09231EC1Ea7363fb29C13f2F",
       "steadyImplForChyme":stt.address,
       "symbol":"PGT",
-      "timeToMaturity":157680000,
+      "timeToMaturity":94608000,
       "steadyDAOReward":steadyDAOReward.address}, stt.address
       );
      
@@ -99,7 +99,7 @@ async function main() {
 
 
   await newChyme.wait();
-  elixirImpl.setAcademy(alchemistAcademy.address);
+  await elixirImpl.connect(wallet2).setAcademy(alchemistAcademy.address);
 
   
   const receipt = await ethers.provider.getTransactionReceipt(newChyme.hash);
@@ -110,7 +110,7 @@ async function main() {
   const event = interfaceAlch.decodeEventLog("AlchemistForged(address indexed,address,uint8,address)", data, topics);
   console.log("CHyme Alchemist deployed to:", event.alchemist);
 
-  elixirImpl.connect(wallet2).grantRole(MINTER_ROLE, event.alchemist); 
+  await elixirImpl.connect(wallet2).grantRole(MINTER_ROLE, event.alchemist); 
 
   console.log("Academy deployed to:", alchemistAcademy.address);
   console.log("Now verifying...\n",
@@ -121,7 +121,6 @@ async function main() {
   treasureChest.address,"treasureChest Address\n",
   alchemistImpl.address,"alchemistImpl Address\n",
   DAOAddress.address,"DAOAddress Address\n",);
-  elixirImpl.connect(wallet2).setAcademy(alchemistAcademy.address);
 
 
   await verify(stt.address, 8);
@@ -154,21 +153,21 @@ function delay(ms: number) {
 }
 
 async function singleFn() {
-  await verify("0x0cE8175ecC3C60B9ab2aeF2b97220f52ab00E63d", 8);
-  await verify("0xC87C9Aa171240129ad5579B5f3A381CFC4CB37d0");
-  await verify("0x614c1CB94Ee0735a36A714c1ce701b7DCBb5c11b");
-  await verify("0x17edA0628fdD549E3a37efD53a5c0767EEC2E3E7");
+  await verify("0xd7ee3B42896F95D768936D5059246541Ba37Af8C", 8);
+  await verify("0x994D1d27875E918cAB33A2CFBeE96935848714Da");
+  await verify("0xeCb4C9Cc67F744FB38CD6BeABBd9d5e8F7341396");
+  await verify("0xdd21aaf299EEEEA82b5E0004b208EDB8d7cC56D3");
   // await verify("0x1bEdD6e959bE719D46612ad90F387d1f0dDACBdF","NFT","Elixir", "0x583D1fDfD9189EE4a2b971afEe10AcF53d6fCECd" );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-singleFn()
-// main()
-//   .then( async (deployedData) => {
-//     process.exit(0)
-//   })
-//   .catch(error => {
-//     console.error(error);
-//     process.exit(1);
-//   });
+// singleFn()
+main()
+  .then( async (deployedData) => {
+    process.exit(0)
+  })
+  .catch(error => {
+    console.error(error);
+    process.exit(1);
+  });

@@ -1,8 +1,8 @@
 type Platform @entity {
   id: ID!
-  totalValueLocked: BigInt
-  totalSplit: BigInt
-  totalMerged: BigInt
+  totalValueLocked: BigInt!
+  totalSplit: BigInt!
+  totalMerged: BigInt!
 }
 
 type Alchemist @entity {
@@ -23,9 +23,16 @@ type Chyme @entity(immutable: true) {
 
 type Elixir @entity {
   id: ID!
-  tokenId: BigInt!
+  tokenId: Int!
   status: Status
-  chyme: Chyme 
+  ratioOfSteady: BigInt!
+  forgeConstant: BigInt!
+  amount: BigInt!
+  dateSplit: BigInt
+  dateMerged: BigInt
+  chyme: Chyme
+  vault: Bytes! # address
+  owner: Bytes! # address
 }
 
 type Transaction @entity {

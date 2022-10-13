@@ -15,6 +15,10 @@ export class Platform extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
+
+    this.set("totalValueLocked", Value.fromBigInt(BigInt.zero()));
+    this.set("totalSplit", Value.fromBigInt(BigInt.zero()));
+    this.set("totalMerged", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -42,55 +46,31 @@ export class Platform extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get totalValueLocked(): BigInt | null {
+  get totalValueLocked(): BigInt {
     let value = this.get("totalValueLocked");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalValueLocked(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalValueLocked");
-    } else {
-      this.set("totalValueLocked", Value.fromBigInt(<BigInt>value));
-    }
+  set totalValueLocked(value: BigInt) {
+    this.set("totalValueLocked", Value.fromBigInt(value));
   }
 
-  get totalSplit(): BigInt | null {
+  get totalSplit(): BigInt {
     let value = this.get("totalSplit");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalSplit(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalSplit");
-    } else {
-      this.set("totalSplit", Value.fromBigInt(<BigInt>value));
-    }
+  set totalSplit(value: BigInt) {
+    this.set("totalSplit", Value.fromBigInt(value));
   }
 
-  get totalMerged(): BigInt | null {
+  get totalMerged(): BigInt {
     let value = this.get("totalMerged");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalMerged(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalMerged");
-    } else {
-      this.set("totalMerged", Value.fromBigInt(<BigInt>value));
-    }
+  set totalMerged(value: BigInt) {
+    this.set("totalMerged", Value.fromBigInt(value));
   }
 }
 
@@ -252,7 +232,12 @@ export class Elixir extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("tokenId", Value.fromBigInt(BigInt.zero()));
+    this.set("tokenId", Value.fromI32(0));
+    this.set("ratioOfSteady", Value.fromBigInt(BigInt.zero()));
+    this.set("forgeConstant", Value.fromBigInt(BigInt.zero()));
+    this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("vault", Value.fromBytes(Bytes.empty()));
+    this.set("owner", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -280,13 +265,13 @@ export class Elixir extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get tokenId(): BigInt {
+  get tokenId(): i32 {
     let value = this.get("tokenId");
-    return value!.toBigInt();
+    return value!.toI32();
   }
 
-  set tokenId(value: BigInt) {
-    this.set("tokenId", Value.fromBigInt(value));
+  set tokenId(value: i32) {
+    this.set("tokenId", Value.fromI32(value));
   }
 
   get status(): string | null {
@@ -306,6 +291,67 @@ export class Elixir extends Entity {
     }
   }
 
+  get ratioOfSteady(): BigInt {
+    let value = this.get("ratioOfSteady");
+    return value!.toBigInt();
+  }
+
+  set ratioOfSteady(value: BigInt) {
+    this.set("ratioOfSteady", Value.fromBigInt(value));
+  }
+
+  get forgeConstant(): BigInt {
+    let value = this.get("forgeConstant");
+    return value!.toBigInt();
+  }
+
+  set forgeConstant(value: BigInt) {
+    this.set("forgeConstant", Value.fromBigInt(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
+  }
+
+  get dateSplit(): BigInt | null {
+    let value = this.get("dateSplit");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set dateSplit(value: BigInt | null) {
+    if (!value) {
+      this.unset("dateSplit");
+    } else {
+      this.set("dateSplit", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get dateMerged(): BigInt | null {
+    let value = this.get("dateMerged");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set dateMerged(value: BigInt | null) {
+    if (!value) {
+      this.unset("dateMerged");
+    } else {
+      this.set("dateMerged", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
   get chyme(): string | null {
     let value = this.get("chyme");
     if (!value || value.kind == ValueKind.NULL) {
@@ -321,6 +367,24 @@ export class Elixir extends Entity {
     } else {
       this.set("chyme", Value.fromString(<string>value));
     }
+  }
+
+  get vault(): Bytes {
+    let value = this.get("vault");
+    return value!.toBytes();
+  }
+
+  set vault(value: Bytes) {
+    this.set("vault", Value.fromBytes(value));
+  }
+
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value!.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
   }
 }
 

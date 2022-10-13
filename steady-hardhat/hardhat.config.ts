@@ -59,29 +59,17 @@ task("accounts", "Prints the list of accounts", async (args, { ethers }) => {
     hardhat: {
       forking: {
         enabled: true,
-        url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_RINKEBY_API_KEY}`,
+        url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_GOERLI_API_KEY}`,
         blockNumber: 10702595,
         
       },
       accounts},
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_RINKEBY_API_KEY}`, 
-      accounts,
-    },
-    kovan: {
-      url: "https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}", 
-      accounts,
-    },
     mainnet: {
       url: "https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}", 
       accounts,
     },
-    ropsten: {
-      url: "https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}", 
-      accounts,
-    },
     goerli: {
-      url: "https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}", 
+      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_GOERLI_API_KEY}`,
       accounts,
     },
     xdai: {

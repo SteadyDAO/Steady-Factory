@@ -10,6 +10,32 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
+export class ElixirCreated extends ethereum.Event {
+  get params(): ElixirCreated__Params {
+    return new ElixirCreated__Params(this);
+  }
+}
+
+export class ElixirCreated__Params {
+  _event: ElixirCreated;
+
+  constructor(event: ElixirCreated) {
+    this._event = event;
+  }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get ratio(): i32 {
+    return this._event.parameters[1].value.toI32();
+  }
+
+  get forgePrice(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
 export class Initialized extends ethereum.Event {
   get params(): Initialized__Params {
     return new Initialized__Params(this);
@@ -41,20 +67,16 @@ export class Merge__Params {
     this._event = event;
   }
 
-  get source(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
   get mergedAmount(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[0].value.toBigInt();
   }
 
   get chyme(): Address {
-    return this._event.parameters[2].value.toAddress();
+    return this._event.parameters[1].value.toAddress();
   }
 
   get tokenid(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
@@ -87,7 +109,7 @@ export class Split__Params {
     return this._event.parameters[3].value.toAddress();
   }
 
-  get tokenId(): BigInt {
+  get tokenid(): BigInt {
     return this._event.parameters[4].value.toBigInt();
   }
 }

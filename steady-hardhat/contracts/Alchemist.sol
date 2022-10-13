@@ -29,7 +29,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         uint256 amount;
     }
 
-    address public constant elixirImpl = 0x70b0FbacB4a6b1C0bf09cddef4cE2B908f87DF18;
+    address public constant elixirImpl = 0x403aD48F8c8507dD193fbe4453EF2A410EB402cD;
     IElixir elixir;
     address public academy;
     address public chyme;
@@ -39,10 +39,14 @@ contract Alchemist is ReentrancyGuard, Initializable {
         uint256 splitAmount,
         address chymeVaultDeployed,
         address chyme,
-        uint256 tokenId
+        uint256 tokenid
+    );
+    event ElixirCreated(
+        uint256 tokenId,
+        uint8 ratio,
+        uint256 forgePrice
     );
     event Merge(
-        address indexed source,
         uint256 mergedAmount,
         address chyme,
         uint256 tokenid
@@ -106,7 +110,8 @@ contract Alchemist is ReentrancyGuard, Initializable {
             ratioOfSteady,
             forgePrice,
             durationForMaturity,
-            chymeVaultDeployed
+            chymeVaultDeployed,
+            decimals
         );
         emit Split(msg.sender, amount, chymeVaultDeployed, chyme, tokenId);
         return true;
@@ -128,7 +133,8 @@ contract Alchemist is ReentrancyGuard, Initializable {
         Ratios ratioOfSteady,
         uint256 forgePrice,
         uint256 durationForMaturity,
-        address chymeVaultDeployed
+        address chymeVaultDeployed,
+        uint decimals
     ) internal returns (uint256 tokenId) {
         tokenId = elixir.safeMint(
             msg.sender,
@@ -137,15 +143,17 @@ contract Alchemist is ReentrancyGuard, Initializable {
             forgePrice,
             amount,
             block.timestamp + durationForMaturity,
-            chymeVaultDeployed
+            chymeVaultDeployed,
+            decimals
         );
+        emit ElixirCreated(tokenId, uint8(ratioOfSteady), forgePrice);
         return tokenId;
     }
 
     /// @notice This closes a given Elixir NFT
     function merge(uint256 tokenId) external nonReentrant returns (bool) {
         TokenInfo memory _steady;
-        uint256 chymeAmountToMerge;
+        // uint256 chymeAmountToMerge;
         uint256 timeToMaturity;
         uint256 ratioOfSteady;
         address chymeVaultDeployed;
@@ -172,6 +180,7 @@ contract Alchemist is ReentrancyGuard, Initializable {
         uint256[] memory beneficiaryAmounts = new uint256[](2);
         beneficiaries[0] = chymeBeneficiary;
         beneficiaryAmounts[0] = totalChymeInVaultToMerge;
+
         if (timeToMaturity > block.timestamp) {
             require(
                 chymeBeneficiary == msg.sender,
@@ -206,9 +215,13 @@ contract Alchemist is ReentrancyGuard, Initializable {
             msg.sender,
             _steady.amount
         );
-        elixir.burn(tokenId);
-        emit Merge(msg.sender, chymeAmountToMerge, chyme, ratioOfSteady);
+        performMergeActions(  totalChymeInVaultToMerge , tokenId);
         return true;
+    }
+
+    function performMergeActions(uint256 amount, uint256 tokenId) internal {
+        emit Merge( amount, chyme, tokenId);
+        elixir.burn(tokenId);
     }
 
     function getChyme() public view returns (address) {

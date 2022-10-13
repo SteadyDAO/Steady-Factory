@@ -53,21 +53,30 @@ interface AlchemistInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "split", data: BytesLike): Result;
 
   events: {
+    "ElixirCreated(uint256,uint8,uint256)": EventFragment;
     "Initialized(uint8)": EventFragment;
-    "Merge(address,uint256,address,uint256)": EventFragment;
+    "Merge(uint256,address,uint256)": EventFragment;
     "Split(address,uint256,address,address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ElixirCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Merge"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Split"): EventFragment;
 }
 
+export type ElixirCreatedEvent = TypedEvent<
+  [BigNumber, number, BigNumber] & {
+    tokenId: BigNumber;
+    ratio: number;
+    forgePrice: BigNumber;
+  }
+>;
+
 export type InitializedEvent = TypedEvent<[number] & { version: number }>;
 
 export type MergeEvent = TypedEvent<
-  [string, BigNumber, string, BigNumber] & {
-    source: string;
+  [BigNumber, string, BigNumber] & {
     mergedAmount: BigNumber;
     chyme: string;
     tokenid: BigNumber;
@@ -80,7 +89,7 @@ export type SplitEvent = TypedEvent<
     splitAmount: BigNumber;
     chymeVaultDeployed: string;
     chyme: string;
-    tokenId: BigNumber;
+    tokenid: BigNumber;
   }
 >;
 
@@ -198,6 +207,24 @@ export class Alchemist extends BaseContract {
   };
 
   filters: {
+    "ElixirCreated(uint256,uint8,uint256)"(
+      tokenId?: null,
+      ratio?: null,
+      forgePrice?: null
+    ): TypedEventFilter<
+      [BigNumber, number, BigNumber],
+      { tokenId: BigNumber; ratio: number; forgePrice: BigNumber }
+    >;
+
+    ElixirCreated(
+      tokenId?: null,
+      ratio?: null,
+      forgePrice?: null
+    ): TypedEventFilter<
+      [BigNumber, number, BigNumber],
+      { tokenId: BigNumber; ratio: number; forgePrice: BigNumber }
+    >;
+
     "Initialized(uint8)"(
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
@@ -206,34 +233,22 @@ export class Alchemist extends BaseContract {
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
 
-    "Merge(address,uint256,address,uint256)"(
-      source?: string | null,
+    "Merge(uint256,address,uint256)"(
       mergedAmount?: null,
       chyme?: null,
       tokenid?: null
     ): TypedEventFilter<
-      [string, BigNumber, string, BigNumber],
-      {
-        source: string;
-        mergedAmount: BigNumber;
-        chyme: string;
-        tokenid: BigNumber;
-      }
+      [BigNumber, string, BigNumber],
+      { mergedAmount: BigNumber; chyme: string; tokenid: BigNumber }
     >;
 
     Merge(
-      source?: string | null,
       mergedAmount?: null,
       chyme?: null,
       tokenid?: null
     ): TypedEventFilter<
-      [string, BigNumber, string, BigNumber],
-      {
-        source: string;
-        mergedAmount: BigNumber;
-        chyme: string;
-        tokenid: BigNumber;
-      }
+      [BigNumber, string, BigNumber],
+      { mergedAmount: BigNumber; chyme: string; tokenid: BigNumber }
     >;
 
     "Split(address,uint256,address,address,uint256)"(
@@ -241,7 +256,7 @@ export class Alchemist extends BaseContract {
       splitAmount?: null,
       chymeVaultDeployed?: null,
       chyme?: null,
-      tokenId?: null
+      tokenid?: null
     ): TypedEventFilter<
       [string, BigNumber, string, string, BigNumber],
       {
@@ -249,7 +264,7 @@ export class Alchemist extends BaseContract {
         splitAmount: BigNumber;
         chymeVaultDeployed: string;
         chyme: string;
-        tokenId: BigNumber;
+        tokenid: BigNumber;
       }
     >;
 
@@ -258,7 +273,7 @@ export class Alchemist extends BaseContract {
       splitAmount?: null,
       chymeVaultDeployed?: null,
       chyme?: null,
-      tokenId?: null
+      tokenid?: null
     ): TypedEventFilter<
       [string, BigNumber, string, string, BigNumber],
       {
@@ -266,7 +281,7 @@ export class Alchemist extends BaseContract {
         splitAmount: BigNumber;
         chymeVaultDeployed: string;
         chyme: string;
-        tokenId: BigNumber;
+        tokenid: BigNumber;
       }
     >;
   };
