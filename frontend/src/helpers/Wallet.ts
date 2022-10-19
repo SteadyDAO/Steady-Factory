@@ -46,7 +46,7 @@ export const errorHandler = (err: any, setSnackbar: Function) => {
       isOpen: true,
       timeOut: 60000,
       type: 'error',
-      message: err.message
+      message: err.message.split(',') && err.message.split(',')[0] ? err.message.split(',')[0] + ')' : err.message
     });
   } else {
     setSnackbar({

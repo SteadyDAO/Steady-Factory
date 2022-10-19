@@ -1,14 +1,59 @@
 .PlatformContainer {
+  background: var(--cardBgColor);
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
   max-width: 1200px;
+  padding: 1rem;
   width: 100%;
 }
 
-.PlatformListContainer {
+.PlatformHeaderContainer {
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.PlatformHeaderTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.PlatformTokensContainer {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  width: 100%;
+}
+
+.PlatformTokensHeaderContainer {
+  align-items: center;
+  border-bottom: 1px var(--greyColor) solid;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+.PlatformTokensHeaderToken {
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalValueLocked {
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalSplit {
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalMerged {
+  width: 25%;
+}
+
+.PlatformSpinnerContainer {
+  align-items: center;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
 }
 
 @media only screen and (max-width: 1366px) {

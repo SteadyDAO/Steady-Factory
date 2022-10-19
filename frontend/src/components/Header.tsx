@@ -1,7 +1,6 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import steadyImage from '../assets/images/steadydao.png';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Header = () => {
@@ -17,9 +16,9 @@ const Header = () => {
 
   return (
     <div className="HeaderContainer">
-      <img src={steadyImage} alt="Steady DAO" className="Logo" onClick={() => {
+      <span className="LogoText" onClick={() => {
         navigate('/');
-      }} />
+      }}>STEADY DAO</span>
       <div className="RightSideContainer">
         {isLaunchApp ?
           <Button color="secondary" variant="contained" onClick={() => {

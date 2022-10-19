@@ -6,6 +6,7 @@ import { getContractByAddressName } from "../helpers/Contract";
 import { getAppConfig } from "../helpers/Utilities";
 import { IPlatform } from "../models/Alchemist";
 import { IAppConfig } from "../models/Base";
+import ethImage from '../assets/images/ethereum_icon.svg';
 
 const PlatformItem = (props: {
   platform: IPlatform;
@@ -31,34 +32,34 @@ const PlatformItem = (props: {
 
   return (
     <div className="PlatformItemContainer">
-      <div className="PlatformItemHeader">
-        {tokenName ?
-          <span className="PlatformItemTokenName">{tokenName}</span> :
+      <div className="PlatformItemTokenContainer">
+        <img width={36} height={36} src={ethImage} alt="" />
+        {symbol && tokenName ?
+          <div className="PlatformItemTokenNameContainer">
+            <div className="PlatformItemTokenSymbolContainer">
+              <span className="PlatformItemTokenSymbol">{symbol}</span>
+            </div>
+            <span className="PlatformItemTokenName">{tokenName}</span>
+          </div> : <Skeleton width={80} height={35} variant="text" />
+        }
+      </div>
+      <div className="PlatformItemTokenContainer">
+        {symbol && decimals ?
+          <span className="PlatformTokensItemTotalValueLocked">{(+formatUnits(props.platform.totalValueLocked, decimals)).toLocaleString()} {symbol}</span> :
           <Skeleton width={80} height={35} variant="text" />
         }
       </div>
-      <div className="PlatformItemContent">
-        <div className="PlatformItemValue">
-          <span className="PlatformItemValueLabel">Total Value Locked</span>
-          {symbol && decimals ?
-            <span className="PlatformItemValueLocked">{(+formatUnits(props.platform.totalValueLocked, decimals)).toLocaleString()} {symbol}</span> :
-            <Skeleton width={80} height={35} variant="text" />
-          }
-        </div>
-        <div className="PlatformItemValue">
-          <span className="PlatformItemValueLabel">Total Split</span>
-          {symbol && decimals ?
-            <span className="PlatformItemValueLocked">{(+formatUnits(props.platform.totalSplit, decimals)).toLocaleString()} {symbol}</span> :
-            <Skeleton width={80} height={35} variant="text" />
-          }
-        </div>
-        <div className="PlatformItemValue">
-          <span className="PlatformItemValueLabel">Total Merged</span>
-          {symbol && decimals ?
-            <span className="PlatformItemValueLocked">{(+formatUnits(props.platform.totalMerged, decimals)).toLocaleString()} {symbol}</span> :
-            <Skeleton width={80} height={35} variant="text" />
-          }
-        </div>
+      <div className="PlatformItemTokenContainer">
+        {symbol && decimals ?
+          <span className="PlatformTokensHeaderTotalSplit">{(+formatUnits(props.platform.totalSplit, decimals)).toLocaleString()} {symbol}</span> :
+          <Skeleton width={80} height={35} variant="text" />
+        }
+      </div>
+      <div className="PlatformItemTokenContainer">
+        {symbol && decimals ?
+          <span className="PlatformTokensHeaderTotalMerged">{(+formatUnits(props.platform.totalMerged, decimals)).toLocaleString()} {symbol}</span> :
+          <Skeleton width={80} height={35} variant="text" />
+        }
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Button, Skeleton } from '@mui/material';
+import { IconButton, Skeleton, Tooltip } from '@mui/material';
 import { formatUnits } from 'ethers/lib/utils';
 import { useState } from 'react';
 import { useAccount, useBalance, useContractRead } from 'wagmi';
@@ -40,44 +40,35 @@ const TokenItem = (props: {
     <>
       <div className="TokensItemContainer">
         <div className="TokensItemTokenContainer">
-          <img className="TokensItemTokenImg" src={ethImage} alt="" />
-          <span>{name ? name : <Skeleton width={80} height={35} variant="text" />}</span>
+          <img width={36} height={36} src={ethImage} alt="" />
+          <div className="TokensItemTokenNameContainer">
+            <div className="TokensItemTokenSymbolContainer">
+              <span className="TokensItemTokenSymbol">{balanceData?.symbol ? `${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
+              <Tooltip title="Add to metamask">
+                <IconButton size="small" onClick={() => {
+                  (window as any).ethereum?.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                      type: 'ERC20',
+                      options: {
+                        address: props.steadyToken,
+                        symbol: balanceData?.symbol,
+                        decimals: balanceData?.decimals
+                      },
+                    },
+                  }).then(() => {
+                  }, () => {
+                  });
+                }}>
+                  <img width={20} height={20} src={metamaskImage} alt="" />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <span className="TokensItemTokenName">{name ? name : <Skeleton width={80} height={35} variant="text" />}</span>
+          </div>
         </div>
-        <div className="TokensItemBalanceContainer">
-          <span>{balanceData?.value && balanceData?.decimals ? `${(+formatUnits(balanceData?.value, balanceData?.decimals)).toLocaleString()} ${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
-        </div>
-        <div className="TokensItemTotalSupplyContainer">
-          <span>{totalSupply && balanceData?.decimals ? `${(+formatUnits(totalSupply, balanceData?.decimals)).toLocaleString()} ${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
-        </div>
-        <div className="TokensAddTokenContainer">
-          {balanceData?.symbol && balanceData?.decimals ?
-            <Button variant="text" className="TokensAddTokenButton" onClick={() => {
-              (window as any).ethereum?.request({
-                method: 'wallet_watchAsset',
-                params: {
-                  type: 'ERC20',
-                  options: {
-                    address: props.steadyToken,
-                    symbol: balanceData?.symbol,
-                    decimals: balanceData?.decimals
-                  },
-                },
-              }).then(() => {
-              }, () => {
-              });
-            }}>
-              <img className="TokensAddTokenImg" src={metamaskImage} alt="" />
-              <span>{`Add ${balanceData?.symbol}`}</span>
-            </Button> : <Skeleton width={80} height={35} variant="text" />
-          }
-        </div>
-      </div>
-      <div className="TokensItemMobileContainer">
-        <img className="TokensItemMobileTokenImg" src={ethImage} alt="" />
-        <div className="TokensItemInfoMobileContainer">
-          <span>{balanceData?.symbol ? balanceData?.symbol : <Skeleton width={80} height={35} variant="text" />}</span>
-          <span>{balanceData?.value && balanceData?.decimals ? `${(+formatUnits(balanceData?.value, balanceData?.decimals)).toLocaleString()} ${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
-        </div>
+        <span className="TokensItemTokenBalance">{balanceData?.value && balanceData?.decimals ? `${(+formatUnits(balanceData?.value, balanceData?.decimals)).toLocaleString()} ${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
+        <span className="TokensItemTokenTotalSupply">{totalSupply && balanceData?.decimals ? `${(+formatUnits(totalSupply, balanceData?.decimals)).toLocaleString()} ${balanceData?.symbol}` : <Skeleton width={80} height={35} variant="text" />}</span>
       </div>
       <SnackbarMessage snackbar={snackbar} setSnackbar={setSnackbar} />
     </>

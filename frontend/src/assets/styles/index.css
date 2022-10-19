@@ -1,11 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
 
 @import url(./App);
 @import url(./pages);
 @import url(./components);
 
 body {
-  color: #FFFFFF;
+  /* Variables */
+  --bgColor: #101213;
+  --cardBgColor: #1E1F25;
+  --textColor: #F1F5F9;
+  --linkColor: #2345DC;
+  --greyColor: #A2A4A7;
+  --fontFamily: 'Inter', sans-serif;
+}
+
+body {
+  color: var(--textColor);
   margin: 0;
   padding: 0;
 }
@@ -16,11 +27,13 @@ code {
 
 * {
   box-sizing: border-box;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--fontFamily);
 }
 
 .MuiInputBase-root {
-  border-radius: 12px !important;
+  border-radius: 8px !important;
+  color: var(--textColor) !important;
+  font-size: 1.1rem !important;
 }
 
 .MuiStepLabel-root
@@ -36,3 +49,14 @@ code {
   color: #dd563e !important;
 }
 
+.MuiPaper-root {
+  background: var(--cardBgColor) !important;
+}
+
+.MuiListItemText-root {
+  color: var(--textColor);
+}
+
+.MuiSkeleton-root {
+  background-color: #a2a4a766 !important;
+}

@@ -1,6 +1,6 @@
 
 .TransactionsConfirmationContainer {
-  background: #675B5B;
+  background: var(--cardBgColor);
   display: flex;
   flex-direction: column;
 }
@@ -20,7 +20,7 @@
 }
 
 .TransactionsConfirmationMessage {
-  color: #FFFFFF;
+  color: var(--textColor);
   text-align: center;
   width: 100%;
 }

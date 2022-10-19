@@ -1,6 +1,6 @@
 .AppWrapper {
   align-items: center;
-  background: #533535;
+  background: var(--bgColor);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -16,6 +16,9 @@
 }
 
 @media only screen and (max-width: 1366px) {
+  .AppContainer {
+    padding: 0 50px;
+  }
 }
 
 @media only screen and (max-width: 1180px) {
@@ -25,9 +28,15 @@
 }
 
 @media only screen and (max-width: 960px) {
+  .AppContainer {
+    padding: 0 30px;
+  }
 }
 
 @media only screen and (max-width: 640px) {
+  .AppContainer {
+    padding: 0 1rem;
+  }
 }
 
 @media only screen and (max-width: 480px) {

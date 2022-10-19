@@ -1,75 +1,43 @@
 .ElixirNftContainer {
-  background: #675B5B;
-  box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.35);
-  border-radius: 1rem;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-}
-
-.ElixirPricesContainer {
-  align-items: center;
-  background: rgba(251, 239, 223, 0.5);
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  margin-top: .25rem;
+  background: var(--bgColor);
+  border-radius: .5rem;
   padding: .5rem;
+}
+
+.ElixirNftInfoContainer {
+  align-items: center;
+  display: flex;
   width: 100%;
 }
 
-.ElixirPricesLeftSide {
-  display: flex;
-  gap: .25rem;
-}
-
-.ElixirPriceLabelContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.ElixirPriceLabel {
-  color: #000000;
-  font-size: .85rem;
-  font-style: italic;
-}
-
-.ElixirPriceText {
-  color: #000000;
-  font-size: .85rem;
-  font-weight: 600;
-}
-
-.ElixirPricesIcon {
-  cursor: pointer;
-}
-
-.ElixirNftActions {
-  display: flex;
-  justify-content: center;
-  padding: .5rem 0;
-  width: 100%;
-}
-
-.ElixirNftImage {
-  cursor: pointer;
-  width: 225px;
-}
-
-.MergeConfirmationContent {
-  color: #FFFFFF;
+.ElixirNftInfoLabelContainer,
+.ElixirNftInfoValueContainer {
   display: flex;
   flex-direction: column;
   gap: .5rem;
-  margin-bottom: 1rem;
-  min-width: 250px;
-  padding: 0 1.5rem;
+  justify-content: space-between;
+  width: 50%;
 }
 
-.MergeConfirmationContentRow {
-  align-items: center;
+.ElixirNftInfoValueContainer {
   display: flex;
-  gap: .25rem;
+  flex-direction: column;
+  gap: .5rem;
+  justify-content: space-between;
+  width: 35%;
+}
+
+.ElixirNftInfoLabel {
+  font-size: .8rem;
+}
+
+.ElixirNftInfoValue {
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.ElixirNftActionsContainer {
+  width: 15%;
 }
 
 @media only screen and (max-width: 1366px) {
@@ -79,18 +47,12 @@
 }
 
 @media only screen and (max-width: 1024px) {
-  .ElixirNftImage {
-    width: 200px;
-  }
 }
 
 @media only screen and (max-width: 960px) {
 }
 
 @media only screen and (max-width: 640px) {
-  .ElixirNftImage {
-    width: 180px;
-  }
 }
 
 @media only screen and (max-width: 480px) {

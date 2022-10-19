@@ -1,56 +1,83 @@
 .SplitContainer {
-  align-items: flex-start;
-  background: #675B5B;
-  border-radius: 1.5rem;
+  align-items: center;
   display: flex;
   flex-direction: column;
   gap: .5rem;
-  max-width: 500px;
-  padding: 2rem;
+  max-width: 550px;
   width: 100%;
 }
 
-.SplitLabel {
-  font-size: 1.5rem;
-  font-weight: 600;
+.SplitSectionContainer {
+  background: var(--cardBgColor);
+  border-radius: .65rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.SplitIcon {
+  font-size: 3rem !important;
+  transform: rotate(-180deg);
+}
+
+.SplitSectionTitleContainer {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  min-height: 30px;
+  width: 100%;
+}
+
+.SplitSectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .SplitBalanceContainer {
   align-items: center;
   display: flex;
-  justify-content: space-between;
-  padding: .5rem;
-  width: 100%;
+  gap: .35rem;
 }
 
-.SplitBalance {
-  font-size: .8rem;
+.SplitBalanceText {
+  font-size: .85rem;
   font-weight: 600;
 }
 
-.SplitFormContainer {
+.SplitButton {
+  font-family: var(--fontFamily) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  height: 50px !important;
+  text-transform: none !important;
+  width: 250px !important;
+}
+
+.SplitAmountContainer {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
-  gap: 2%;
-  max-width: 450px;
-  width: 100%;
+  gap: 1rem;
+  justify-content: space-between;
 }
 
-.SplitFormControl {
-  background: rgba(251, 239, 223, 0.5);
-  border-radius: 12px;
+.SplitAmountButton {
+  align-items: center !important;
+  display: flex !important;
+  gap: .5rem !important;
+  padding: .35rem 1.25rem !important;
+  min-width: 120px !important;
 }
 
-.SplitChymeControl {
-  width: 100%;
-}
-
-.SplitStrikeControl {
-  width: 58%;
+.SplitAmountButtonText {
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .SplitAmountControl {
+  background: var(--bgColor);
+  border-radius: .5rem;
   width: 100%;
 }
 
@@ -58,36 +85,36 @@
   height: 2rem !important;
 }
 
-.SplitMessageContainer {
+.SplitReceiveContainer {
   align-items: center;
   display: flex;
-  justify-content: flex-start;
-  padding: 0 .5rem;
+  gap: .5rem;
+}
+
+.SplitReceiveItemContainer {
+  align-items: center;
+  background: var(--bgColor);
+  border-radius: .5rem;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
   width: 100%;
 }
 
-.SplitElixirMessage {
-  color: #ffffff;
-  font-size: .75rem;
-  font-style: italic;
+.SplitReceiveItemNftContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  margin-left: 1rem;
+}
+
+.SplitReceiveItemText {
+  font-size: .8rem;
+  font-weight: 600;
 }
 
 .SplitFormControlErrorMessage {
-  color: #d32f2f;
-  font-size: .75rem;
-}
-
-.SplitActions {
-  display: flex;
-  justify-content: center;
-  padding: .5rem 0;
-  width: 100%;
-}
-
-.SplitButton {
-  font-size: 1.25rem !important;
-  height: 50px !important;
-  width: 250px !important;
+  color: #FF494A;
 }
 
 @media only screen and (max-width: 1366px) {
@@ -106,19 +133,6 @@
 }
 
 @media only screen and (max-width: 480px) {
-  .SplitContainer {
-    padding: 1rem;
-  }
-  .SplitFormContainer {
-    flex-direction: column;
-    gap: .5rem;
-  }
-  .SplitFormControl {
-    width: 100%;
-  }
-  .SplitBalance {
-    padding: 0;
-  }
 }
 
 @media only screen and (max-width: 320px) {

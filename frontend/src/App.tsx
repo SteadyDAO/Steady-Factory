@@ -19,12 +19,12 @@ const config: IAppConfig = getAppConfig();
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FFFFFF',
-      contrastText: '#533535',
+      main: '#F1F5F9',
+      contrastText: '#2345DC',
     },
     secondary: {
-      main: '#E6CCA9',
-      contrastText: '#FFFFFF',
+      main: '#2345DC',
+      contrastText: '#F1F5F9',
     }
   },
   typography: {
@@ -36,7 +36,7 @@ const theme = createTheme({
 });
 
 const { chains, provider } = configureChains(
-  [chain.rinkeby],
+  [chain.goerli],
   [
     alchemyProvider({ apiKey: config.NETWORK.ALCHEMY_API_KEY }),
     publicProvider()

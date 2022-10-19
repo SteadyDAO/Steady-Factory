@@ -1,10 +1,10 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, MenuItem, Select, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist } from "../models/Alchemist";
 import { getContractByAddressName, getContractByName } from "../helpers/Contract";
-import { formatUnits, isAddress, parseUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { IFormControl } from "../models/Form";
 import { errorHandler, pollingTransaction } from "../helpers/Wallet";
 import { TransactionResponse } from "@ethersproject/providers";
@@ -18,6 +18,12 @@ import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useNetwork, useSigner } from "wagmi";
+import CallSplitIcon from '@mui/icons-material/CallSplit';
+import ethImage from '../assets/images/ethereum_icon.svg';
+import openseaImage from '../assets/images/opensea.png';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddIcon from '@mui/icons-material/Add';
+import { ethers } from "ethers";
 
 const Split = () => {
   const config: IAppConfig = getAppConfig();
@@ -33,7 +39,7 @@ const Split = () => {
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
   const [disableForm, setDisableForm] = useState<boolean>(false);
   const [chymeControl, setChymeControl] = useState<IFormControl>({
-    value: 'default',
+    value: null,
     invalid: true
   });
   const [amountControl, setAmountControl] = useState<IFormControl>({
@@ -53,6 +59,12 @@ const Split = () => {
   const { chain } = useNetwork();
   const { data: signer } = useSigner();
 
+  const [tokensDropdownEl, setTokensDropdownEl] = useState<null | HTMLElement>(null);
+  const openTokensDropdownEl = Boolean(tokensDropdownEl);
+  const [errorPopperEl, setErrorPopperEl] = useState<null | HTMLElement>(null);
+  const openErrorPopperEl = Boolean(errorPopperEl);
+  const errorPopperId = openErrorPopperEl ? 'error-popper' : undefined;
+
   useEffect(() => {
     if (getAlchemists && getAlchemists.alchemists) {
       setAlchemists(getAlchemists.alchemists);
@@ -60,14 +72,14 @@ const Split = () => {
   }, [getAlchemists]);
 
   useEffect(() => {
-    if (isAddress(chymeControl.value) && address && chain?.id === config.NETWORK.CHAIN_ID) {
+    if (chymeControl.value && address && chain?.id === config.NETWORK.CHAIN_ID) {
       if (polling) {
         clearInterval(polling);
         setBalance('');
         setSymbol('');
       }
       const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
+        const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
         const bl = await chymeContract.balanceOf(address);
         const sb = await chymeContract.symbol();
         const dcm = await chymeContract.decimal();
@@ -80,12 +92,12 @@ const Split = () => {
       }, 3000);
       setPolling(pl);
       const getOraclePrice = async () => {
-        const academyContract = getContractByName('Academy', signer as any);
-        const chymeInfo = await academyContract.getChymeInfo(chymeControl.value);
+        const academyContract = getContractByName('Academy', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
+        const chymeInfo = await academyContract.getChymeInfo(chymeControl.value?.chyme?.id);
         const oracleAddress = chymeInfo.oracleAddress;
-        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', signer as any);
+        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
         const oracleLatestAnswer = await oracleContract.latestAnswer();
-        const oracleDecimals= await oracleContract.decimals();
+        const oracleDecimals = await oracleContract.decimals();
         setOraclePrice((+formatUnits(oracleLatestAnswer, oracleDecimals)).toFixed(2) as any);
       }
       getOraclePrice();
@@ -102,7 +114,7 @@ const Split = () => {
   }, [amountControl, balance]);
 
   useEffect(() => {
-    if (!isNotEnoughBalance && !chymeControl.invalid && !amountControl.invalid +amountControl.value && +amountControl.value > 0) {
+    if (!isNotEnoughBalance && !chymeControl.invalid && !amountControl.invalid + amountControl.value && +amountControl.value > 0) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -112,22 +124,29 @@ const Split = () => {
   useEffect(() => {
     if (alchemists.length > 0) {
       setChymeControl({
-        value: alchemists[0].chyme.id,
+        value: alchemists[0],
         invalid: false
       });
     } else {
       setChymeControl({
-        value: 'default',
+        value: null,
         invalid: true
       });
     }
   }, [alchemists]);
 
+  const openTokensDropdown = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setTokensDropdownEl(event.currentTarget);
+  };
+
+  const closeTokensDropdown = () => {
+    setTokensDropdownEl(null);
+  };
+
   const approve = async () => {
     setDisableForm(true);
-    const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
-    const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
-    const allowance = await chymeContract.allowance(address?.toString(), alchemistAdd);
+    const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', signer as any);
+    const allowance = await chymeContract.allowance(address?.toString(), chymeControl.value?.id);
     if (allowance?.gte(parseUnits(amountControl.value.toString(), chymeDecimal))) {
       splitChyme();
     } else {
@@ -136,7 +155,7 @@ const Split = () => {
       setIsTryAgain(false);
       setIsSplitCompleted(false);
       setConfirmationMessage('Waiting for transaction confirmation...');
-      chymeContract.approve(alchemistAdd, parseUnits(amountControl.value.toString(), chymeDecimal))
+      chymeContract.approve(chymeControl.value?.id, parseUnits(amountControl.value.toString(), chymeDecimal))
         .then((transactionResponse: TransactionResponse) => {
           setSnackbar({
             isOpen: true,
@@ -179,8 +198,7 @@ const Split = () => {
     setIsTryAgain(false);
     setIsSplitCompleted(false);
     setConfirmationMessage('Waiting for transaction confirmation...');
-    const alchemistAdd = alchemists.filter((al: IAlchemist) => al.chyme.id === chymeControl.value)[0].alchemist;
-    const alchemistContract = getContractByAddressName(alchemistAdd, 'Alchemist', signer as any);
+    const alchemistContract = getContractByAddressName(chymeControl.value?.id, 'Alchemist', signer as any);
     alchemistContract.split(parseUnits(amountControl.value.toString(), chymeDecimal), 0)
       .then((transactionResponse: TransactionResponse) => {
         setSnackbar({
@@ -216,7 +234,7 @@ const Split = () => {
           message: 'Split Success!'
         });
         const getBalance = async () => {
-          const chymeContract = getContractByAddressName(chymeControl.value, 'Chyme', signer as any);
+          const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', signer as any);
           const bl = await chymeContract.balanceOf(address);
           const sb = await chymeContract.symbol();
           const dcm = await chymeContract.decimal();
@@ -248,99 +266,157 @@ const Split = () => {
   return (
     <>
       <div className="SplitContainer">
-        <span className="SplitLabel">Split Token</span>
-        <div className="SplitFormContainer">
-          <div className="SplitChymeControl SplitFormControl">
-            <FormControl required fullWidth>
-              <Select value={chymeControl.value} disabled={disableForm} onChange={(event) => {
-                if (event.target.value) {
-                  setChymeControl({
-                    value: event.target.value,
-                    invalid: false
-                  });
-                } else {
-                  setChymeControl({
-                    value: 'default',
-                    invalid: true
-                  });
-                }
-              }}>
-                <MenuItem selected disabled value="default">Token</MenuItem>
-                {alchemists.length > 0 && alchemists.map((alchemist: IAlchemist) =>
-                  <MenuItem key={alchemist.id} value={alchemist.chyme.id}>
-                    {alchemist.chyme?.symbol}
-                  </MenuItem>
-                )}
-              </Select>
-            </FormControl>
+        <div className="SplitSectionContainer">
+          <div className="SplitSectionTitleContainer">
+            <span className="SplitSectionTitle">You split</span>
+            <div className="SplitBalanceContainer">
+              {balance && symbol ?
+                <>
+                  <span className="SplitBalanceText">Balance:</span>
+                  <span className="SplitBalanceText">{balance.toLocaleString()} {symbol}</span>
+                </> : <Skeleton width={80} height={30} variant="text" />
+              }
+            </div>
           </div>
-          <div className="SplitBalanceContainer">
-            {isConnected ?
-              <>
-                {symbol && oraclePrice ?
-                  <span className="SplitBalance">{symbol}/USD: ${oraclePrice}</span> : <Skeleton width={80} height={30} variant="text" />
-                }
-                {balance && symbol ?
-                  <span className="SplitBalance">Balance: {balance} {symbol}</span> : <Skeleton width={80} height={30} variant="text" />
-                }
-              </> : <></>
-            }
+          <div className="SplitAmountContainer">
+            <Button className="SplitAmountButton" id="token-dropdown" onClick={openTokensDropdown}>
+              {chymeControl.value?.chyme?.symbol ?
+                <>
+                  <img width={24} height={24} src={ethImage} alt="Token Icon" />
+                  <span className="SplitAmountButtonText">{chymeControl.value?.chyme?.symbol}</span>
+                  <ExpandMoreIcon fontSize="medium" />
+                </> : <Skeleton width={80} height={40} variant="text" />
+              }
+            </Button>
+            <div className="SplitAmountControl">
+              <FormControl required fullWidth>
+                <TextField color="secondary"
+                  aria-describedby={errorPopperId}
+                  error={isNotEnoughBalance}
+                  value={amountControl.value}
+                  disabled={!+balance || disableForm}
+                  type="text"
+                  placeholder="Amount"
+                  InputProps={{
+                    endAdornment:
+                      <InputAdornment position="end">
+                        <Button className="SplitMaxAmountButton" color="secondary" variant="contained"
+                          disabled={!+balance || disableForm}
+                          onClick={() => {
+                            setErrorPopperEl(null);
+                            if (+balance) {
+                              setAmountControl({
+                                value: +balance,
+                                invalid: false
+                              });
+                            } else {
+                              setAmountControl({
+                                value: '',
+                                invalid: true
+                              });
+                            }
+                          }}>Max</Button>
+                      </InputAdornment>,
+                  }}
+                  onChange={(e) => {
+                    setAmountControl({
+                      value: e.target.value,
+                      invalid: false
+                    });
+                    if (+e.target.value && +e.target.value > +balance) {
+                      setErrorPopperEl(e.currentTarget);
+                    } else {
+                      setErrorPopperEl(null);
+                    }
+                  }}
+                />
+              </FormControl>
+            </div>
           </div>
-          <div className="SplitAmountControl SplitFormControl">
-            <FormControl required fullWidth>
-              <TextField
-                value={amountControl.value}
-                disabled={!+balance || disableForm}
-                type="text"
-                placeholder="Amount"
-                InputProps={{
-                  endAdornment:
-                    <InputAdornment position="end">
-                      <Button className="SplitMaxAmountButton" color="secondary" variant="contained" disabled={!+balance || disableForm} onClick={() => {
-                        if (+balance) {
-                          setAmountControl({
-                            value: +balance,
-                            invalid: false
-                          });
-                        } else {
-                          setAmountControl({
-                            value: '',
-                            invalid: true
-                          });
-                        }
-                      }}>Max</Button>
-                    </InputAdornment>,
-                }}
-                onChange={(e) => {
-                  setAmountControl({
-                    value: e.target.value,
-                    invalid: false
-                  });
-                }}
-              />
-            </FormControl>
-          </div>
-          <div className="SplitMessageContainer">
-            {isFormValid && oraclePrice && symbol ?
-              <span className="SplitElixirMessage">Receive 1 Leveraged NFT representing {(Math.floor((+amountControl.value * 25 * oraclePrice) / 100)).toLocaleString() } s{symbol} (25%) and {(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString() } s{symbol} (75%)</span> : <></>
-            }
-            {isNotEnoughBalance ?
-              <span className="SplitFormControlErrorMessage">Not enough balance</span> : <></>
-            }
+          <div className="SplitSectionTitleContainer">
+            <div className="SplitBalanceContainer">
+              {symbol && oraclePrice ?
+                <>
+                  <span className="SplitBalanceText">{symbol}/USD:</span>
+                  <span className="SplitBalanceText">${oraclePrice}</span>
+                </> : <Skeleton width={80} height={30} variant="text" />
+              }
+            </div>
+            <div className="SplitBalanceContainer">
+              {symbol && oraclePrice && +amountControl.value ?
+                <span className="SplitBalanceText">~ ${(+amountControl.value * oraclePrice).toLocaleString()}</span> : <></>
+              }
+
+            </div>
           </div>
         </div>
-        <div className="SplitActions">
-          {isConnected && chain?.id === config.NETWORK.CHAIN_ID ?
-            <Button className="SplitButton" color="secondary" variant="contained" disabled={!isFormValid || disableForm} onClick={approve}>
-              {disableForm ?
-                <CircularProgress color="secondary" size={25} /> : <></>
-              }
-              Split
-            </Button> :
-            <ConnectButton />
+        <CallSplitIcon fontSize="inherit" className="SplitIcon" />
+        <div className="SplitSectionContainer">
+          <div className="SplitSectionTitleContainer">
+            <span className="SplitSectionTitle">You receive</span>
+          </div>
+          {isFormValid && oraclePrice && symbol ?
+            <div className="SplitReceiveContainer">
+              <div className="SplitReceiveItemContainer">
+                <img width={24} height={24} src={ethImage} alt="Token Icon" />
+                <span className="SplitReceiveItemText">{(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString()} s{symbol} (75%)</span>
+              </div>
+              <AddIcon fontSize="large" />
+              <div className="SplitReceiveItemContainer">
+                <img width={48} height={48} src={openseaImage} alt="NFT Icon" />
+                <div className="SplitReceiveItemNftContainer">
+                  <span className="SplitReceiveItemText">1 Leveraged NFT</span>
+                  <span className="SplitReceiveItemText">~ {(Math.floor((+amountControl.value * 25 * oraclePrice) / 100)).toLocaleString()} s{symbol} (25%)</span>
+                </div>
+              </div>
+            </div> : <></>
           }
         </div>
+        {isConnected && chain?.id === config.NETWORK.CHAIN_ID ?
+          <Button className="SplitButton" color="secondary" variant="contained"
+            disabled={!isFormValid || disableForm}
+            onClick={approve}>
+            {disableForm ?
+              <CircularProgress color="secondary" size={25} /> : <></>
+            }
+            Split
+          </Button> :
+          <ConnectButton />
+        }
       </div>
+
+      <Menu
+        id="token-dropdown"
+        anchorEl={tokensDropdownEl}
+        open={openTokensDropdownEl}
+        onClose={closeTokensDropdown}
+      >
+        {alchemists.length > 0 && alchemists.map((alchemist: IAlchemist) =>
+          <MenuItem key={alchemist.id} selected={alchemist.chyme.id === chymeControl.value?.chyme?.id} onClick={() => {
+            if (alchemist.chyme.id !== chymeControl.value?.chyme?.id) {
+              setChymeControl({
+                value: alchemist,
+                invalid: false
+              });
+              setAmountControl({
+                value: '',
+                invalid: true
+              });
+            }
+            closeTokensDropdown();
+          }}>
+            <ListItemIcon>
+              <img width={24} height={24} src={ethImage} alt="Token Icon" />
+            </ListItemIcon>
+            <ListItemText>{alchemist.chyme?.symbol}</ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
+
+      <Popper id={errorPopperId} open={openErrorPopperEl} anchorEl={errorPopperEl}>
+        <span className="SplitFormControlErrorMessage">Not enough balance</span>
+      </Popper>
+
       <Dialog
         className="TransactionsConfirmationDialog"
         open={isConfirmation}
@@ -377,7 +453,7 @@ const Split = () => {
           </div>
           {isTryAgain ?
             <div className="TransactionsConfirmationActionsContainer">
-              <Button variant="contained" onClick={tryAgain}>
+              <Button color="secondary" variant="contained" onClick={tryAgain}>
                 Try again
               </Button>
             </div> : <></>

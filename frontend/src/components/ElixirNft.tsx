@@ -14,6 +14,7 @@ import { IElixir } from "../models/Alchemist";
 import { formatUnits } from "ethers/lib/utils";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import MergeTypeIcon from '@mui/icons-material/MergeType';
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
 import { useAccount, useSigner } from "wagmi";
@@ -255,37 +256,44 @@ const ElixirNft = (props: {
     <>
       <div className="ElixirNftContainer">
         <ElixirNftImage maturesdays={maturesDays} chyme={props.elixirNft.chyme.id} value={value} />
-        <div className="ElixirPricesContainer">
-          <div className="ElixirPricesLeftSide">
-            <div className="ElixirPriceLabelContainer">
-              <span className="ElixirPriceLabel">Token Id:</span>
-              <span className="ElixirPriceLabel">Strike Price:</span>
-              <span className="ElixirPriceLabel">Underlying Price:</span>
-            </div>
-            <div className="ElixirPriceLabelContainer">
-              <span className="ElixirPriceText">Elixir #{props.elixirNft.tokenId}</span>
-              {strikePrice ?
-                <span className="ElixirPriceText">${strikePrice}</span> :
-                <Skeleton width={60} variant="text" />
-              }
-              {oraclePrice ?
-                <span className="ElixirPriceText">${oraclePrice}</span> :
-                <Skeleton width={60} variant="text" />
-              }
-            </div>
+        <div className="ElixirNftInfoContainer">
+          <div className="ElixirNftInfoLabelContainer">
+            <span className="ElixirNftInfoLabel">Token Id:</span>
+            <span className="ElixirNftInfoLabel">Strike Price:</span>
+            <span className="ElixirNftInfoLabel">Underlying Price:</span>
           </div>
-          <Tooltip title="View Elixir on Opensea">
-            <OpenInNewIcon className="ElixirPricesIcon" onClick={() => {
-              window.open(`${config.OPENSEA_ASSETS_URL}/${config.CONTRACTS_ADDRESS.ElixirNft}/${props.elixirNft.tokenId}`, '_blank')
-            }} />
-          </Tooltip>
-        </div>
-        <div className="ElixirNftActions">
-          <Button color="secondary" variant="contained" onClick={() => {
-            setIsConfirmation(true);
-          }} disabled={disableMerge}>Merge</Button>
+          <div className="ElixirNftInfoValueContainer">
+            <span className="ElixirNftInfoValue">Elixir #{props.elixirNft.tokenId}</span>
+            {strikePrice ?
+              <span className="ElixirNftInfoValue">${strikePrice}</span> :
+              <Skeleton width={60} variant="text" />
+            }
+            {oraclePrice ?
+              <span className="ElixirNftInfoValue">${oraclePrice}</span> :
+              <Skeleton width={60} variant="text" />
+            }
+          </div>
+          <div className="ElixirNftActionsContainer">
+            <Tooltip title="View Elixir on Opensea">
+              <IconButton color="primary" size="small" onClick={() => {
+                window.open(`${config.OPENSEA_ASSETS_URL}/${config.CONTRACTS_ADDRESS.ElixirNft}/${props.elixirNft.tokenId}`, '_blank')
+              }}>
+                <OpenInNewIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Merge">
+              <span>
+                <IconButton color="primary" size="small" onClick={() => {
+                  setIsConfirmation(true);
+                }} disabled={disableMerge}>
+                  <MergeTypeIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </div>
         </div>
       </div>
+
       <Dialog
         className="TransactionsConfirmationDialog"
         open={isTxConfirmation}
