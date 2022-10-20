@@ -40,6 +40,22 @@
   width: 15%;
 }
 
+.MergeConfirmationContent {
+  color: var(--textColor);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-bottom: 1rem;
+  min-width: 250px;
+  padding: 0 1.5rem;
+}
+
+.MergeConfirmationContentRow {
+  align-items: center;
+  display: flex;
+  gap: .25rem;
+}
+
 @media only screen and (max-width: 1366px) {
 }
 
