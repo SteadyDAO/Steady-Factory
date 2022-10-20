@@ -8,7 +8,7 @@
 }
 
 .BottomNavigate {
-  background: #675B5B !important;
+  background: var(--cardBgColor) !important;
   height: 100% !important;
   width: 100% !important;
 }

@@ -34,15 +34,12 @@
 }
 
 .PlatformTokensItemTotalValueLocked {
-  width: 25%;
 }
 
 .PlatformTokensItemTotalSplit {
-  width: 25%;
 }
 
 .PlatformTokensItemTotalMerged {
-  width: 25%;
 }
 
 @media only screen and (max-width: 1366px) {

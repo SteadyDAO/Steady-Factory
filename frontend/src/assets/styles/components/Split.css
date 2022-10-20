@@ -46,6 +46,11 @@
   font-weight: 600;
 }
 
+.SplitGetTokenIcon {
+  cursor: pointer;
+  font-size: 1rem !important;
+}
+
 .SplitButton {
   font-family: var(--fontFamily) !important;
   font-size: 1.1rem !important;
@@ -114,6 +119,7 @@
 }
 
 .SplitFormControlErrorMessage {
+  font-size: .8rem;
   color: #FF494A;
 }
 

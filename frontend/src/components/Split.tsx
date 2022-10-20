@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Skeleton, Step, StepLabel, Stepper, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, FormControl, IconButton, InputAdornment, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Skeleton, Step, StepLabel, Stepper, TextField, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GET_ALCHEMISTS } from "../graphql/alchemist.queries";
 import { IAlchemist } from "../models/Alchemist";
@@ -17,13 +17,13 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { IAppConfig } from "../models/Base";
 import { getAppConfig } from "../helpers/Utilities";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useNetwork, useSigner } from "wagmi";
+import { useAccount, useNetwork, useProvider, useSigner } from "wagmi";
 import CallSplitIcon from '@mui/icons-material/CallSplit';
 import ethImage from '../assets/images/ethereum_icon.svg';
 import openseaImage from '../assets/images/opensea.png';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add';
-import { ethers } from "ethers";
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 const Split = () => {
   const config: IAppConfig = getAppConfig();
@@ -58,6 +58,7 @@ const Split = () => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: signer } = useSigner();
+  const provider = useProvider();
 
   const [tokensDropdownEl, setTokensDropdownEl] = useState<null | HTMLElement>(null);
   const openTokensDropdownEl = Boolean(tokensDropdownEl);
@@ -79,7 +80,7 @@ const Split = () => {
         setSymbol('');
       }
       const getBalance = async () => {
-        const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
+        const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', provider as any);
         const bl = await chymeContract.balanceOf(address);
         const sb = await chymeContract.symbol();
         const dcm = await chymeContract.decimal();
@@ -92,10 +93,10 @@ const Split = () => {
       }, 3000);
       setPolling(pl);
       const getOraclePrice = async () => {
-        const academyContract = getContractByName('Academy', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
+        const academyContract = getContractByName('Academy', provider as any);
         const chymeInfo = await academyContract.getChymeInfo(chymeControl.value?.chyme?.id);
         const oracleAddress = chymeInfo.oracleAddress;
-        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', new ethers.providers.JsonRpcProvider(config.NETWORK.RPC_URL) as any);
+        const oracleContract = getContractByAddressName(oracleAddress, 'Oracle', provider as any);
         const oracleLatestAnswer = await oracleContract.latestAnswer();
         const oracleDecimals = await oracleContract.decimals();
         setOraclePrice((+formatUnits(oracleLatestAnswer, oracleDecimals)).toFixed(2) as any);
@@ -103,7 +104,7 @@ const Split = () => {
       getOraclePrice();
     }
     // eslint-disable-next-line
-  }, [chymeControl, address, chain]);
+  }, [chymeControl]);
 
   useEffect(() => {
     if (amountControl.value && balance && +amountControl.value > +balance) {
@@ -263,6 +264,16 @@ const Split = () => {
     }
   }
 
+  // Get Test Token
+  const getTestToken = async () => {
+    const chymeContract = getContractByAddressName(chymeControl.value?.chyme?.id, 'Chyme', signer as any);
+    chymeContract.mint(address, parseUnits('8000', chymeDecimal))
+      .then(() => {
+      }, () => {
+      });
+  }
+
+
   return (
     <>
       <div className="SplitContainer">
@@ -274,7 +285,10 @@ const Split = () => {
                 <>
                   <span className="SplitBalanceText">Balance:</span>
                   <span className="SplitBalanceText">{balance.toLocaleString()} {symbol}</span>
-                </> : <Skeleton width={80} height={30} variant="text" />
+                  <Tooltip title={`Get ${symbol}`}>
+                    <GetAppIcon className="SplitGetTokenIcon" color="secondary" fontSize="inherit" onClick={getTestToken} />
+                  </Tooltip>
+                </> : <Skeleton width={100} height={30} variant="text" />
               }
             </div>
           </div>

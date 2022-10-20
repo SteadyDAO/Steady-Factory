@@ -34,18 +34,22 @@
 }
 
 .PlatformTokensHeaderToken {
+  font-weight: 600;
   width: 25%;
 }
 
 .PlatformTokensHeaderTotalValueLocked {
+  font-weight: 600;
   width: 25%;
 }
 
 .PlatformTokensHeaderTotalSplit {
+  font-weight: 600;
   width: 25%;
 }
 
 .PlatformTokensHeaderTotalMerged {
+  font-weight: 600;
   width: 25%;
 }
 

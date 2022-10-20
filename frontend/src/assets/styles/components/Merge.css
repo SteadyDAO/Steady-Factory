@@ -60,14 +60,17 @@
 }
 
 .MergeSteadyTokensHeaderToken {
+  font-weight: 600;
   width: 30%;
 }
 
 .MergeSteadyTokensHeaderBalance {
+  font-weight: 600;
   width: 30%;
 }
 
 .MergeSteadyTokensHeaderTotalSupply {
+  font-weight: 600;
   width: 40%;
 }
 

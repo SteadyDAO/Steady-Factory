@@ -21,19 +21,25 @@ const TokenItem = (props: {
   const { data: balanceData } = useBalance({
     addressOrName: address,
     token: props.steadyToken,
-    chainId: config.NETWORK.CHAIN_ID
+    chainId: config.NETWORK.CHAIN_ID,
+    watch: true,
+    cacheTime: 3000
   });
   const { data: totalSupply } = useContractRead({
     addressOrName: props.steadyToken,
     contractInterface: getABI('SteadyToken'),
     functionName: 'totalSupply',
-    chainId: config.NETWORK.CHAIN_ID
+    chainId: config.NETWORK.CHAIN_ID,
+    watch: true,
+    cacheTime: 3000
   });
   const { data: name } = useContractRead({
     addressOrName: props.steadyToken,
     contractInterface: getABI('SteadyToken'),
     functionName: 'name',
-    chainId: config.NETWORK.CHAIN_ID
+    chainId: config.NETWORK.CHAIN_ID,
+    watch: true,
+    cacheTime: 3000
   });
 
   return (
