@@ -18,7 +18,7 @@
 }
 
 .BottomNavigateActionSelected {
-  color: #E6CCA9 !important;
+  color: var(--linkColor) !important;
 }
 
 @media only screen and (max-width: 1366px) {

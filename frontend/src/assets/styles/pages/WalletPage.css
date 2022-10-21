@@ -1,0 +1,8 @@
+.WalletPageContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-height: calc(100vh - 140px);
+  padding: 60px 20px 0 20px;
+}

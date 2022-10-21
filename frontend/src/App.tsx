@@ -13,6 +13,7 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import { IAppConfig } from './models/Base';
 import { getAppConfig } from './helpers/Utilities';
+import WalletPage from './pages/WalletPage';
 
 const config: IAppConfig = getAppConfig();
 
@@ -76,6 +77,15 @@ function App() {
                     <Header />
                     <div className="AppContainer">
                       <SplitPage />
+                    </div>
+                    <BottomNavigate />
+                  </>
+                } />
+                <Route path="/wallet" element={
+                  <>
+                    <Header />
+                    <div className="AppContainer">
+                      <WalletPage />
                     </div>
                     <BottomNavigate />
                   </>

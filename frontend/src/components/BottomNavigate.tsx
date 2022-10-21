@@ -14,7 +14,7 @@ const BottomNavigate = () => {
   useEffect(() => {
     if (pathname === '/split') {
       setValue(0);
-    } else if (pathname === '/merge') {
+    } else if (pathname === '/wallet') {
       setValue(1);
     }
   }, [pathname]);
@@ -46,6 +46,7 @@ const BottomNavigate = () => {
           icon={<CallSplitIcon fontSize="large" />} />
         <BottomNavigationAction
           onClick={() => {
+            navigate('/wallet');
           }}
           className={value === 1 ? 'BottomNavigateAction BottomNavigateActionSelected' : 'BottomNavigateAction'} label="Wallet"
           icon={<AccountBalanceWalletIcon fontSize="large" />} />
