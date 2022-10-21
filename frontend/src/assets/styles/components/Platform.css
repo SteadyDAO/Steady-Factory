@@ -19,9 +19,17 @@
   font-weight: 700;
 }
 
+.PlatformScrollxContainer {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  width: 100%;
+}
+
 .PlatformTokensContainer {
   display: flex;
   flex-direction: column;
+  min-width: 900px;
   width: 100%;
 }
 

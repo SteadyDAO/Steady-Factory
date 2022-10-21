@@ -102,26 +102,28 @@ const Merge = () => {
           </ToggleButtonGroup>
         </div>
         {toggle === 'tokens' ?
-          <div className="MergeSteadyTokensContainer">
-            <div className="MergeSteadyTokensHeaderContainer">
-              <span className="MergeSteadyTokensHeaderToken">Token</span>
-              <span className="MergeSteadyTokensHeaderBalance">My Agg. Balance</span>
-              <span className="MergeSteadyTokensHeaderTotalSupply">Total Supply</span>
+          <div className="MergeSteadyTokensScrollxContainer">
+            <div className="MergeSteadyTokensContainer">
+              <div className="MergeSteadyTokensHeaderContainer">
+                <span className="MergeSteadyTokensHeaderToken">Token</span>
+                <span className="MergeSteadyTokensHeaderBalance">My Agg. Balance</span>
+                <span className="MergeSteadyTokensHeaderTotalSupply">Total Supply</span>
+              </div>
+              {getAlchemistsLoading ?
+                <div className="MergeSpinnerContainer">
+                  <CircularProgress color="secondary" size={80} />
+                </div> :
+                <>
+                  {alchemists && alchemists.length > 0 ?
+                    <>
+                      {alchemists.map((alchemist: IAlchemist) =>
+                        <TokenItem key={alchemist.id} steadyToken={alchemist.chyme.steadyToken} />
+                      )}
+                    </> : <></>
+                  }
+                </>
+              }
             </div>
-            {getAlchemistsLoading ?
-              <div className="MergeSpinnerContainer">
-                <CircularProgress color="secondary" size={80} />
-              </div> :
-              <>
-                {alchemists && alchemists.length > 0 ?
-                  <>
-                    {alchemists.map((alchemist: IAlchemist) =>
-                      <TokenItem key={alchemist.id} steadyToken={alchemist.chyme.steadyToken} />
-                    )}
-                  </> : <></>
-                }
-              </>
-            }
           </div> :
           <div className="MergeLeveragedTokensContainer">
             {getElixirsByAccountLoading ?

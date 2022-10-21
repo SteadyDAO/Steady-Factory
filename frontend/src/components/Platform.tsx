@@ -22,21 +22,23 @@ const Platform = () => {
       <div className="PlatformTokensHeaderContainer">
         <span className="PlatformHeaderTitle">Tokens</span>
       </div>
-      <div className="PlatformTokensContainer">
-        <div className="PlatformTokensHeaderContainer">
-          <span className="PlatformTokensHeaderToken">Token</span>
-          <span className="PlatformTokensHeaderTotalValueLocked">Total Value Locked</span>
-          <span className="PlatformTokensHeaderTotalSplit">Total Split</span>
-          <span className="PlatformTokensHeaderTotalMerged">Total Merged</span>
+      <div className="PlatformScrollxContainer">
+        <div className="PlatformTokensContainer">
+          <div className="PlatformTokensHeaderContainer">
+            <span className="PlatformTokensHeaderToken">Token</span>
+            <span className="PlatformTokensHeaderTotalValueLocked">Total Value Locked</span>
+            <span className="PlatformTokensHeaderTotalSplit">Total Split</span>
+            <span className="PlatformTokensHeaderTotalMerged">Total Merged</span>
+          </div>
+          {getPlatformsLoading ?
+            <div className="PlatformSpinnerContainer">
+              <CircularProgress color="secondary" size={80} />
+            </div> :
+            <>
+              {platforms.map((platform: IPlatform) => <PlatformItem key={platform.id} platform={platform} />)}
+            </>
+          }
         </div>
-        {getPlatformsLoading ?
-          <div className="PlatformSpinnerContainer">
-            <CircularProgress color="secondary" size={80} />
-          </div> :
-          <>
-            {platforms.map((platform: IPlatform) => <PlatformItem key={platform.id} platform={platform} />)}
-          </>
-        }
       </div>
     </div>
   );

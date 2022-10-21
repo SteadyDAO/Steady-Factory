@@ -136,6 +136,13 @@
 }
 
 @media only screen and (max-width: 640px) {
+  .SplitReceiveContainer {
+    flex-direction: column;
+  }
+
+  .SplitAmountButton {
+    min-width: 105px !important;
+  }
 }
 
 @media only screen and (max-width: 480px) {

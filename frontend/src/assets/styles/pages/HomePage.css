@@ -17,8 +17,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2rem;
   width: 50%;
+}
+
+h3 {
+  padding-right: 50px;
 }
 
 .SteadyIntroGif {
@@ -49,9 +52,29 @@
 }
 
 @media only screen and (max-width: 640px) {
+  .HomePageContainer {
+    padding: 0 0 50px;
+  }
+
+  .HomepageIntroContainer {
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+
+  .HomepageIntroSection {
+    width: 100%;
+  }
+
+  .SteadyIntroGif {
+    padding: 0 3rem;
+  }
 }
 
 @media only screen and (max-width: 480px) {
+
+  .SteadyIntroGif {
+    padding: 1rem;
+  }
 }
 
 @media only screen and (max-width: 320px) {
