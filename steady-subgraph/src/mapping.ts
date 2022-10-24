@@ -1,12 +1,13 @@
-import {ByteArray , Bytes,BigInt, ethereum, Address, store } from "@graphprotocol/graph-ts"
+import {ByteArray , Bytes,BigInt, ethereum, Address } from "@graphprotocol/graph-ts"
 
 import {
   AlchemistAcademy,
   AlchemistForged,
   Chymed,
 } from "../generated/AlchemistAcademy/AlchemistAcademy"
-import { Split,Merge } from "../generated/templates/AlchemistInstance/Alchemist"
-import { Alchemist, Chyme, Elixir, Transaction} from "../generated/schema"
+// import { Elixir as ElixirNFT} from "../generated/Elixir/Elixir"
+import { ElixirCreated, Split,Merge } from "../generated/templates/AlchemistInstance/Alchemist"
+import { Alchemist, Chyme, Elixir, Transaction, Platform} from "../generated/schema"
 import { AlchemistInstance } from "../generated/templates"
 enum Status{
   Split,
@@ -104,23 +105,64 @@ export function handleChymed(event: Chymed): void {
 }
 
 export function handleSplit(event: Split): void {
+  let elixirEntity = Elixir.load(event.params.tokenid.toHexString())
+  let platformEntity = Platform.load(event.params.chyme.toHexString())
+  if(!platformEntity){
+    platformEntity = new Platform(event.params.chyme.toHexString())
+  }
+  if(!elixirEntity){
+    elixirEntity = new Elixir(event.params.tokenid.toHexString())
+  }
+  elixirEntity.chyme = event.params.chyme.toHexString()
+  elixirEntity.status = "Split"
+  elixirEntity.amount = event.params.splitAmount
+  elixirEntity.vault = event.params.chymeVaultDeployed
+  elixirEntity.tokenId = event.params.tokenid.toI32()
+
+  elixirEntity.save()
+
+  platformEntity.totalSplit = platformEntity.totalSplit.plus(event.params.splitAmount)
+  platformEntity.totalValueLocked = platformEntity.totalValueLocked.plus(event.params.splitAmount)
+
+  platformEntity.save()
+}
+
+export function handleElixirCreated(event: ElixirCreated): void {
   let elixirEntity = Elixir.load(event.params.tokenId.toHexString())
   if(!elixirEntity){
     elixirEntity = new Elixir(event.params.tokenId.toHexString())
   }
-  elixirEntity.chyme = event.params.chyme.toHexString()
-  elixirEntity.status = "Split"
+  let ratioTemp = (BigInt.fromI32(25)).times(BigInt.fromI32(event.params.ratio))
+  elixirEntity.ratioOfSteady = (BigInt.fromI32(75)).minus(ratioTemp)
+  elixirEntity.forgeConstant = elixirEntity.ratioOfSteady.times(event.params.forgePrice)
+  elixirEntity.forgeConstant = elixirEntity.forgeConstant.div(BigInt.fromI32(100))
 
+  elixirEntity.dateSplit =  event.block.timestamp
+  elixirEntity.owner = event.transaction.from
   elixirEntity.save()
 }
 
 export function handleMerge(event: Merge): void {
   let elixirEntity = Elixir.load(event.params.tokenid.toHexString())
+  let platformEntity = Platform.load(event.params.chyme.toHexString())
+  if(!platformEntity){
+    platformEntity = new Platform(event.params.chyme.toHexString())
+  }
   if(!elixirEntity){
     elixirEntity = new Elixir(event.params.tokenid.toHexString())
   }
   elixirEntity.status = "Merged"
+  elixirEntity.dateMerged =  event.block.timestamp;
   elixirEntity.save()
+
+  platformEntity.totalMerged = platformEntity.totalMerged.plus(event.params.mergedAmount)
+  platformEntity.totalValueLocked = platformEntity.totalValueLocked.minus(event.params.mergedAmount)
+  platformEntity.save()
+  
+ 
+}
+export function handleBlock(block: ethereum.Block): void {
+
 }
 // export function handleChymeCreated(call: CreateNewChymeCall): void {
 //   let id = call.transaction.hash.toHexString()

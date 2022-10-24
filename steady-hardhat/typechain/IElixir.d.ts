@@ -29,7 +29,7 @@ interface IElixirInterface extends ethers.utils.Interface {
     "getSteadyRequired(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "safeMint(address,address,uint8,uint256,uint256,uint256,address)": FunctionFragment;
+    "safeMint(address,address,uint8,uint256,uint256,uint256,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -71,7 +71,8 @@ interface IElixirInterface extends ethers.utils.Interface {
       BigNumberish,
       BigNumberish,
       BigNumberish,
-      string
+      string,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
@@ -250,7 +251,8 @@ export class IElixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -328,7 +330,8 @@ export class IElixir extends BaseContract {
     _forgePrice: BigNumberish,
     _amount: BigNumberish,
     _timeToMaturity: BigNumberish,
-    chymeVault: string,
+    _chymeVault: string,
+    _decimals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -403,7 +406,8 @@ export class IElixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -541,7 +545,8 @@ export class IElixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -626,7 +631,8 @@ export class IElixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -275,8 +275,13 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "chymeVault",
+        name: "_chymeVault",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_decimals",
+        type: "uint256",
       },
     ],
     name: "safeMint",

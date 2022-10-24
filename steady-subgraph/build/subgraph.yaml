@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum
     name: AlchemistAcademy
-    network: rinkeby
+    network: goerli
     source:
-      address: "0xC87C9Aa171240129ad5579B5f3A381CFC4CB37d0"
+      address: "0x43603A40B20b2E3988C5a029fd5dfc255fd662aB"
       abi: AlchemistAcademy
     mapping:
       kind: ethereum/events
@@ -27,7 +27,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: AlchemistInstance
-    network: rinkeby
+    network: goerli
     source:
       abi: Alchemist
     mapping:
@@ -41,8 +41,10 @@ templates:
         - name: Alchemist
           file: AlchemistInstance/abis/Alchemist.json
       eventHandlers:
-        - event: Merge(indexed address,uint256,address,uint256)
+        - event: Merge(uint256,address,uint256)
           handler: handleMerge
         - event: Split(indexed address,uint256,address,address,uint256)
           handler: handleSplit
+        - event: ElixirCreated(uint256,uint8,uint256)
+          handler: handleElixirCreated
       file: AlchemistAcademy/AlchemistAcademy.wasm

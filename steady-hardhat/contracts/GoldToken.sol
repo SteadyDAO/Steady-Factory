@@ -7,10 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract BrilliantToken is ERC20, Ownable {
+contract GoldToken is ERC20, Ownable {
     uint8 public decimal = 8;
     uint8 public constant something = 1;
-    constructor(uint8 _decimals) ERC20("BrilliantToken", "BNT") {
+    constructor(uint8 _decimals) ERC20("Gold Token", "CGT") {
         decimal = _decimals;
     }
 

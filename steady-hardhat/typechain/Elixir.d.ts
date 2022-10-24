@@ -24,12 +24,14 @@ interface ElixirInterface extends ethers.utils.Interface {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "academy()": FunctionFragment;
+    "alchemistId()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "calculateParams(uint256)": FunctionFragment;
     "elements(uint256)": FunctionFragment;
-    "generateAttributes(uint256,uint256,uint256)": FunctionFragment;
+    "generateAttributesPartA(uint256,uint256,uint256,uint256)": FunctionFragment;
+    "generateAttributesPartB(string)": FunctionFragment;
     "generateBase64Image(uint256,uint256,string)": FunctionFragment;
     "generateImage(uint256,uint256,string)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -44,7 +46,7 @@ interface ElixirInterface extends ethers.utils.Interface {
     "ownerOf(uint256)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "safeMint(address,address,uint8,uint256,uint256,uint256,address)": FunctionFragment;
+    "safeMint(address,address,uint8,uint256,uint256,uint256,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setAcademy(address)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -67,6 +69,10 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "academy", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "alchemistId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
@@ -81,8 +87,12 @@ interface ElixirInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "generateAttributes",
-    values: [BigNumberish, BigNumberish, BigNumberish]
+    functionFragment: "generateAttributesPartA",
+    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "generateAttributesPartB",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "generateBase64Image",
@@ -143,7 +153,8 @@ interface ElixirInterface extends ethers.utils.Interface {
       BigNumberish,
       BigNumberish,
       BigNumberish,
-      string
+      string,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
@@ -184,6 +195,10 @@ interface ElixirInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "academy", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "alchemistId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
@@ -193,7 +208,11 @@ interface ElixirInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "elements", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "generateAttributes",
+    functionFragment: "generateAttributesPartA",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "generateAttributesPartB",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -367,6 +386,8 @@ export class Elixir extends BaseContract {
 
     academy(overrides?: CallOverrides): Promise<[string]>;
 
+    alchemistId(overrides?: CallOverrides): Promise<[string]>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -396,7 +417,16 @@ export class Elixir extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
+      [
+        BigNumber,
+        number,
+        BigNumber,
+        string,
+        string,
+        BigNumber,
+        string,
+        BigNumber
+      ] & {
         amount: BigNumber;
         ratioOfSteady: number;
         forgePrice: BigNumber;
@@ -404,13 +434,20 @@ export class Elixir extends BaseContract {
         alchemistId: string;
         timeToMaturity: BigNumber;
         chymeVault: string;
+        decimals: BigNumber;
       }
     >;
 
-    generateAttributes(
+    generateAttributesPartA(
       tokenId: BigNumberish,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
+      divisor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    generateAttributesPartB(
+      elixirCurrentSteadyValue: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -495,7 +532,8 @@ export class Elixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -562,6 +600,8 @@ export class Elixir extends BaseContract {
 
   academy(overrides?: CallOverrides): Promise<string>;
 
+  alchemistId(overrides?: CallOverrides): Promise<string>;
+
   approve(
     to: string,
     tokenId: BigNumberish,
@@ -591,7 +631,16 @@ export class Elixir extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
+    [
+      BigNumber,
+      number,
+      BigNumber,
+      string,
+      string,
+      BigNumber,
+      string,
+      BigNumber
+    ] & {
       amount: BigNumber;
       ratioOfSteady: number;
       forgePrice: BigNumber;
@@ -599,13 +648,20 @@ export class Elixir extends BaseContract {
       alchemistId: string;
       timeToMaturity: BigNumber;
       chymeVault: string;
+      decimals: BigNumber;
     }
   >;
 
-  generateAttributes(
+  generateAttributesPartA(
     tokenId: BigNumberish,
     currentPrice: BigNumberish,
     forgeConstant: BigNumberish,
+    divisor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  generateAttributesPartB(
+    elixirCurrentSteadyValue: string,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -687,7 +743,8 @@ export class Elixir extends BaseContract {
     _forgePrice: BigNumberish,
     _amount: BigNumberish,
     _timeToMaturity: BigNumberish,
-    chymeVault: string,
+    _chymeVault: string,
+    _decimals: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -749,6 +806,8 @@ export class Elixir extends BaseContract {
 
     academy(overrides?: CallOverrides): Promise<string>;
 
+    alchemistId(overrides?: CallOverrides): Promise<string>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -775,7 +834,16 @@ export class Elixir extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, BigNumber, string, string, BigNumber, string] & {
+      [
+        BigNumber,
+        number,
+        BigNumber,
+        string,
+        string,
+        BigNumber,
+        string,
+        BigNumber
+      ] & {
         amount: BigNumber;
         ratioOfSteady: number;
         forgePrice: BigNumber;
@@ -783,13 +851,20 @@ export class Elixir extends BaseContract {
         alchemistId: string;
         timeToMaturity: BigNumber;
         chymeVault: string;
+        decimals: BigNumber;
       }
     >;
 
-    generateAttributes(
+    generateAttributesPartA(
       tokenId: BigNumberish,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
+      divisor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    generateAttributesPartB(
+      elixirCurrentSteadyValue: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -871,7 +946,8 @@ export class Elixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1038,6 +1114,8 @@ export class Elixir extends BaseContract {
 
     academy(overrides?: CallOverrides): Promise<BigNumber>;
 
+    alchemistId(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -1058,10 +1136,16 @@ export class Elixir extends BaseContract {
 
     elements(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    generateAttributes(
+    generateAttributesPartA(
       tokenId: BigNumberish,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
+      divisor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    generateAttributesPartB(
+      elixirCurrentSteadyValue: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1142,7 +1226,8 @@ export class Elixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1210,6 +1295,8 @@ export class Elixir extends BaseContract {
 
     academy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    alchemistId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -1236,10 +1323,16 @@ export class Elixir extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    generateAttributes(
+    generateAttributesPartA(
       tokenId: BigNumberish,
       currentPrice: BigNumberish,
       forgeConstant: BigNumberish,
+      divisor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    generateAttributesPartB(
+      elixirCurrentSteadyValue: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1320,7 +1413,8 @@ export class Elixir extends BaseContract {
       _forgePrice: BigNumberish,
       _amount: BigNumberish,
       _timeToMaturity: BigNumberish,
-      chymeVault: string,
+      _chymeVault: string,
+      _decimals: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

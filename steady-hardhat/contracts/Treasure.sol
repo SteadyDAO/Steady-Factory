@@ -24,15 +24,21 @@ library Treasure {
                 ));
     }
 
-    function generateHeader() public pure returns (bytes memory) {
+    function generateStyles() public pure returns (bytes memory) {
         return abi.encodePacked('<svg class="svgBody" width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">',
                 '<style><![CDATA[svg text{stroke:none}]]></style>',
                 '<style type="text/css">',
 	            '.st0{fill:#FFFFFF;}.st1{display:none;fill:none;stroke:#FFFFFF;stroke-width:0.5;}',
                 '.st2{fill:#B0EFEB;}.st3{fill:#EDFFA9;}.st4{display:none;}.st5{fill:#FFFFFF;}',
                 '.st10{fill:#D3D3D3;}.st11{fill:#FFFFFF;stroke:#939393;}',
-                '.st20{fill:#FFB031;} .st21{fill:#FFA300;} .st22{fill:#E58D00;} ', 
-                '</style>',
+                '.st20{fill:#FFB031;}.st21{fill:#FFA300;}.st22{fill:#E58D00;}', 
+                '</style>');
+    }
+
+
+    function generateHeader() public pure returns (bytes memory) {
+        return abi.encodePacked(
+                generateStyles(),
                 '<g id="Base_Layer">',
                 '<path d="M10,0h280c5.5,0,10,4.5,10,10v280c0,5.5-4.5,10-10,10H10c-5.5,0-10-4.5-10-10V10C0,4.5,4.5,0,10,0z"/>',
                 '<rect y="64.2" class="st0" width="300" height="117.4"/>',

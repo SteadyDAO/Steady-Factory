@@ -137,10 +137,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AlchemistAcademy__factory>;
     getContractFactory(
-      name: "BrilliantToken",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BrilliantToken__factory>;
-    getContractFactory(
       name: "ChymeVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ChymeVault__factory>;
@@ -148,6 +144,10 @@ declare module "hardhat/types/runtime" {
       name: "Elixir",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Elixir__factory>;
+    getContractFactory(
+      name: "GoldToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GoldToken__factory>;
     getContractFactory(
       name: "IAcademy",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -353,11 +353,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AlchemistAcademy>;
     getContractAt(
-      name: "BrilliantToken",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BrilliantToken>;
-    getContractAt(
       name: "ChymeVault",
       address: string,
       signer?: ethers.Signer
@@ -367,6 +362,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Elixir>;
+    getContractAt(
+      name: "GoldToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GoldToken>;
     getContractAt(
       name: "IAcademy",
       address: string,

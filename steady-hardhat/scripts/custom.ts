@@ -1,6 +1,13 @@
 import { ethers } from "hardhat";
 import * as hre from "hardhat";
-
+import { Wallet } from 'ethers';
+import {  
+  AlchemistAcademy,
+  Alchemist, 
+  SteadyDAOReward,
+  SimpleToken,
+  Steady,
+  Elixir } from '../typechain';
 const tokenAddr = "0x4bae94FC93deE9712d94451FC434421F883a3300";
 const chymeAddress = '0x326c977e6efc84e512bb9c30f76e30c160ed06fb';
 const oracleAddress = '0x12162c3E810393dEC01362aBf156D7ecf6159528';
@@ -15,9 +22,14 @@ const daiAbi = [
 ];
 
 // The Contract object
+let wallet: Wallet, wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 
 async function main() {
-
+  const MINTER_ROLE = "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6";
+  [wallet, wallet2, Wallet3, treasury, DAOAddress] = await (ethers as any).getSigners()
+  const ElixirFactory = await ethers.getContractFactory("Elixir");
+  // elixirImpl = await ElixirFactory.connect(wallet2).deploy("NFT","Elixir", treasureChest.address) as Elixir;
+  const elixirImpl = await ElixirFactory.connect(wallet2).attach("0x403aD48F8c8507dD193fbe4453EF2A410EB402cD") as Elixir;
   // const accounts = await ethers.getSigners()
   // let tokenContract = new ethers.Contract(tokenAddr, daiAbi, accounts[0]).connect(accounts[0]);
   // let overrides = {
@@ -28,7 +40,11 @@ async function main() {
   // let uri = await tokenContract.getLatestAlchemist();
   // console.log(uri);
   // // return tokenContract.address;
-  return "0x5EB1303916F2a56455f563B5a5b3Fa33b3Ed498E";
+
+  await elixirImpl.connect(wallet2).grantRole(MINTER_ROLE, "0xa9e966aB5dAA049a0caB8075783b05716d35522a"); 
+
+
+  return "";
 }
 
 async function verify(contractAddress:string, ...args:Array<any>) {
@@ -52,7 +68,7 @@ main()
   .then( async (deployedData) => {
     const accounts = await ethers.getSigners()
     // await delay(50000);
-    await verify(deployedData);
+    // await verify(deployedData);
 
     process.exit(0)
   })

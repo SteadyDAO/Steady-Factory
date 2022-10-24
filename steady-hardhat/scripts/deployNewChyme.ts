@@ -12,14 +12,14 @@ import {
   AlchemistAcademy,
   Alchemist, 
   SteadyDAOReward,
-  BrilliantToken,
+  GoldToken,
   Steady,
   Elixir } from '../typechain';
 
 let wallet: Wallet, wallet2: Wallet, Wallet3: Wallet, chymeHolder: Wallet, treasury: Wallet, DAOAddress:Wallet;
 let alchemistAcademy: AlchemistAcademy;
 
-let stt: BrilliantToken;
+let cgt: GoldToken;
 let steadyImpl: Contract;
 let elixirImpl: Contract;
 let alchI: Contract;
@@ -33,22 +33,25 @@ async function main() {
   console.log("addresses ",wallet2.address,DAOAddress.address)
 
 
-  const BrilliantToken = await ethers.getContractFactory("BrilliantToken");
-  stt = await BrilliantToken.connect(wallet2).deploy(8) as BrilliantToken;
-  await stt.deployed();
+  const GoldToken = await ethers.getContractFactory("GoldToken");
+  cgt = await GoldToken.connect(wallet2).deploy(8) as GoldToken;
+  await cgt.deployed();
   const AlchemistAcademyFactory = await ethers.getContractFactory("AlchemistAcademy");
-  alchemistAcademy = await AlchemistAcademyFactory.attach("0x0b3F91A7bf157a40e9F809765289b963728D3C20") as AlchemistAcademy;
+  alchemistAcademy = await AlchemistAcademyFactory.attach("0xDCAfb3962c0031B3295490A10D36Aad4D64Da65f") as AlchemistAcademy;
   console.log("AlchemistAcademyFactory deployed to:", alchemistAcademy.address);
 
 
-  const newChyme =  await alchemistAcademy.connect(DAOAddress).createNewChyme( 
-      8,
-      0,
-      1,
-      stt.address,                
-      "0x81570059A0cb83888f1459Ec66Aad1Ac16730243",
-      157680000//5 years in seconds
-      );
+      const newChyme =  await alchemistAcademy.connect(DAOAddress).createNewChyme( 
+        { 
+          "decimals":8,
+          "fees":0,
+          "DAOApproved":1,
+          "oracleAddress":"0x062e4C197Cb2b6a772E27F9321e005A729888D17",
+          "steadyImplForChyme":cgt.address,
+          "symbol":"PGT",
+          "timeToMaturity":94608000,
+          "steadyDAOReward":"0x587E78b513b1f1192B726e02b53eF93BC9a9e1de"}, cgt.address
+          );
     console.log("createNewChyme done");
 
 
@@ -56,12 +59,12 @@ async function main() {
   await newChyme.wait();
   console.log("Academy deployed to:", alchemistAcademy.address);
   console.log("Now verifying...\n",
-  stt.address,"stt Address\n",
+  cgt.address,"cgt Address\n",
   
   DAOAddress.address,"DAOAddress Address\n",);
 
 
-  await verify(stt.address, 18);
+  await verify(cgt.address, 8);
   console.log("Verified!");
   return alchemistAcademy.address;
 }
