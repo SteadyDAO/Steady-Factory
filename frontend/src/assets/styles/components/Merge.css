@@ -48,7 +48,7 @@
 .MergeSteadyTokensScrollxContainer {
   display: flex;
   flex-direction: column;
-  overflow-x: auto;
+  overflow: auto hidden;
   width: 100%;
 }
 
