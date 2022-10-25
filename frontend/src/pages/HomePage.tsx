@@ -5,6 +5,7 @@ import { steadyApolloClient } from "../helpers/Subgraph";
 import { ApolloProvider } from "@apollo/client";
 import Platform from "../components/Platform";
 import steadyIntroGif from '../assets/images/steady-intro.gif';
+// import RecentActivity from "../components/RecentActivity";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const HomePage = () => {
 
       <ApolloProvider client={steadyApolloClient}>
         <Platform />
+        {/* <RecentActivity /> */}
       </ApolloProvider>
     </div>
   );

@@ -19,7 +19,7 @@ const Platform = () => {
 
   return (
     <div className="PlatformContainer">
-      <div className="PlatformTokensHeaderContainer">
+      <div className="PlatformHeaderContainer">
         <span className="PlatformHeaderTitle">Tokens</span>
       </div>
       <div className="PlatformScrollxContainer">
