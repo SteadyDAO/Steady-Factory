@@ -30,8 +30,11 @@ code {
   font-family: var(--fontFamily);
 }
 
-.MuiTextField-root {
+.MuiInputBase-root {
   color: var(--textColor) !important;
+}
+
+.MuiTextField-root {
   font-size: 1.1rem !important;
 }
 
