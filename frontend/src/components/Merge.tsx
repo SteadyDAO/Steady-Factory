@@ -122,37 +122,37 @@ const Merge = () => {
             </div>
           </div> :
           <div className="MergeLeveragedTokensContainer">
+          <div className="MergeLeveragedTokensFiltersContainer">
+            <span className="MergeLeveragedTokensFiltersLabel">Filter by </span>
+            <Select
+              className="MergeLeveragedTokensFiltersSelect"
+              multiple
+              displayEmpty
+              value={nftsFiltersValue}
+              onChange={onFiltersChange}
+              renderValue={(selected) => {
+                if (selected.length === 0) {
+                  return <em>Select Tokens</em>;
+                }
+                return selected.join(', ');
+              }}
+            >
+              <MenuItem disabled value="">
+                <span className="MergeLeveragedTokensFiltersLabel">Select Tokens</span>
+              </MenuItem>
+              {nftsFiltersItems.map((item: string) => (
+                <MenuItem key={item} value={item}>
+                  <Checkbox checked={nftsFiltersValue.indexOf(item) > -1} />
+                  <ListItemText primary={item} />
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
             {getElixirsByAccountLoading ?
-              <div className="ElixirNftsSpinnerContainer">
+              <div className="MergeSpinnerContainer">
                 <CircularProgress color="secondary" size={80} />
               </div> :
               <>
-                <div className="MergeLeveragedTokensFiltersContainer">
-                  <span className="MergeLeveragedTokensFiltersLabel">Filter by </span>
-                  <Select
-                    className="MergeLeveragedTokensFiltersSelect"
-                    multiple
-                    displayEmpty
-                    value={nftsFiltersValue}
-                    onChange={onFiltersChange}
-                    renderValue={(selected) => {
-                      if (selected.length === 0) {
-                        return <em>Select Tokens</em>;
-                      }
-                      return selected.join(', ');
-                    }}
-                  >
-                    <MenuItem disabled value="">
-                      <span className="MergeLeveragedTokensFiltersLabel">Select Tokens</span>
-                    </MenuItem>
-                    {nftsFiltersItems.map((item: string) => (
-                      <MenuItem key={item} value={item}>
-                        <Checkbox checked={nftsFiltersValue.indexOf(item) > -1} />
-                        <ListItemText primary={item} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
                 {elixirNfts.length > 0 ?
                   <>
                     <span className="NoElixirNftMessage">Please note that it will take a while for these NFT's to appear here and on Opensea!</span>
