@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import ElixirNft from "./ElixirNft";
-import { CircularProgress, IconButton, SelectChangeEvent, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Checkbox, CircularProgress, IconButton, ListItemText, MenuItem, Select, SelectChangeEvent, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from "@apollo/client";
 import { GET_ALCHEMISTS, GET_ELIXIR_BY_ACCOUNT } from "../graphql/alchemist.queries";
 import { IAlchemist, IElixir } from "../models/Alchemist";
 import TokenItem from "./TokenItem";
-import { IAppConfig } from "../models/Base";
-import { getAppConfig } from "../helpers/Utilities";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 const Merge = () => {
-  const config: IAppConfig = getAppConfig();
   const [elixirNfts, setElixirNfts] = useState<Array<any>>([]);
   const [alchemists, setAlchemists] = useState<Array<IAlchemist>>([]);
   const [toggle, setToggle] = useState<string>('tokens');
@@ -21,8 +18,7 @@ const Merge = () => {
     notifyOnNetworkStatusChange: true
   });
 
-  const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
+  const { address } = useAccount();
   const { data: getElixirsByAccount, loading: getElixirsByAccountLoading, refetch: refetchElixirsByAccount } = useQuery(GET_ELIXIR_BY_ACCOUNT, {
     variables: {
       account: address,
@@ -131,6 +127,32 @@ const Merge = () => {
                 <CircularProgress color="secondary" size={80} />
               </div> :
               <>
+                <div className="MergeLeveragedTokensFiltersContainer">
+                  <span className="MergeLeveragedTokensFiltersLabel">Filter by </span>
+                  <Select
+                    className="MergeLeveragedTokensFiltersSelect"
+                    multiple
+                    displayEmpty
+                    value={nftsFiltersValue}
+                    onChange={onFiltersChange}
+                    renderValue={(selected) => {
+                      if (selected.length === 0) {
+                        return <em>Select Tokens</em>;
+                      }
+                      return selected.join(', ');
+                    }}
+                  >
+                    <MenuItem disabled value="">
+                      <span className="MergeLeveragedTokensFiltersLabel">Select Tokens</span>
+                    </MenuItem>
+                    {nftsFiltersItems.map((item: string) => (
+                      <MenuItem key={item} value={item}>
+                        <Checkbox checked={nftsFiltersValue.indexOf(item) > -1} />
+                        <ListItemText primary={item} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
                 {elixirNfts.length > 0 ?
                   <>
                     <span className="NoElixirNftMessage">Please note that it will take a while for these NFT's to appear here and on Opensea!</span>

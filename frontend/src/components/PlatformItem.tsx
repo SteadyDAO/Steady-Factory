@@ -16,27 +16,21 @@ const PlatformItem = (props: {
     addressOrName: props.platform.id,
     contractInterface: getABI('Chyme'),
     functionName: 'name',
-    chainId: config.NETWORK.CHAIN_ID,
-    watch: true,
-    cacheTime: 3000
+    chainId: config.NETWORK.CHAIN_ID
   });
 
   const { data: symbol } = useContractRead({
     addressOrName: props.platform.id,
     contractInterface: getABI('Chyme'),
     functionName: 'symbol',
-    chainId: config.NETWORK.CHAIN_ID,
-    watch: true,
-    cacheTime: 3000
+    chainId: config.NETWORK.CHAIN_ID
   });
 
   const { data: decimals } = useContractRead({
     addressOrName: props.platform.id,
     contractInterface: getABI('Chyme'),
     functionName: 'decimals',
-    chainId: config.NETWORK.CHAIN_ID,
-    watch: true,
-    cacheTime: 3000
+    chainId: config.NETWORK.CHAIN_ID
   });
 
   return (

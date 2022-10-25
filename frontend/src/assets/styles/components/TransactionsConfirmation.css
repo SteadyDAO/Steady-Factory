@@ -3,6 +3,7 @@
   background: var(--cardBgColor);
   display: flex;
   flex-direction: column;
+  min-width: 300px;
 }
 
 .TransactionsConfirmationHeaderContainer {

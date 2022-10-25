@@ -24,6 +24,7 @@
     height: calc(100vh - 140px);
     margin-bottom: 70px;
     overflow-y: auto;
+    padding: 50px 1rem;
   }
 }
 

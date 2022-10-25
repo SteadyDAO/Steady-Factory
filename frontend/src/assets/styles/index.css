@@ -30,8 +30,7 @@ code {
   font-family: var(--fontFamily);
 }
 
-.MuiInputBase-root {
-  border-radius: 8px !important;
+.MuiTextField-root {
   color: var(--textColor) !important;
   font-size: 1.1rem !important;
 }
@@ -59,4 +58,9 @@ code {
 
 .MuiSkeleton-root {
   background-color: #a2a4a766 !important;
+}
+
+.MuiSelect-select {
+  padding: 6px 32px 6px 10px !important;
+  color: white !important;
 }

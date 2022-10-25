@@ -9,7 +9,7 @@
   "STEADY_SUBGRAPH_URL": "https://api.thegraph.com/subgraphs/name/vitamind3inj/steady-gor",
   "OPENSEA_ASSETS_URL": "https://testnets.opensea.io/assets/goerli",
   "CONTRACTS_ADDRESS": {
-    "Academy": "0x43603A40B20b2E3988C5a029fd5dfc255fd662aB",
-    "ElixirNft": "0x403aD48F8c8507dD193fbe4453EF2A410EB402cD"
+    "Academy": "0x62855d95CB84226611596f311137C39F6c7BE63b",
+    "ElixirNft": "0x6DA646A26d69BB547b408401FdF30bcC8D90Ba80"
   }
 }

@@ -27,7 +27,7 @@ const Header = () => {
         }
         {isWallet ?
           <>
-          <ConnectButton />
+            <ConnectButton />
           </> : <></>
         }
       </div>

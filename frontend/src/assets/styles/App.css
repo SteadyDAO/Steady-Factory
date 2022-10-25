@@ -35,7 +35,7 @@
 
 @media only screen and (max-width: 640px) {
   .AppContainer {
-    padding: 0 1rem;
+    padding: 0;
   }
 }
 
