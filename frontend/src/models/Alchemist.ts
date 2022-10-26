@@ -26,6 +26,8 @@ export interface IElixir {
   dateMerged: string;
   vault: string;
   owner: string;
+  splitTxId: string;
+  mergeTxId: string;
 }
 
 export type IStatus = 'Split' | 'Merged';

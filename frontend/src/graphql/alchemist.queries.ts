@@ -11,6 +11,29 @@ export const GET_PLATFORMS = gql`
   }
 `;
 
+export const GET_RECENT_ACTIVITY = gql`
+  query GetRecentActivity {
+    elixirs (
+      first: 5,
+      orderBy: dateSplit,
+      orderDirection: desc
+    ) {
+      id
+      status
+      amount
+      dateSplit
+      dateMerged
+      splitTxId
+      mergeTxId
+      owner
+      chyme {
+        id
+        symbol
+      }
+    }
+  }
+`;
+
 export const GET_ALCHEMISTS = gql`
   query GetAlchemists {
     alchemists {
