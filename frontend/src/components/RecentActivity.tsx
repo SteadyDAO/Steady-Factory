@@ -45,12 +45,12 @@ const RecentActivity = () => {
                       <span className="RecentActivityItemInfoTime">{moment(+elixir.dateSplit * 1000).format('DD MMMM yyyy')}</span>
                       <Tooltip title="View address on explorer">
                         <span className="RecentActivityItemInfoAddress" onClick={() => {
-                          window.open(`${config.NETWORK.BLOCK_EXPLORER}/address/${elixir.owner}`, '_blank');
+                          window.open(`${config.NETWORK.BLOCK_EXPLORER}address/${elixir.owner}`, '_blank');
                         }}>{elixir.owner}</span>
                       </Tooltip>
                       <Tooltip title="View transaction on explorer">
                         <OpenInNewIcon className="RecentActivityItemInfoIcon" fontSize="inherit" onClick={() => {
-                          window.open(`${config.NETWORK.BLOCK_EXPLORER}/tx/${elixir.splitTxId}`, '_blank');
+                          window.open(`${config.NETWORK.BLOCK_EXPLORER}tx/${elixir.splitTxId}`, '_blank');
                         }} />
                       </Tooltip>
                     </div>
@@ -64,12 +64,12 @@ const RecentActivity = () => {
                       <span className="RecentActivityItemInfoTime">{moment(+elixir.dateMerged * 1000).format('DD MMMM yyyy')}</span>
                       <Tooltip title="View address on explorer">
                         <span className="RecentActivityItemInfoAddress" onClick={() => {
-                          window.open(`${config.NETWORK.BLOCK_EXPLORER}/address/${elixir.owner}`, '_blank');
+                          window.open(`${config.NETWORK.BLOCK_EXPLORER}address/${elixir.owner}`, '_blank');
                         }}>{elixir.owner}</span>
                       </Tooltip>
                       <Tooltip title="View transaction on explorer">
                         <OpenInNewIcon className="RecentActivityItemInfoIcon" fontSize="inherit" onClick={() => {
-                          window.open(`${config.NETWORK.BLOCK_EXPLORER}/tx/${elixir.mergeTxId}`, '_blank');
+                          window.open(`${config.NETWORK.BLOCK_EXPLORER}tx/${elixir.mergeTxId}`, '_blank');
                         }} />
                       </Tooltip>
                     </div>
