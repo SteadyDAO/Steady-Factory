@@ -373,7 +373,7 @@ const Split = () => {
             <div className="SplitReceiveContainer">
               <div className="SplitReceiveItemContainer">
                 <img width={24} height={24} src={ethImage} alt="Token Icon" />
-                <span className="SplitReceiveItemText">{(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString()} s{symbol} (75%)</span>
+                <span className="SplitReceiveItemText">~ {(Math.floor((+amountControl.value * 75 * oraclePrice) / 100)).toLocaleString()} s{symbol} (75%)</span>
               </div>
               <AddIcon fontSize="large" />
               <div className="SplitReceiveItemContainer">

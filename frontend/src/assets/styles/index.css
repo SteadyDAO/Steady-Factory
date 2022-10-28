@@ -65,5 +65,9 @@ code {
 
 .MuiSelect-select {
   padding: 6px 32px 6px 10px !important;
-  color: white !important;
+  color: var(--textColor) !important;
+}
+
+.MuiSelect-icon {
+  color: var(--textColor) !important;
 }

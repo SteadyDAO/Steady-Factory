@@ -125,6 +125,7 @@ const Merge = () => {
           <div className="MergeLeveragedTokensFiltersContainer">
             <span className="MergeLeveragedTokensFiltersLabel">Filter by </span>
             <Select
+              color="secondary"
               className="MergeLeveragedTokensFiltersSelect"
               multiple
               displayEmpty
