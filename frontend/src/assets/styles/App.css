@@ -1,0 +1,46 @@
+.AppWrapper {
+  align-items: center;
+  background: var(--bgColor);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+.AppContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 70px);
+  overflow-y: auto;
+  width: 100%;
+}
+
+@media only screen and (max-width: 1366px) {
+  .AppContainer {
+    padding: 0 50px;
+  }
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+  .AppContainer {
+    padding: 0 30px;
+  }
+}
+
+@media only screen and (max-width: 640px) {
+  .AppContainer {
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

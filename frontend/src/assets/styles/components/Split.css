@@ -1,0 +1,152 @@
+.SplitContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  max-width: 550px;
+  width: 100%;
+}
+
+.SplitSectionContainer {
+  background: var(--cardBgColor);
+  border-radius: .65rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem;
+  width: 100%;
+}
+
+.SplitIcon {
+  font-size: 3rem !important;
+  transform: rotate(-180deg);
+}
+
+.SplitSectionTitleContainer {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  min-height: 30px;
+  width: 100%;
+}
+
+.SplitSectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.SplitBalanceContainer {
+  align-items: center;
+  display: flex;
+  gap: .35rem;
+}
+
+.SplitBalanceText {
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.SplitGetTokenIcon {
+  cursor: pointer;
+  font-size: 1rem !important;
+}
+
+.SplitButton {
+  font-family: var(--fontFamily) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  height: 50px !important;
+  text-transform: none !important;
+  width: 250px !important;
+}
+
+.SplitAmountContainer {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.SplitAmountButton {
+  align-items: center !important;
+  display: flex !important;
+  gap: .5rem !important;
+  padding: .35rem 1.25rem !important;
+  min-width: 120px !important;
+}
+
+.SplitAmountButtonText {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.SplitAmountControl {
+  background: var(--bgColor);
+  border-radius: .25rem;
+  width: 100%;
+}
+
+.SplitMaxAmountButton {
+  height: 2rem !important;
+}
+
+.SplitReceiveContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+}
+
+.SplitReceiveItemContainer {
+  align-items: center;
+  background: var(--bgColor);
+  border-radius: .5rem;
+  display: flex;
+  gap: .25rem;
+  justify-content: center;
+  padding: 1rem;
+  width: 100%;
+}
+
+.SplitReceiveItemNftContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.SplitReceiveItemText {
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.SplitFormControlErrorMessage {
+  font-size: .8rem;
+  color: #FF494A;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+  .SplitReceiveContainer {
+    flex-direction: column;
+  }
+
+  .SplitAmountButton {
+    min-width: 105px !important;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

@@ -1,0 +1,151 @@
+.MergeContainer {
+  background: var(--cardBgColor);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.MergeHeaderContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.MergeHeaderTitleContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+}
+
+.MergeHeaderTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.MergeToggleButtons {
+  border: 1px var(--greyColor) solid !important;
+  border-radius: 1rem !important;
+}
+
+.MergeToggleButton {
+  border: none !important;
+  border-radius: 1rem !important;
+  color: var(--textColor) !important;
+  padding: .35rem 1rem !important;
+  text-transform: none !important;
+}
+
+.MergeToggleButton.Mui-selected {
+  background: var(--linkColor) !important;
+  border: 1px var(--greyColor) solid !important;
+  font-weight: 700 !important;
+}
+
+.MergeSteadyTokensScrollxContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto hidden;
+  width: 100%;
+}
+
+.MergeSteadyTokensContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: 700px;
+  width: 100%;
+}
+
+.MergeSteadyTokensHeaderContainer {
+  align-items: center;
+  border-bottom: 1px var(--greyColor) solid;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+.MergeSteadyTokensHeaderToken {
+  font-weight: 600;
+  width: 30%;
+}
+
+.MergeSteadyTokensHeaderBalance {
+  font-weight: 600;
+  width: 30%;
+}
+
+.MergeSteadyTokensHeaderTotalSupply {
+  font-weight: 600;
+  width: 40%;
+}
+
+.MergeSpinnerContainer {
+  align-items: center;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+.MergeLeveragedTokensContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.MergeLeveragedTokensFiltersContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+  padding: .5rem 0;
+}
+
+.MergeLeveragedTokensFiltersSelect {
+  min-width: 150px;
+}
+
+.MergeLeveragedTokensFiltersLabel {
+  color: var(--textColor);
+}
+
+.ElixirNftsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.NoElixirNftMessage {
+  font-size: .85rem;
+  font-weight: 600;
+  padding: .5rem 0;
+  width: 100%;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+  .MergeHeaderContainer {
+    flex-direction: column;
+    gap: .25rem;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

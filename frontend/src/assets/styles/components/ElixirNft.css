@@ -1,0 +1,78 @@
+.ElixirNftContainer {
+  background: var(--bgColor);
+  border-radius: .5rem;
+  padding: .5rem;
+}
+
+.ElixirNftInfoContainer {
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.ElixirNftInfoLabelContainer,
+.ElixirNftInfoValueContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  justify-content: space-between;
+  width: 50%;
+}
+
+.ElixirNftInfoValueContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  justify-content: space-between;
+  width: 35%;
+}
+
+.ElixirNftInfoLabel {
+  font-size: .8rem;
+}
+
+.ElixirNftInfoValue {
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.ElixirNftActionsContainer {
+  width: 15%;
+}
+
+.MergeConfirmationContent {
+  color: var(--textColor);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-bottom: 1rem;
+  min-width: 250px;
+  padding: 0 1.5rem;
+}
+
+.MergeConfirmationContentRow {
+  align-items: center;
+  display: flex;
+  gap: .25rem;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

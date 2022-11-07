@@ -1,0 +1,80 @@
+.HomePageContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 50px 0;
+}
+
+.HomepageIntroContainer {
+  display: flex;
+  justify-content: flex-start;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.HomepageIntroSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 50%;
+}
+
+h3 {
+  padding-right: 50px;
+}
+
+.SteadyIntroGif {
+  border-radius: 25%;
+  width: 100%;
+}
+
+.HomepageLaunchAppButton {
+  height: 45px;
+  width: 220px;
+}
+
+.HomepageLaunchAppButtonText {
+  font-size: 1.1rem;
+  margin-left: .5rem;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+  .HomePageContainer {
+    padding: 0 1rem 50px;
+  }
+
+  .HomepageIntroContainer {
+    flex-direction: column-reverse;
+  }
+
+  .HomepageIntroSection {
+    width: 100%;
+  }
+
+  .SteadyIntroGif {
+    padding: 0 3rem;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+
+  .SteadyIntroGif {
+    padding: 1rem;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+}

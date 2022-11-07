@@ -1,0 +1,42 @@
+.TokensItemContainer {
+  align-items: center;
+  border-bottom: 1px var(--greyColor) solid;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+.TokensItemTokenContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+  width: 30%;
+}
+
+.TokensItemTokenNameContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.TokensItemTokenSymbolContainer {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+}
+
+.TokensItemTokenSymbol {
+  font-weight: 600;
+}
+
+.TokensItemTokenName {
+  font-size: .8rem;
+}
+
+.TokensItemTokenBalance {
+  width: 30%;
+}
+
+.TokensItemTokenTotalSupply {
+  width: 40%;
+}

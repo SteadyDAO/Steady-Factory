@@ -1,0 +1,56 @@
+.HeaderContainer {
+  align-items: center;
+  display: flex;
+  height: 70px;
+  justify-content: space-between;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.LogoText {
+  cursor: pointer;
+  font-family: 'Comic Neue', cursive;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.RightSideContainer {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+@media only screen and (max-width: 1366px) {
+  .HeaderContainer {
+    padding: 0 50px;
+  }
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+  .HeaderContainer {
+    padding: 0 30px;
+  }
+}
+
+@media only screen and (max-width: 640px) {
+  .HeaderContainer {
+    justify-content: center;
+    padding: 0;
+  }
+  .RightSideContainer {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

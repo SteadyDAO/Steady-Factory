@@ -1,0 +1,46 @@
+.BottomNavigateContainer {
+  display: none;
+  bottom: 0;
+  height: 70px;
+  left: 0;
+  position: fixed;
+  width: 100%;
+}
+
+.BottomNavigate {
+  background: var(--cardBgColor) !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.BottomNavigateAction {
+  color: #FFFFFF !important;
+}
+
+.BottomNavigateActionSelected {
+  color: var(--linkColor) !important;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+  .BottomNavigateContainer {
+    display: flex;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}

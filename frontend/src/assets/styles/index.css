@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+@import url(./App);
+@import url(./pages);
+@import url(./components);
+
+body {
+  /* Variables */
+  --bgColor: #101213;
+  --cardBgColor: #1E1F25;
+  --textColor: #F1F5F9;
+  --linkColor: #2345DC;
+  --greyColor: #A2A4A7;
+  --fontFamily: 'Inter', sans-serif;
+}
+
+body {
+  color: var(--textColor);
+  margin: 0;
+  padding: 0;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: var(--fontFamily);
+}
+
+.MuiInputBase-root {
+  color: var(--textColor) !important;
+}
+
+.MuiTextField-root {
+  font-size: 1.1rem !important;
+}
+
+.MuiStepLabel-root
+.Mui-completed {
+  color: #FFFFFF !important;
+}
+
+.CompletedColor {
+  color: #12da33 !important;
+}
+
+.ErrorColor {
+  color: #dd563e !important;
+}
+
+.MuiPaper-root {
+  background: var(--cardBgColor) !important;
+}
+
+.MuiListItemText-root {
+  color: var(--textColor);
+}
+
+.MuiSkeleton-root {
+  background-color: #a2a4a766 !important;
+}
+
+.MuiSelect-select {
+  padding: 6px 32px 6px 10px !important;
+  color: var(--textColor) !important;
+}
+
+.MuiSelect-icon {
+  color: var(--textColor) !important;
+}

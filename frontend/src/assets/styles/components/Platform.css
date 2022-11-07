@@ -1,0 +1,91 @@
+.PlatformContainer {
+  background: var(--cardBgColor);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  max-width: 1200px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.PlatformHeaderContainer {
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.PlatformHeaderTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.PlatformScrollxContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto hidden;
+  width: 100%;
+}
+
+.PlatformTokensContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: 900px;
+  width: 100%;
+}
+
+.PlatformTokensHeaderContainer {
+  align-items: center;
+  border-bottom: 1px var(--greyColor) solid;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+.PlatformTokensHeaderToken {
+  font-weight: 600;
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalValueLocked {
+  font-weight: 600;
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalSplit {
+  font-weight: 600;
+  width: 25%;
+}
+
+.PlatformTokensHeaderTotalMerged {
+  font-weight: 600;
+  width: 25%;
+}
+
+.PlatformSpinnerContainer {
+  align-items: center;
+  display: flex;
+  padding: 1rem .8rem;
+  width: 100%;
+}
+
+@media only screen and (max-width: 1366px) {
+}
+
+@media only screen and (max-width: 1180px) {
+}
+
+@media only screen and (max-width: 1024px) {
+}
+
+@media only screen and (max-width: 960px) {
+}
+
+@media only screen and (max-width: 640px) {
+}
+
+@media only screen and (max-width: 480px) {
+}
+
+@media only screen and (max-width: 320px) {
+}
